@@ -32,13 +32,22 @@ app.use('/api', apiRouter);
 app.use(errorHandler);
 
 // Start server
-const startServer = async () => {
+const startServer = async (port: number = config.port) => {
   await connectDatabase();
 
-  server.listen(config.port, () => {
-    logger.info(`🚀 MindPulse Backend API running on port ${config.port} [${config.nodeEnv}]`);
-    logger.info(`🔗 API Healthcheck: http://localhost:${config.port}/api/health`);
+  const currentServer = server.listen(port, () => {
+    logger.info(`🚀 MindPulse Backend API running on port ${port} [${config.nodeEnv}]`);
+    logger.info(`🔗 API Healthcheck: http://localhost:${port}/api/health`);
     logger.info(`🛡️ Non-Diagnostic Policy: Strictly Active`);
+  });
+
+  currentServer.on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+      logger.warn(`Port ${port} in use, trying port ${port + 1}...`);
+      startServer(port + 1);
+    } else {
+      logger.error('Server error:', err);
+    }
   });
 };
 
