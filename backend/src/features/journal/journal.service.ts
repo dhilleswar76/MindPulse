@@ -1,0 +1,79 @@
+import { JournalEntry } from '../../models/index.js';
+import { mlClient } from '../../services/mlClient.service.js';
+import { CreateJournalInput } from './journal.validation.js';
+
+const memoryJournals: Map<string, any[]> = new Map();
+
+export const journalService = {
+  createEntry: async (userId: string, input: CreateJournalInput) => {
+    // Run NLP keyword extraction
+    const nlpResult = await mlClient.analyzeJournal(userId, input.content);
+
+    let doc: any = null;
+    try {
+      doc = await JournalEntry.create({
+        userId,
+        title: input.title || 'Daily Reflection',
+        content: input.content,
+        isPrivate: input.isPrivate,
+        sentiment: nlpResult.sentiment,
+        stressSignal: nlpResult.stressSignal,
+        emotionSignals: nlpResult.emotionSignals,
+      });
+    } catch {
+      const userList = memoryJournals.get(userId) || [];
+      doc = {
+        _id: 'journal_' + Date.now(),
+        userId,
+        title: input.title || 'Daily Reflection',
+        content: input.content,
+        isPrivate: input.isPrivate,
+        sentiment: nlpResult.sentiment,
+        stressSignal: nlpResult.stressSignal,
+        emotionSignals: nlpResult.emotionSignals,
+        createdAt: new Date(),
+      };
+      userList.unshift(doc);
+      memoryJournals.set(userId, userList);
+    }
+
+    return doc;
+  },
+
+  getUserEntries: async (userId: string) => {
+    try {
+      const docs = await JournalEntry.find({ userId }).sort({ createdAt: -1 }).lean();
+      if (docs && docs.length > 0) return docs;
+    } catch {}
+
+    const memList = memoryJournals.get(userId) || [];
+    if (memList.length > 0) return memList;
+
+    // Seed synthetic sample journal
+    const initial = [
+      {
+        _id: 'journal_synth_1',
+        userId,
+        title: 'Midterm Preparations & Late Nights',
+        content: 'Studying late for machine learning midterms. Feeling a bit tired and anxious about time management, but taking deep breaths.',
+        sentiment: 'neutral',
+        stressSignal: 0.48,
+        emotionSignals: ['fatigue', 'anxiety'],
+        isPrivate: true,
+        createdAt: new Date(Date.now() - 86400000),
+      },
+    ];
+    memoryJournals.set(userId, initial);
+    return initial;
+  },
+
+  deleteEntry: async (userId: string, id: string) => {
+    try {
+      await JournalEntry.findOneAndDelete({ _id: id, userId });
+    } catch {}
+
+    const list = memoryJournals.get(userId) || [];
+    memoryJournals.set(userId, list.filter((j) => j._id !== id));
+    return true;
+  },
+};

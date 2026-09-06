@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mindpulse-mongo
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mindpulse-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: mindpulse-redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - mindpulse-net
+
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: mindpulse-ml
+    restart: always
+    ports:
+      - '8000:8000'
+    environment:
+      - PORT=8000
+      - ENVIRONMENT=development
+    networks:
+      - mindpulse-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mindpulse-backend
+    restart: always
+    ports:
+      - '5000:5000'
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/mindpulse
+      - REDIS_URL=redis://redis:6379
+      - ML_SERVICE_URL=http://ml-service:8000
+      - JWT_SECRET=mindpulse_docker_jwt_secret_demo
+    depends_on:
+      - mongodb
+      - redis
+      - ml-service
+    networks:
+      - mindpulse-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mindpulse-frontend
+    restart: always
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
+    networks:
+      - mindpulse-net
+
+networks:
+  mindpulse-net:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  redis_data:
