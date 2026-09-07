@@ -30,6 +30,29 @@ def calculate_feature_attribution(features: Dict[str, float]) -> List[RiskFactor
             description=f"Reported stress averages {avg_stress}/10"
         ))
 
+    # Case-related stress factor
+    avg_case_stress = features.get("avg_case_stress", 4.0)
+    if avg_case_stress > 5.5:
+        impact_pct = min(0.30, (avg_case_stress - 5.0) / 10.0 * 0.45)
+        factors.append(RiskFactor(
+            feature="Case-Related Stress",
+            impact=round(impact_pct, 2),
+            direction="increase",
+            description=f"Case-related stress reported at {avg_case_stress}/10 during current stage"
+        ))
+
+    # Sense of safety reduction factor
+    avg_safety = features.get("avg_safety", 7.5)
+    safety_drop = features.get("safety_drop_recent", 0.0)
+    if avg_safety < 6.0 or safety_drop > 0.15:
+        impact_pct = min(0.28, (8.0 - avg_safety) / 10.0 * 0.4)
+        factors.append(RiskFactor(
+            feature="Safety Concern Signal",
+            impact=round(impact_pct, 2),
+            direction="increase",
+            description=f"Reported sense of safety ({avg_safety}/10) shows variance from baseline"
+        ))
+
     # Mood decline factor
     avg_mood = features.get("avg_mood", 7.0)
     if avg_mood < 5.0:

@@ -115,4 +115,25 @@ export const mlClient = {
       };
     }
   },
+
+  analyzeVoice: async (userId: string, audioMeta: { durationSec: number; sampleRate?: number }): Promise<any> => {
+    try {
+      const response = await axios.post(
+        `${config.mlServiceUrl}/analyze-voice`,
+        { userId, audioDurationSeconds: audioMeta.durationSec, sampleRate: audioMeta.sampleRate || 16000 },
+        { timeout: 3000 }
+      );
+      return response.data;
+    } catch (err: any) {
+      return {
+        userId,
+        voiceStressIndex: 0.42,
+        jitterDelta: 0.03,
+        shimmerDelta: 0.04,
+        pitchVariability: 'MODERATE',
+        status: 'prototype_simulated',
+        disclaimer: 'Prototype — voice stress analysis module planned. Non-diagnostic decision support only.',
+      };
+    }
+  },
 };

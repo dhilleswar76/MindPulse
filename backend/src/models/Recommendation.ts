@@ -1,6 +1,15 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export type RecommendationCategory = 'BREATHING' | 'SLEEP' | 'MINDFULNESS' | 'CAMPUS_RESOURCE' | 'CRISIS_CONTACT';
+export type RecommendationCategory =
+  | 'BREATHING'
+  | 'SLEEP'
+  | 'MINDFULNESS'
+  | 'LEGAL_AID'
+  | 'VICTIM_COMPENSATION'
+  | 'WITNESS_PROTECTION'
+  | 'COUNSELING_PATHWAY'
+  | 'DISTRICT_WELFARE'
+  | 'CRISIS_CONTACT';
 
 export interface IRecommendation extends Document {
   title: string;
@@ -17,7 +26,17 @@ const RecommendationSchema = new Schema<IRecommendation>(
     title: { type: String, required: true },
     category: {
       type: String,
-      enum: ['BREATHING', 'SLEEP', 'MINDFULNESS', 'CAMPUS_RESOURCE', 'CRISIS_CONTACT'],
+      enum: [
+        'BREATHING',
+        'SLEEP',
+        'MINDFULNESS',
+        'LEGAL_AID',
+        'VICTIM_COMPENSATION',
+        'WITNESS_PROTECTION',
+        'COUNSELING_PATHWAY',
+        'DISTRICT_WELFARE',
+        'CRISIS_CONTACT',
+      ],
       required: true,
     },
     description: { type: String, required: true },

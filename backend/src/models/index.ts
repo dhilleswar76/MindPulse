@@ -8,4 +8,5 @@ export * from './Alert.js';
 export * from './Intervention.js';
 export * from './FollowUp.js';
 export * from './Recommendation.js';
+export * from './Case.js';
 export * from './AuditLog.js';

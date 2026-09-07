@@ -49,7 +49,7 @@ export const LoginPage: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@campus.edu"
+              placeholder="user@support.portal"
               className="w-full bg-slate-900/80 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
             />
           </div>
@@ -92,7 +92,7 @@ export const LoginPage: React.FC = () => {
             onClick={() => fillQuickDemo('demo.user@mindpulse.local')}
             className="p-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-300 text-center transition-colors"
           >
-            Student
+            Victim / Witness
           </button>
           <button
             type="button"
@@ -106,7 +106,7 @@ export const LoginPage: React.FC = () => {
             onClick={() => fillQuickDemo('demo.admin@mindpulse.local')}
             className="p-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-300 text-center transition-colors"
           >
-            Admin
+            District Admin
           </button>
         </div>
       </div>

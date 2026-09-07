@@ -61,7 +61,7 @@ export const JournalEditorModal: React.FC<Props> = ({ isOpen, onClose, onSuccess
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="E.g. Reflections after chemistry lecture"
+              placeholder="E.g. Reflections after hearing preparation / daily feelings"
               className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-teal-500"
             />
           </div>

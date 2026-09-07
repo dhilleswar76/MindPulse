@@ -1,10 +1,42 @@
 export type UserRole = 'USER' | 'COUNSELOR' | 'ADMIN';
 
+export type VictimType = 'VICTIM' | 'WITNESS' | 'FAMILY_MEMBER' | 'COMPLAINANT' | 'OTHER_AFFECTED_PERSON';
+
+export type CaseStage =
+  | 'CASE_REGISTRATION'
+  | 'INVESTIGATION'
+  | 'COURT_TRIAL'
+  | 'COMPENSATION'
+  | 'REHABILITATION'
+  | 'PROTECTION_SUPPORT'
+  | 'CLOSED';
+
+export type CaseStatus = 'ACTIVE' | 'UNDER_REVIEW' | 'SUPPORT_IN_PROGRESS' | 'CLOSED';
+
+export type SupportType =
+  | 'COUNSELLING'
+  | 'PROFESSIONAL_REFERRAL'
+  | 'LEGAL_AID'
+  | 'PROTECTION_SUPPORT'
+  | 'RELOCATION_SUPPORT'
+  | 'FINANCIAL_ASSISTANCE'
+  | 'REHABILITATION_SUPPORT'
+  | 'CHECK_IN_CHAT'
+  | 'OTHER';
+
 export interface User {
   id: string;
   email: string;
   fullName: string;
   role: UserRole;
+  victimType?: VictimType;
+  caseId?: string;
+  caseStage?: CaseStage;
+  district?: string;
+  state?: string;
+  supportStatus?: string;
+  consentStatus?: boolean;
+  assignedCounselor?: string;
   department?: string;
   yearOfStudy?: number;
 }
@@ -24,6 +56,8 @@ export interface RiskScoreData {
   factors: RiskFactor[];
   modelVersion: string;
   calculatedAt?: string;
+  caseStageContext?: string;
+  humanReviewRecommended?: boolean;
 }
 
 export interface CheckIn {
@@ -32,6 +66,10 @@ export interface CheckIn {
   stress: number;
   energy: number;
   sleepHours: number;
+  senseOfSafety?: number;
+  supportAvailability?: number;
+  caseRelatedStress?: number;
+  caseStage?: CaseStage;
   optionalNote?: string;
   timestamp: string | Date;
 }
@@ -50,7 +88,16 @@ export interface JournalEntry {
 export interface Recommendation {
   _id: string;
   title: string;
-  category: 'BREATHING' | 'SLEEP' | 'MINDFULNESS' | 'CAMPUS_RESOURCE' | 'CRISIS_CONTACT';
+  category:
+    | 'BREATHING'
+    | 'SLEEP'
+    | 'MINDFULNESS'
+    | 'LEGAL_AID'
+    | 'VICTIM_COMPENSATION'
+    | 'WITNESS_PROTECTION'
+    | 'COUNSELING_PATHWAY'
+    | 'DISTRICT_WELFARE'
+    | 'CRISIS_CONTACT';
   description: string;
   durationMinutes?: number;
   actionUrl?: string;
@@ -60,11 +107,14 @@ export interface Recommendation {
 
 export interface CounselorCase {
   id: string;
+  caseId: string;
   userId: string;
-  studentName: string;
-  studentEmail: string;
-  department: string;
-  yearOfStudy: number;
+  victimName: string;
+  victimEmail?: string;
+  victimType?: VictimType;
+  caseStage: CaseStage;
+  district: string;
+  state: string;
   riskLevel: RiskLevel;
   riskScore: number;
   riskTrend: string;
@@ -74,20 +124,26 @@ export interface CounselorCase {
     stress: number;
     energy: number;
     sleepHours: number;
+    senseOfSafety?: number;
+    supportAvailability?: number;
+    caseRelatedStress?: number;
+    caseStage?: CaseStage;
     timestamp: string;
   };
   topSignals: RiskFactor[];
   aiSummary: string;
+  suggestedPathways?: string[];
   interventionsCount: number;
 }
 
 export interface Intervention {
   _id: string;
   userId: string;
-  studentName?: string;
+  caseId?: string;
+  victimName?: string;
   counselorId: string;
   counselorName?: string;
-  type: 'CHECK_IN_CHAT' | 'COUNSELING_SESSION' | 'RESOURCE_REFERRAL' | 'ACADEMIC_ADJUSTMENT';
+  type: SupportType;
   status: 'PLANNED' | 'ACTIVE' | 'COMPLETED' | 'FOLLOW_UP_REQUIRED';
   clinicalNotes: string;
   actionItems?: string[];
@@ -97,3 +153,11 @@ export interface Intervention {
   riskAfterScore?: number;
   createdAt: string;
 }
+
+export interface CaseJourneyStage {
+  key: CaseStage;
+  label: string;
+  description: string;
+  order: number;
+}
+

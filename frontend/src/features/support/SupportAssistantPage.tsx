@@ -13,7 +13,7 @@ export const SupportAssistantPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: 'assistant',
-      text: "Hello! I'm your **MindPulse Support Assistant**.\n\nI can help you with:\n• Grounding and breathing exercises (e.g. 4-7-8 method)\n• Reflective journaling prompts for academic stress\n• Sleep routine optimization\n• Finding campus peer & counseling resources\n\nHow can I support your wellness today?",
+      text: "Hello! I am your **MindPulse Trauma-Informed Support Companion**.\n\nI can assist you with:\n• Grounding and breathing exercises (e.g., 4-7-8 somatic regulation before hearings)\n• Reflective journaling prompts for processing case-related tension\n• Explaining the 6-stage legal & rehabilitation journey\n• Connecting with DLSA Legal Aid and Victim Compensation contacts\n\nHow can I support your wellbeing today?",
     },
   ]);
   const [input, setInput] = useState('');
@@ -45,7 +45,7 @@ export const SupportAssistantPage: React.FC = () => {
         ...prev,
         {
           sender: 'assistant',
-          text: "Thank you for sharing. Remember to pace yourself, drink some water, and take 3 deep belly breaths. Let's explore grounding exercises or journaling prompts.",
+          text: "Thank you for sharing. Remember to pace yourself, drink some water, and take 3 deep belly breaths. Let's explore grounding exercises or connecting with your assigned counselor Dr. Sarah Jenkins.",
         },
       ]);
     } finally {
@@ -62,10 +62,10 @@ export const SupportAssistantPage: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
           <Bot className="w-7 h-7 text-teal-400" />
-          MindPulse Support Assistant
+          Trauma-Informed Support Companion
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Non-clinical conversational companion for grounding exercises, wellness prompts, and resource navigation.
+          Non-clinical conversational companion for grounding exercises, legal journey orientation, and resource navigation.
         </p>
       </div>
 
@@ -73,7 +73,7 @@ export const SupportAssistantPage: React.FC = () => {
       <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2.5 text-xs text-slate-400">
         <Shield className="w-4 h-4 text-teal-400 shrink-0" />
         <span>
-          <strong className="text-slate-300">Non-Clinical Assistant:</strong> Not an AI Therapist or medical diagnostician. For clinical emergencies, dial 988.
+          <strong className="text-slate-300">Non-Clinical Decision Support:</strong> Not an AI therapist or medical diagnostician. For immediate crisis support, contact KIRAN at 1800-599-0019 or emergency services at 112.
         </span>
       </div>
 
@@ -132,27 +132,27 @@ export const SupportAssistantPage: React.FC = () => {
         <div className="px-4 py-2 bg-slate-900/60 border-t border-slate-800/80 flex items-center gap-2 overflow-x-auto text-xs">
           <button
             type="button"
-            onClick={() => handleQuickPrompt("I'm feeling anxious about my exam tomorrow. Can you guide me through a breathing exercise?")}
+            onClick={() => handleQuickPrompt("I have a court hearing tomorrow and I'm feeling severe anxiety. Can you guide me through a calming breathing exercise?")}
             className="px-3 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700/60 flex items-center gap-1.5"
           >
             <Wind className="w-3 h-3 text-teal-400" />
-            Breathing Exercise
+            Hearing Anxiety Grounding
           </button>
           <button
             type="button"
-            onClick={() => handleQuickPrompt("Give me a journaling prompt to help with stress.")}
+            onClick={() => handleQuickPrompt("What are the stages of victim compensation and how do I apply under 357A CrPC?")}
             className="px-3 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700/60 flex items-center gap-1.5"
           >
             <BookOpen className="w-3 h-3 text-indigo-400" />
-            Journaling Prompt
+            Compensation Scheme Info
           </button>
           <button
             type="button"
-            onClick={() => handleQuickPrompt("What are the best habits to recover from a sleep deficit?")}
+            onClick={() => handleQuickPrompt("How do I request witness protection or safe transit from DLSA?")}
             className="px-3 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700/60 flex items-center gap-1.5"
           >
             <Sparkles className="w-3 h-3 text-amber-400" />
-            Sleep Tips
+            Witness Protection Aid
           </button>
         </div>
 
@@ -162,7 +162,7 @@ export const SupportAssistantPage: React.FC = () => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message or question about wellness, grounding, or study stress..."
+            placeholder="Type a message or question regarding grounding, legal stages, or wellness support..."
             className="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
           />
           <button

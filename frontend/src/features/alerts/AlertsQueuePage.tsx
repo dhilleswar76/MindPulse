@@ -14,20 +14,20 @@ export const AlertsQueuePage: React.FC = () => {
       setAlerts([
         {
           _id: 'alert_1',
-          studentName: 'Alex Rivera',
-          department: 'Computer Science',
+          studentName: 'Case MP-1042 (Alex Rivera)',
+          department: 'Protected Witness • Court / Trial Stage',
           riskLevel: 'COUNSELOR_REVIEW',
           status: 'OPEN',
-          triggerReason: 'Severe sleep reduction (3.5h avg) combined with 3 consecutive days of stress score >= 8',
+          triggerReason: 'Severe sleep reduction (3.5h avg) combined with high pre-trial tension and low sense of safety (3/10)',
           createdAt: new Date().toISOString(),
         },
         {
           _id: 'alert_2',
-          studentName: 'Jordan Chen',
-          department: 'Biomedical Engineering',
+          studentName: 'Case MP-1001 (Priya Sharma)',
+          department: 'Direct Victim • Investigation Stage',
           riskLevel: 'WATCH',
           status: 'OPEN',
-          triggerReason: 'Sudden mood decline deviation (-3.2 from personal baseline)',
+          triggerReason: 'Sudden safety score drop (-3.0) and perceived delay in FIR compensation interim relief',
           createdAt: new Date(Date.now() - 3600000).toISOString(),
         },
       ]);
@@ -72,7 +72,7 @@ export const AlertsQueuePage: React.FC = () => {
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2.5">
-                  <span className="font-bold text-slate-100">{alert.studentName || 'Student Case'}</span>
+                  <span className="font-bold text-slate-100">{alert.studentName || 'Monitored Case'}</span>
                   <span className="text-xs text-slate-400">({alert.department})</span>
                   <span className="badge-review">{alert.riskLevel.replace('_', ' ')}</span>
                 </div>

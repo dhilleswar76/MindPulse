@@ -89,15 +89,25 @@ export const checkinService = {
     const checkins = await checkinService.getUserCheckIns(userId, 14);
     if (!checkins || checkins.length === 0) {
       return {
-        baseline: { avgMood: 7.2, avgStress: 4.5, avgEnergy: 6.8, avgSleep: 7.5, totalLogs: 0 },
+        baseline: {
+          avgMood: 7.0,
+          avgStress: 4.8,
+          avgEnergy: 6.5,
+          avgSleep: 7.2,
+          avgSafety: 7.5,
+          avgCaseStress: 4.2,
+          totalLogs: 0,
+        },
         trend: [],
       };
     }
 
-    const avgMood = checkins.reduce((a, b) => a + b.mood, 0) / checkins.length;
-    const avgStress = checkins.reduce((a, b) => a + b.stress, 0) / checkins.length;
-    const avgEnergy = checkins.reduce((a, b) => a + b.energy, 0) / checkins.length;
-    const avgSleep = checkins.reduce((a, b) => a + b.sleepHours, 0) / checkins.length;
+    const avgMood = checkins.reduce((a, b) => a + (b.mood || 7), 0) / checkins.length;
+    const avgStress = checkins.reduce((a, b) => a + (b.stress || 5), 0) / checkins.length;
+    const avgEnergy = checkins.reduce((a, b) => a + (b.energy || 6), 0) / checkins.length;
+    const avgSleep = checkins.reduce((a, b) => a + (b.sleepHours || 7), 0) / checkins.length;
+    const avgSafety = checkins.reduce((a, b) => a + (b.senseOfSafety || 7), 0) / checkins.length;
+    const avgCaseStress = checkins.reduce((a, b) => a + (b.caseRelatedStress || 5), 0) / checkins.length;
 
     return {
       baseline: {
@@ -105,15 +115,22 @@ export const checkinService = {
         avgStress: Math.round(avgStress * 10) / 10,
         avgEnergy: Math.round(avgEnergy * 10) / 10,
         avgSleep: Math.round(avgSleep * 10) / 10,
+        avgSafety: Math.round(avgSafety * 10) / 10,
+        avgCaseStress: Math.round(avgCaseStress * 10) / 10,
         totalLogs: checkins.length,
       },
-      trend: checkins.map((c) => ({
-        date: new Date(c.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        mood: c.mood,
-        stress: c.stress,
-        energy: c.energy,
-        sleepHours: c.sleepHours,
-      })).reverse(),
+      trend: checkins
+        .map((c) => ({
+          date: new Date(c.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          mood: c.mood,
+          stress: c.stress,
+          energy: c.energy,
+          sleepHours: c.sleepHours,
+          senseOfSafety: c.senseOfSafety ?? 7,
+          caseRelatedStress: c.caseRelatedStress ?? 5,
+          caseStage: c.caseStage || 'COURT_TRIAL',
+        }))
+        .reverse(),
     };
   },
 
@@ -128,11 +145,15 @@ export const checkinService = {
       generated.push({
         _id: `synth_${i}`,
         userId,
-        mood: Math.max(2, Math.min(10, Math.floor(7 + Math.sin(i) * 2))),
-        stress: Math.max(1, Math.min(10, Math.floor(5 + Math.cos(i) * 2))),
-        energy: Math.max(2, Math.min(10, Math.floor(6 + Math.sin(i * 0.8) * 2))),
-        sleepHours: Math.max(4, Math.min(10, Math.floor(7.5 - (i > 6 ? 1.5 : 0)))),
-        optionalNote: i === 0 ? 'Busy day with project deadlines' : undefined,
+        mood: Math.max(2, Math.min(10, Math.floor(7 - (i < 4 ? 3 : 0) + Math.sin(i) * 1.2))),
+        stress: Math.max(1, Math.min(10, Math.floor(4 + (i < 4 ? 4 : 0) + Math.cos(i) * 1.2))),
+        energy: Math.max(2, Math.min(10, Math.floor(6 - (i < 4 ? 2 : 0) + Math.sin(i * 0.8)))),
+        sleepHours: Math.max(4, Math.min(10, Math.floor(7.5 - (i < 4 ? 2.5 : 0)))),
+        senseOfSafety: Math.max(2, Math.min(10, Math.floor(8 - (i < 4 ? 3 : 0)))),
+        supportAvailability: 7,
+        caseRelatedStress: Math.max(2, Math.min(10, Math.floor(4 + (i < 4 ? 4 : 0)))),
+        caseStage: 'COURT_TRIAL',
+        optionalNote: i === 0 ? 'Upcoming court hearing scheduled for cross-examination' : undefined,
         timestamp: d,
       });
     }

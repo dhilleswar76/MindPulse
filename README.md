@@ -1,42 +1,80 @@
 # MindPulse 🧠⚡
-### AI-Powered Mental Health Monitoring, Distress Prediction & Early Intervention Platform
+### AI-Powered Dynamic Mental Health Monitoring & Distress Prediction System for Victims of Atrocities
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Smart India Hackathon 2024 / 2025](https://img.shields.io/badge/SIH-Problem%20Statement%2026094-blue.svg)](https://www.sih.gov.in/)
+[![Ministry](https://img.shields.io/badge/Ministry-Social%20Justice%20%26%20Empowerment-orange.svg)](https://socialjustice.gov.in/)
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript%20%7C%20Vite%20%7C%20Tailwind-blue)](frontend)
 [![Backend](https://img.shields.io/badge/Backend-Node.js%20%7C%20Express%20%7C%20TypeScript%20%7C%20MongoDB-green)](backend)
 [![ML Service](https://img.shields.io/badge/ML%20Service-FastAPI%20%7C%20Scikit--Learn%20%7C%20XGBoost%20%7C%20SHAP-orange)](ml-service)
 
-> **IMPORTANT DISCLAIMER**: MindPulse is a **non-diagnostic decision-support and early intervention platform**. It does NOT claim to diagnose mental illness or replace qualified clinical professionals. Human-in-the-loop oversight is preserved at every step.
+> **IMPORTANT NON-DIAGNOSTIC NOTICE**: MindPulse is strictly an **AI-assisted decision-support and early intervention platform**. It does NOT diagnose psychiatric illness or replace qualified clinical psychologists, legal aid advocates, or law enforcement. Human counselors and district officials make all intervention decisions with explicit human-in-the-loop oversight.
 
 ---
 
-## 🌟 Overview & Problem Solved
+## 🏛️ Smart India Hackathon Alignment (SIH26094)
 
-College students and young adults often experience silent mental health deterioration due to chronic stress, sleep deprivation, and academic pressure before acute crises emerge. Traditional counseling systems are purely reactive — students only reach out when distress is severe.
+| Parameter | Specification |
+| :--- | :--- |
+| **Problem Statement ID** | **SIH26094 / 26094** |
+| **Title** | **AI-Powered Dynamic Mental Health Monitoring and Distress Prediction System for Victims of Atrocities** |
+| **Organization** | Ministry of Social Justice and Empowerment |
+| **Department** | Department of Social Justice and Empowerment |
+| **Category** | Software |
+| **Theme** | MedTech / BioTech / Social Welfare |
 
-**MindPulse** bridges this gap by enabling:
-1. **Low-friction wellness check-ins & journaling** for individuals.
-2. **Privacy-first baseline tracking & early distress signal detection** using explainable ML.
-3. **Counselor triage decision-support** with AI-assisted summaries and intervention outcome tracking.
-4. **Institutional aggregate analytics & policy simulation** with strict k-anonymity privacy safeguards.
+---
+
+## 🌟 Overview & Problem Addressed
+
+Victims, complainants, and protected witnesses affected by atrocities often navigate protracted, re-traumatizing legal and rehabilitation journeys. Acute mental health deterioration, sleep disruption, and fear of retaliation frequently spike around critical case milestones (e.g., pre-trial hearings, testimony, investigation cross-examinations, and compensation delays). 
+
+Traditional support systems are purely reactive. **MindPulse** solves this challenge through:
+1. **Low-Friction Trauma-Informed Check-Ins & Voice Screening**: Voluntary mood, sleep, perceived sense of safety, and case-related tension tracking.
+2. **Dynamic Longitudinal Baseline & Anomaly Detection**: Tracks individuals against their personal historical normal rather than arbitrary thresholds.
+3. **Multi-Stage Legal Journey Contextualization**: Calibrates distress sensitivity across 6 journey milestones (`Case Registration` $\rightarrow$ `Investigation` $\rightarrow$ `Court/Trial` $\rightarrow$ `Compensation` $\rightarrow$ `Rehabilitation` $\rightarrow$ `Protection/Support`).
+4. **Explainable AI (XAI) Risk Prediction**: Gradient-boosted scoring with SHAP feature attributions explaining contributing factors (e.g., Hearing Proximity +28%, Sleep Deficit +22%, Safety Volatility +18%).
+5. **Counselor Triage Decision Support**: Prioritized case queues, automated non-diagnostic telemetry summaries, and DLSA legal aid / victim compensation intervention tracking.
+6. **Privacy-Preserving Institutional Analytics**: District $\rightarrow$ State aggregated telemetry ($k \ge 5$) with regional distress heatmaps and policy simulation tools.
+
+---
+
+## 🗺️ 6-Stage Case Journey Architecture
+
+```text
+[1. Case Registration] ──► [2. Investigation] ──► [3. Court / Trial]
+          │                        │                     │
+          ▼                        ▼                     ▼
+[6. Protection / Support] ◄── [5. Rehabilitation] ◄── [4. Compensation]
+```
 
 ---
 
 ## 🏗️ Monorepo Architecture
 
-MindPulse is engineered as a feature-isolated **MERN + Python ML monorepo**:
-
 ```text
-mindpulse/
+MindPulse/
 ├── frontend/             # React 18, TypeScript, Vite, Tailwind CSS, Recharts, Lucide
-├── backend/              # Node.js, Express, TypeScript, Mongoose, JWT, Socket.IO
-├── ml-service/           # Python 3, FastAPI, Pandas, NumPy, Scikit-learn, XGBoost, SHAP
-├── workers/              # Redis & BullMQ background job processing skeleton
-├── scripts/              # Synthetic seed generator & setup utilities
-├── docs/                 # Architecture, API specifications, DB schemas, Feature maps
-├── AGENT_RULES.md        # Strict rules for multi-agent AI & human developer collaboration
-├── TECH_STACK.md         # Detailed tech stack breakdown and rationale
-└── docker-compose.yml    # Single-command multi-container environment
+│   ├── src/features/
+│   │   ├── dashboard/    # Victim/Witness Portal with Case Journey Timeline
+│   │   ├── checkins/     # 10-point telemetry check-ins (Safety, Case Stress, Sleep)
+│   │   ├── voice/        # Prototype Voice Stress & Acoustic Biomarker Modal
+│   │   ├── journal/      # Trauma-informed expressive writing & NLP indicators
+│   │   ├── counselor/    # Case queue, triage details, AI telemetry synthesis
+│   │   ├── interventions/# Multi-pathway logging & pre/post outcome tracking
+│   │   ├── analytics/    # District/State aggregated telemetry (k >= 5)
+│   │   ├── heatmap/      # Regional jurisdictional distress heatmap
+│   │   ├── simulator/    # What-If district welfare policy simulator
+│   │   └── support/      # Trauma-informed conversational companion
+├── backend/              # Node.js, Express, TypeScript, Mongoose, JWT
+│   ├── src/models/       # User, Case, CheckIn, Intervention, Recommendation, Alert
+│   ├── src/features/     # Cases, Counselor, Checkins, Analytics, Interventions
+│   └── src/seed.ts       # Synthetic demo database seeder
+├── ml-service/           # Python FastAPI, Scikit-learn, XGBoost, SHAP
+│   ├── app/feature_engineering/ # Longitudinal safety & stage delta extractors
+│   ├── app/explainability/      # SHAP feature factor explainer
+│   ├── app/services/            # Risk scoring & prototype voice analysis service
+│   └── app/api/endpoints.py     # /predict-risk, /forecast, /analyze-voice
+└── docs/                 # System architecture, schemas, and API documentation
 ```
 
 ---
@@ -47,16 +85,14 @@ mindpulse/
 - Node.js (v18+ or v20+)
 - Python (v3.10+)
 - Git
-- *(Optional)* MongoDB & Redis, or run in lightweight standalone mode!
 
-### 1. Clone & Install
+### 1. Installation
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd MindPulse
 
-# Install root & workspace dependencies
-npm install
+# Install workspace dependencies
 cd backend && npm install
 cd ../frontend && npm install
 cd ../ml-service && pip install -r requirements.txt
@@ -64,79 +100,62 @@ cd ../ml-service && pip install -r requirements.txt
 
 ### 2. Environment Setup
 ```bash
-# Copy template environment variables
 cp .env.example .env
 cp .env.example backend/.env
 ```
 
 ### 3. Seed Demo Data
 ```bash
-npm run seed
+cd backend && npm run seed
 ```
 
-### 4. Launch Development Servers
-You can run all three services concurrently:
-```bash
-npm run dev
-```
-
-Or run them individually in separate terminals:
-- **Backend API**: `cd backend && npm run dev` (starts on `http://localhost:5000`)
-- **Frontend Dashboard**: `cd frontend && npm run dev` (starts on `http://localhost:5173`)
-- **Python ML Service**: `cd ml-service && uvicorn app.main:app --reload --port 8000` (starts on `http://localhost:8000`)
+### 4. Launch Services
+- **Backend API**: `cd backend && npm run dev` (`http://localhost:5000`)
+- **Frontend App**: `cd frontend && npm run dev` (`http://localhost:5173`)
+- **Python ML Service**: `cd ml-service && uvicorn app.main:app --reload --port 8000` (`http://localhost:8000`)
 
 ---
 
-## 🔑 Demo Accounts
+## 🔑 Pre-Configured Synthetic Demo Personas
 
-The seed script automatically prepares preconfigured synthetic demo accounts:
-
-| Role | Email | Password | Access / Portal |
+| Role | Email | Password | Case ID & Context |
 | :--- | :--- | :--- | :--- |
-| **Student / User** | `demo.user@mindpulse.local` | `MindPulseDemo2026!` | User Dashboard, Check-ins, Journal, Baseline, Recommendations, Support Assistant |
-| **Counselor** | `demo.counselor@mindpulse.local` | `MindPulseDemo2026!` | Counselor Triage Queue, AI Summaries, Interventions, Outcome Tracking |
-| **Institutional Admin** | `demo.admin@mindpulse.local` | `MindPulseDemo2026!` | Aggregate Analytics (k-anonymity), Campus Heatmap, What-If Policy Simulator |
+| **Protected Witness (Victim)** | `demo.user@mindpulse.local` | `MindPulseDemo2026!` | **Case MP-1042** (Alex Rivera) • *Court/Trial Stage* • Experiencing acute testimony anxiety & sleep disruption |
+| **Support Counselor** | `demo.counselor@mindpulse.local` | `MindPulseDemo2026!` | **Dr. Sarah Jenkins** • *District Legal Aid & Victim Support Cell* • Triages case queue & logs legal aid pathways |
+| **District Welfare Official** | `demo.admin@mindpulse.local` | `MindPulseDemo2026!` | **Marcus Vance** • *District Social Justice Division* • Monitors anonymized regional distress trends ($k \ge 5$) |
 
-*(A convenient Quick Role Switcher is also built into the authentication header during prototype mode!)*
-
----
-
-## 📦 Features Breakdown & Ownership
-
-Every feature is isolated under `frontend/src/features/<feature>/` and `backend/src/features/<feature>/`:
-
-1. **Authentication & RBAC**: JWT stateless auth with role-based routing (`USER`, `COUNSELOR`, `ADMIN`).
-2. **Wellness Check-ins**: 10-point slider check-ins (Mood, Stress, Energy, Sleep) with longitudinal history.
-3. **Journal & NLP Signals**: Rich journal reflection with prototype sentiment, stress signal, and emotion tagging.
-4. **Personal Baseline**: Rolling 14-day statistical averages and standard deviation offsets.
-5. **Distress Risk Prediction**: 4-tier risk classification (`STABLE`, `WATCH`, `ELEVATED`, `REQUIRES_REVIEW`).
-6. **Explainable AI (XAI)**: SHAP-inspired feature attribution showing top contributing signals (e.g. sleep reduction +21%).
-7. **Anomaly Detection**: Statistical & Isolation Forest deviation detection from personal historical normal.
-8. **Early Distress Forecasting**: 7-day trajectory projection based on rolling telemetry.
-9. **Smart Alerts**: Counselor escalation engine evaluating persistent risk and safety thresholds.
-10. **Counselor Dashboard**: Prioritized case queue with triage tags and risk factor breakdowns.
-11. **AI Counselor Summary**: Automated bulleted synthesis of recent telemetry with human-in-the-loop review labels.
-12. **Intervention Management**: Structured intervention planning, notes, and status management.
-13. **Intervention Outcome Tracking**: Observed trend comparisons before vs. after intervention.
-14. **Personalized Recommendations**: Non-clinical support cards (breathing, grounding, sleep hygiene, campus resources).
-15. **MindPulse Support Assistant**: Non-clinical chat assistant for grounding exercises and resource navigation.
-16. **Institutional Analytics**: Privacy-preserving aggregate trends with minimum group size ($k \ge 5$) filtering.
-17. **Wellness Heatmap**: Aggregate campus zone visualization with zero individual exposure.
-18. **What-If Intervention Simulator**: Policy impact projection for mental wellness initiatives.
-19. **Privacy & Audit Logging**: Cryptographic consent records and immutable audit logs.
+*(A Quick Role Switcher is accessible on the top navigation bar for seamless judge/evaluator demonstration!)*
 
 ---
 
-## 🤖 Multi-Agent Collaboration
+## 📊 Feature Implementation Status
 
-If you or your AI coding agent are extending MindPulse, please read [AGENT_RULES.md](AGENT_RULES.md) before writing code.
+| Feature Module | SIH26094 Scope | Status |
+| :--- | :--- | :---: |
+| **Case Journey Tracking (6 Stages)** | Milestone-based stress calibration across legal journey | **Implemented** |
+| **Trauma-Informed Telemetry** | Mood, sleep deficit, perceived safety, and case tension | **Implemented** |
+| **Explainable AI (XAI) Engine** | Tree-based classification with SHAP factor attributions | **Implemented** |
+| **Voice Acoustic Biomarker Screener** | Jitter, shimmer, and speech rate screening interface | **Prototype** |
+| **Counselor Decision Support Queue** | Pseudonymous triage queue, AI summaries, human oversight | **Implemented** |
+| **Support Pathway Interventions** | Legal Aid (NALSA/DLSA), Victim Compensation, Protection | **Implemented** |
+| **Intervention Outcome Tracking** | Longitudinal delta comparison (pre vs. post intervention) | **Implemented** |
+| **District Aggregated Analytics** | Minimum cohort size ($k \ge 5$) privacy-preserving reporting | **Implemented** |
+| **Regional Distress Heatmap** | Jurisdictional cluster distress tracking without PII exposure | **Implemented** |
+| **What-If Policy Simulator** | Legal aid capacity and transit protection impact modeling | **Implemented** |
 
 ---
 
-## 📚 Documentation Links
+## 🔒 Ethical & Privacy Safeguards
+1. **Non-Diagnostic Framing**: Emphasizes supportive decision support and early distress cues over clinical diagnostic claims.
+2. **Human-in-the-Loop**: Automated summaries highlight signals; human counselors approve all interventions.
+3. **Pseudonymity & Encryption**: Identifiers are decoupled into Case IDs (`MP-1042`).
+4. **k-Anonymity ($k \ge 5$)**: Spatial and institutional reports enforce minimum cohort thresholds to prevent reverse identification.
+
+---
+
+## 📚 Documentation
 - [System Architecture](docs/architecture.md)
-- [API Overview](docs/api-overview.md)
 - [Database Schema](docs/database-schema.md)
+- [API Overview](docs/api-overview.md)
 - [Feature Map](docs/feature-map.md)
-- [Contributing Guide](CONTRIBUTING.md)
-- [Technology Stack](TECH_STACK.md)
+

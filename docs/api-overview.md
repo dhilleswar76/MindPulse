@@ -1,51 +1,55 @@
-# API Overview — MindPulse REST Specifications
+# API Overview — MindPulse REST Specifications (SIH26094)
 
 Base URL: `http://localhost:5000/api`
 
 ---
 
 ## 1. Authentication & Users
-- `POST /auth/register` — Register a new student/counselor/admin.
+- `POST /auth/register` — Register a new victim/witness/counselor/admin.
 - `POST /auth/login` — Authenticate and receive a JWT token.
 - `GET /auth/me` — Get current authenticated user profile.
-- `GET /users` *(ADMIN)* — List users with role filter.
+- `GET /users` *(ADMIN)* — List users with role and district filter.
 
-## 2. Wellness Check-ins
-- `POST /checkins` *(USER)* — Submit a new wellness check-in.
+## 2. 6-Stage Case Journey Tracking
+- `GET /cases` *(COUNSELOR, ADMIN)* — List cases indexed by stage and priority score.
+- `GET /cases/:id` — Retrieve case details and journey metadata.
+- `PUT /cases/:id/stage` *(COUNSELOR, ADMIN)* — Update case stage (`CASE_REGISTRATION` -> `INVESTIGATION` -> `COURT_TRIAL` -> `COMPENSATION` -> `REHABILITATION` -> `PROTECTION_SUPPORT`).
+- `GET /cases/:id/timeline` — Retrieve stage history timeline.
+
+## 3. Trauma-Informed Check-ins & Voice Screening
+- `POST /checkins` *(USER)* — Submit wellbeing check-in (Mood, Stress, Sleep, Sense of Safety, Case Tension).
 - `GET /checkins` *(USER)* — Get historical check-ins for the authenticated user.
-- `GET /checkins/trend` *(USER)* — Get aggregated 14-day mood/stress/energy trends.
+- `GET /checkins/trend` *(USER)* — Get aggregated 14-day mood/stress/safety trends and baseline.
+- `POST /ml/analyze-voice` — (Prototype) Voice acoustic feature screening (pitch jitter, shimmer, speech rate).
 
-## 3. Journal & NLP Reflection
-- `POST /journal` *(USER)* — Create a new journal entry with NLP analysis.
+## 4. Journal & NLP Reflection
+- `POST /journal` *(USER)* — Create a new reflection entry with trauma-informed NLP analysis.
 - `GET /journal` *(USER)* — Get all journal entries for the current user.
 - `GET /journal/:id` *(USER)* — Retrieve single journal entry with emotion tags.
 - `DELETE /journal/:id` *(USER)* — Delete personal journal entry.
 
-## 4. Personal Baseline & Anomaly
-- `GET /wellness/baseline` *(USER)* — Get user's calculated statistical baseline.
-- `GET /wellness/anomalies` *(USER)* — Get recent deviation anomalies from personal normal.
+## 5. Distress Risk & Explainable AI (XAI)
+- `GET /risk/current` *(USER)* — Get latest computed distress score, risk level, and SHAP factors.
+- `GET /risk/history` *(USER)* — Get longitudinal risk progression.
+- `GET /forecast` *(USER)* — Get 7-day early distress trajectory projection.
 
-## 5. Distress Risk & Explainable AI
-- `GET /risk/current` *(USER)* — Get latest computed risk score, level, and factors.
-- `GET /risk/history` *(USER)* — Get historical risk progression.
-- `GET /forecast` *(USER)* — Get 7-day distress trajectory forecast.
+## 6. Recommendations & Support Companion
+- `GET /recommendations` *(USER)* — Get personalized non-clinical recommendations (NALSA Legal Aid, Victim Compensation, Witness Protection).
+- `POST /users/support-chat` *(USER)* — Chat with Trauma-Informed Support Companion (grounding, legal stages).
 
-## 6. Recommendations & Support Assistant
-- `GET /recommendations` *(USER)* — Get personalized non-clinical recommendations.
-- `POST /support/chat` *(USER)* — Chat with MindPulse Support Assistant (grounding & resources).
+## 7. Counselor Decision Support Portal
+- `GET /counselor/cases` *(COUNSELOR, ADMIN)* — Get prioritized triage queue of cases.
+- `GET /counselor/cases/:id` *(COUNSELOR, ADMIN)* — Get case details, AI telemetry synthesis, safety metrics.
+- `GET /counselor/summary/:userId` *(COUNSELOR)* — Generate on-demand non-diagnostic AI counselor summary.
 
-## 7. Counselor Portal
-- `GET /counselor/cases` *(COUNSELOR, ADMIN)* — Get list of students flagged for review.
-- `GET /counselor/cases/:id` *(COUNSELOR, ADMIN)* — Get case details, AI summary, telemetry.
-- `GET /counselor/summary/:userId` *(COUNSELOR)* — Generate on-demand AI counselor summary.
-
-## 8. Interventions & Outcomes
-- `POST /interventions` *(COUNSELOR)* — Create an intervention record.
-- `GET /interventions` *(COUNSELOR)* — Get interventions list.
+## 8. Support Pathways & Outcome Tracking
+- `POST /interventions` *(COUNSELOR)* — Log support pathway (`LEGAL_AID`, `VICTIM_COMPENSATION`, `WITNESS_PROTECTION`, `COUNSELLING`).
+- `GET /interventions` *(COUNSELOR)* — Get list of logged interventions.
 - `PUT /interventions/:id` *(COUNSELOR)* — Update intervention status / notes.
-- `GET /interventions/outcomes/:userId` *(COUNSELOR)* — Before vs after risk comparison.
+- `GET /interventions/outcomes/:userId` *(COUNSELOR)* — Before vs. after distress trajectory delta comparison.
 
-## 9. Institutional Analytics & Simulator
-- `GET /analytics/overview` *(ADMIN)* — Aggregate metrics with k-anonymity guarantee.
-- `GET /analytics/heatmap` *(ADMIN)* — Campus zone aggregate stress heatmap.
-- `POST /analytics/simulate` *(ADMIN)* — Run what-if policy intervention simulation.
+## 9. District / State Analytics & Policy Simulator
+- `GET /analytics/overview` *(ADMIN)* — Aggregate metrics with strict k-anonymity guarantee ($k \ge 5$).
+- `GET /analytics/heatmap` *(ADMIN)* — Regional jurisdictional distress heatmap.
+- `POST /analytics/simulate` *(ADMIN)* — Run what-if policy intervention simulation (legal aid expansion, witness transit).
+

@@ -111,17 +111,21 @@ export const ForecastingPage: React.FC = () => {
               Proactive Early Support
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed mb-4">
-              If your current study routine and sleep patterns continue on their present trend, distress indicators may reach an elevated state by Day +4.
+              If your current sleep deficit and pre-trial stress trajectory continue on their present trend, distress indicators may reach an acute escalation state before your next court date.
             </p>
             <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-2">
-              <strong className="text-slate-200 block">Recommended Action Steps:</strong>
+              <strong className="text-slate-200 block">Recommended Proactive Steps:</strong>
               <div className="flex items-center gap-2 text-slate-300">
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" />
-                <span>Adjust nighttime study schedule to recover 1.5h sleep</span>
+                <span>Schedule a 15-minute preparation check-in with your assigned counselor</span>
               </div>
               <div className="flex items-center gap-2 text-slate-300">
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" />
-                <span>Practice 5-minute NSDR relaxation technique</span>
+                <span>Practice 5-minute somatic grounding before evening rest</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" />
+                <span>Confirm safe transit and court escort with NALSA Legal Aid</span>
               </div>
             </div>
           </div>

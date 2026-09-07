@@ -9,11 +9,11 @@ export const WhatIfSimulatorPage: React.FC = () => {
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationResult, setSimulationResult] = useState<any>({
     projectedImpact: {
-      stressTrendDelta: '-0.7 pts',
-      supportUtilizationDelta: '+18%',
-      projectedHighRiskDecline: '-22%',
+      stressTrendDelta: '-0.9 pts',
+      supportUtilizationDelta: '+24%',
+      projectedHighRiskDecline: '-31%',
     },
-    disclaimer: 'Simulation / decision-support estimate. Does not assert clinical causal certainty.',
+    disclaimer: 'Simulation / decision-support estimate. Assesses directional policy impact for resource planning.',
   });
 
   const handleRunSimulation = async () => {
@@ -28,9 +28,9 @@ export const WhatIfSimulatorPage: React.FC = () => {
     } catch {
       setSimulationResult({
         projectedImpact: {
-          stressTrendDelta: `-${((counselingPct / 100) * 1.2 + (peerSupport ? 0.4 : 0) + (examDecompression ? 0.8 : 0)).toFixed(1)} pts`,
-          supportUtilizationDelta: `+${Math.round(counselingPct * 0.4 + (peerSupport ? 12 : 0))}%`,
-          projectedHighRiskDecline: `-${Math.round((counselingPct / 100) * 18 + (peerSupport ? 8 : 0) + (examDecompression ? 14 : 0))}%`,
+          stressTrendDelta: `-${((counselingPct / 100) * 1.4 + (peerSupport ? 0.6 : 0) + (examDecompression ? 0.9 : 0)).toFixed(1)} pts`,
+          supportUtilizationDelta: `+${Math.round(counselingPct * 0.5 + (peerSupport ? 16 : 0))}%`,
+          projectedHighRiskDecline: `-${Math.round((counselingPct / 100) * 22 + (peerSupport ? 10 : 0) + (examDecompression ? 18 : 0))}%`,
         },
         disclaimer: 'Simulation / decision-support estimate.',
       });
@@ -44,10 +44,10 @@ export const WhatIfSimulatorPage: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
           <Sliders className="w-7 h-7 text-teal-400" />
-          What-If Policy & Intervention Simulator
+          What-If Welfare & Support Policy Simulator
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Model hypothetical campus wellness initiatives and forecast directional changes in population distress.
+          Model hypothetical district welfare initiatives, witness protection measures, and compensation speedups.
         </p>
       </div>
 
@@ -55,7 +55,7 @@ export const WhatIfSimulatorPage: React.FC = () => {
         <Shield className="w-5 h-5 text-teal-400 shrink-0 mt-0.5" />
         <div className="text-xs text-slate-300 leading-relaxed">
           <strong className="text-teal-300 block mb-0.5">Policy Simulation Safeguard</strong>
-          Outputs are predictive decision-support estimates derived from synthetic regression curves. They assist in resource planning and do not claim causal certainty.
+          Outputs are predictive decision-support estimates derived from synthetic regression curves. They assist district officers in resource planning and do not claim causal certainty.
         </div>
       </div>
 
@@ -63,14 +63,14 @@ export const WhatIfSimulatorPage: React.FC = () => {
         {/* Scenario Parameter Controls */}
         <div className="lg:col-span-6 glass-card p-6 border border-slate-800 space-y-6">
           <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-            <span>Configure Policy Interventions</span>
+            <span>Configure Support Interventions</span>
           </h2>
 
-          {/* Slider: Increase counseling availability */}
+          {/* Slider: Expand DLSA Legal Aid & Counselors */}
           <div>
             <div className="flex justify-between items-center mb-2">
               <label className="text-sm font-medium text-slate-300">
-                Expand Counseling Staff & Hours
+                Expand DLSA Legal Aid Advocates & Trauma Counselors
               </label>
               <span className="text-xs font-bold text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">
                 +{counselingPct}% capacity
@@ -87,11 +87,11 @@ export const WhatIfSimulatorPage: React.FC = () => {
             />
           </div>
 
-          {/* Checkbox: Launch Peer Support */}
+          {/* Checkbox: Witness transit & safehouse */}
           <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer" onClick={() => setPeerSupport(!peerSupport)}>
             <div>
-              <span className="text-sm font-semibold text-slate-200 block">Launch Peer Wellness Network</span>
-              <span className="text-xs text-slate-400">Establish peer-led drop-in study & decompression groups</span>
+              <span className="text-sm font-semibold text-slate-200 block">Protected Safe Transit & Witness Escort</span>
+              <span className="text-xs text-slate-400">Establish dedicated police escort & transit for court testimony</span>
             </div>
             <input
               type="checkbox"
@@ -101,11 +101,11 @@ export const WhatIfSimulatorPage: React.FC = () => {
             />
           </div>
 
-          {/* Checkbox: Exam decompression */}
+          {/* Checkbox: Fast-track interim compensation */}
           <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between cursor-pointer" onClick={() => setExamDecompression(!examDecompression)}>
             <div>
-              <span className="text-sm font-semibold text-slate-200 block">Exam Schedule Decompression Policy</span>
-              <span className="text-xs text-slate-400">Mandate 48h buffer between major departmental midterms</span>
+              <span className="text-sm font-semibold text-slate-200 block">Fast-Track Interim Compensation Release</span>
+              <span className="text-xs text-slate-400">Expedite 357A CrPC first-stage disbursement within 14 days of FIR</span>
             </div>
             <input
               type="checkbox"
@@ -129,10 +129,10 @@ export const WhatIfSimulatorPage: React.FC = () => {
           <div>
             <h2 className="text-base font-bold text-slate-100 mb-2 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-teal-400" />
-              <span>Simulated Campus Impact Projections</span>
+              <span>Simulated District Impact Projections</span>
             </h2>
             <p className="text-xs text-slate-400 mb-6">
-              Estimated directional outcome on campus wellness indicators
+              Estimated directional outcome on victim recovery & distress reduction
             </p>
 
             {simulationResult && (

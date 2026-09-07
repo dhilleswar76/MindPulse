@@ -96,7 +96,7 @@ export const BaselineOverviewPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-400">
           <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <strong className="text-slate-200 block mb-1">1. Rolling Time Window</strong>
-            Updates daily with each new check-in log, adapting naturally to term breaks and academic cycles.
+            Updates dynamically with each voluntary check-in log, adapting across case stages and life events.
           </div>
           <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <strong className="text-slate-200 block mb-1">2. Anomaly Deviation</strong>

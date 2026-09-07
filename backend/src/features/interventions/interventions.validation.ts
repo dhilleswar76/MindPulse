@@ -2,7 +2,18 @@ import { z } from 'zod';
 
 export const createInterventionSchema = z.object({
   userId: z.string().min(1),
-  type: z.enum(['CHECK_IN_CHAT', 'COUNSELING_SESSION', 'RESOURCE_REFERRAL', 'ACADEMIC_ADJUSTMENT']),
+  caseId: z.string().optional(),
+  type: z.enum([
+    'COUNSELLING',
+    'PROFESSIONAL_REFERRAL',
+    'LEGAL_AID',
+    'PROTECTION_SUPPORT',
+    'RELOCATION_SUPPORT',
+    'FINANCIAL_ASSISTANCE',
+    'REHABILITATION_SUPPORT',
+    'CHECK_IN_CHAT',
+    'OTHER',
+  ]),
   status: z.enum(['PLANNED', 'ACTIVE', 'COMPLETED', 'FOLLOW_UP_REQUIRED']).default('PLANNED'),
   clinicalNotes: z.string().min(3, 'Notes must be at least 3 characters'),
   actionItems: z.array(z.string()).optional(),

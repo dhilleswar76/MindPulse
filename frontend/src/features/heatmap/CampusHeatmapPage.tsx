@@ -14,15 +14,14 @@ export const CampusHeatmapPage: React.FC = () => {
         if (res.data?.zones?.length > 0) setSelectedZone(res.data.zones[0]);
       } catch {
         const fallback = {
-          campusName: 'Central University Campus',
+          campusName: 'State Alpha - District Welfare & Legal Support Network',
           zones: [
-            { zoneId: 'zone_lib', name: 'Main Library & Study Commons', aggregateStress: 6.4, sampleSize: 142, alertLevel: 'ELEVATED' },
-            { zoneId: 'zone_eng', name: 'Engineering Complex', aggregateStress: 6.1, sampleSize: 198, alertLevel: 'ELEVATED' },
-            { zoneId: 'zone_sci', name: 'Science Laboratories', aggregateStress: 5.2, sampleSize: 110, alertLevel: 'WATCH' },
-            { zoneId: 'zone_res_north', name: 'North Residence Halls', aggregateStress: 4.6, sampleSize: 260, alertLevel: 'STABLE' },
-            { zoneId: 'zone_res_south', name: 'South Residence Halls', aggregateStress: 4.8, sampleSize: 245, alertLevel: 'STABLE' },
-            { zoneId: 'zone_stu_center', name: 'Student Union & Wellness Hub', aggregateStress: 3.9, sampleSize: 310, alertLevel: 'STABLE' },
-            { zoneId: 'zone_rec', name: 'Campus Recreation Center', aggregateStress: 3.2, sampleSize: 155, alertLevel: 'STABLE' },
+            { zoneId: 'zone_court', name: 'Special Courts & Witness Cell Cluster', aggregateStress: 7.2, sampleSize: 28, alertLevel: 'ELEVATED' },
+            { zoneId: 'zone_dist_central', name: 'District Central Rehabilitation Hub', aggregateStress: 6.1, sampleSize: 42, alertLevel: 'ELEVATED' },
+            { zoneId: 'zone_sub_north', name: 'North Sub-Division Legal Aid Clinic', aggregateStress: 5.4, sampleSize: 19, alertLevel: 'WATCH' },
+            { zoneId: 'zone_rural_east', name: 'Eastern Block Community Outreach', aggregateStress: 4.8, sampleSize: 34, alertLevel: 'STABLE' },
+            { zoneId: 'zone_south_shelter', name: 'Southern Shelter & Protection Safehouse', aggregateStress: 4.2, sampleSize: 15, alertLevel: 'STABLE' },
+            { zoneId: 'zone_welfare_hq', name: 'District Welfare Office (Direct Walk-in)', aggregateStress: 3.8, sampleSize: 52, alertLevel: 'STABLE' },
           ],
         };
         setHeatmapData(fallback);
@@ -37,18 +36,18 @@ export const CampusHeatmapPage: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
           <Map className="w-7 h-7 text-teal-400" />
-          Campus Wellness Zone Heatmap
+          District & Regional Distress Heatmap
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Privacy-preserving aggregate stress and activity intensity across campus facilities.
+          Privacy-preserving aggregate distress and case support intensity across district welfare zones.
         </p>
       </div>
 
       <div className="p-4 rounded-xl bg-slate-900/90 border border-teal-500/30 flex items-start gap-3">
         <Shield className="w-5 h-5 text-teal-400 shrink-0 mt-0.5" />
         <div className="text-xs text-slate-300 leading-relaxed">
-          <strong className="text-teal-300 block mb-0.5">Aggregate Spatial Protection</strong>
-          Location telemetry represents voluntary building tags aggregated into cohort zones. No individual movements or personal traces are stored.
+          <strong className="text-teal-300 block mb-0.5">Privacy-Preserving Jurisdictional Aggregation (k ≥ 5)</strong>
+          All telemetry is anonymized and aggregated at the district/block level. No individual case coordinates or victim identities are ever exposed on spatial maps.
         </div>
       </div>
 
@@ -56,7 +55,7 @@ export const CampusHeatmapPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Visual Zone Grid */}
           <div className="lg:col-span-8 glass-card p-6 border border-slate-800">
-            <h2 className="text-base font-bold text-slate-100 mb-4">Select Campus Zone</h2>
+            <h2 className="text-base font-bold text-slate-100 mb-4">Select District / Division Zone</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {heatmapData.zones.map((zone: any) => (
                 <div
@@ -86,8 +85,8 @@ export const CampusHeatmapPage: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-400 mt-3 pt-3 border-t border-slate-800">
-                    <span>Aggregate Stress: <strong className="text-white">{zone.aggregateStress}/10</strong></span>
-                    <span>Sample: <strong className="text-slate-300">{zone.sampleSize}</strong></span>
+                    <span>Aggregate Distress: <strong className="text-white">{zone.aggregateStress}/10</strong></span>
+                    <span>Anonymized Cohort (k ≥ 5): <strong className="text-slate-300">{zone.sampleSize}</strong></span>
                   </div>
                 </div>
               ))}
@@ -99,26 +98,26 @@ export const CampusHeatmapPage: React.FC = () => {
             <div className="lg:col-span-4 glass-card p-6 border border-slate-800 flex flex-col justify-between">
               <div>
                 <h3 className="text-lg font-bold text-slate-100 mb-1">{selectedZone.name}</h3>
-                <span className="text-xs text-teal-400 block mb-4">Cohort Telemetry Breakdown</span>
+                <span className="text-xs text-teal-400 block mb-4">Jurisdictional Telemetry Breakdown</span>
 
                 <div className="space-y-4 my-6">
                   <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-                    <span className="text-xs text-slate-400 block mb-1">Perceived Stress Index</span>
+                    <span className="text-xs text-slate-400 block mb-1">Perceived Distress Index</span>
                     <div className="text-3xl font-extrabold text-amber-400">{selectedZone.aggregateStress} <span className="text-sm text-slate-500">/ 10</span></div>
                   </div>
 
                   <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-                    <span className="text-xs text-slate-400 block mb-1">Voluntary Sample Cohort</span>
-                    <div className="text-2xl font-bold text-white">{selectedZone.sampleSize} students</div>
+                    <span className="text-xs text-slate-400 block mb-1">Active Cases Monitored</span>
+                    <div className="text-2xl font-bold text-white">{selectedZone.sampleSize} individuals</div>
                   </div>
                 </div>
               </div>
 
               <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 text-xs text-slate-400">
-                <strong className="text-slate-200 block mb-1">Recommended Campus Action:</strong>
+                <strong className="text-slate-200 block mb-1">Recommended Institutional Action:</strong>
                 {selectedZone.alertLevel === 'ELEVATED'
-                  ? 'Deploy peer wellness ambassadors and mobile hydration/rest stations during peak hours.'
-                  : 'Maintain standard wellness support materials.'}
+                  ? 'Deploy mobile legal aid counselors and expedite trauma-informed psycho-social relief camps in this zone.'
+                  : 'Maintain scheduled DLSA outreach and routine counselor check-in coverage.'}
               </div>
             </div>
           )}

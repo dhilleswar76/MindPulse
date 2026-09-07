@@ -2,11 +2,39 @@ import { Request } from 'express';
 
 export type UserRole = 'USER' | 'COUNSELOR' | 'ADMIN';
 
+export type VictimType = 'VICTIM' | 'WITNESS' | 'FAMILY_MEMBER' | 'COMPLAINANT' | 'OTHER_AFFECTED_PERSON';
+
+export type CaseStage =
+  | 'CASE_REGISTRATION'
+  | 'INVESTIGATION'
+  | 'COURT_TRIAL'
+  | 'COMPENSATION'
+  | 'REHABILITATION'
+  | 'PROTECTION_SUPPORT'
+  | 'CLOSED';
+
+export type CaseStatus = 'ACTIVE' | 'UNDER_REVIEW' | 'SUPPORT_IN_PROGRESS' | 'CLOSED';
+
+export type SupportType =
+  | 'COUNSELLING'
+  | 'PROFESSIONAL_REFERRAL'
+  | 'LEGAL_AID'
+  | 'PROTECTION_SUPPORT'
+  | 'RELOCATION_SUPPORT'
+  | 'FINANCIAL_ASSISTANCE'
+  | 'REHABILITATION_SUPPORT'
+  | 'OTHER';
+
 export interface TokenPayload {
   userId: string;
   email: string;
   role: UserRole;
   fullName: string;
+  victimType?: VictimType;
+  caseId?: string;
+  caseStage?: CaseStage;
+  district?: string;
+  state?: string;
 }
 
 export interface AuthRequest extends Request {
@@ -21,3 +49,4 @@ export interface IRiskFactorItem {
   direction?: 'increase' | 'decrease';
   description?: string;
 }
+

@@ -18,34 +18,43 @@ export const RecommendationsPage: React.FC = () => {
             _id: '1',
             title: '4-7-8 Parasympathetic Breathing',
             category: 'BREATHING',
-            description: 'Inhale for 4 seconds, hold for 7 seconds, exhale for 8 seconds. Repeat for 4 cycles to alleviate acute stress sensations.',
+            description: 'Inhale for 4s, hold for 7s, exhale for 8s. Repeat for 4 cycles to alleviate acute tension before hearings or interviews.',
             durationMinutes: 4,
             targetRiskLevels: ['ALL'],
             isNonClinical: true,
           },
           {
             _id: '2',
-            title: 'Non-Sleep Deep Rest (NSDR) Recovery',
-            category: 'SLEEP',
-            description: 'Guided audio body-scan relaxation that accelerates mental recovery and helps offset sleep deficits.',
-            durationMinutes: 10,
+            title: 'NALSA / DLSA Free Legal Aid Cell',
+            category: 'LEGAL_AID',
+            description: 'Connect with your District Legal Services Authority appointed advocate for case updates, witness deposition guidance, and bail opposition.',
+            durationMinutes: 15,
             targetRiskLevels: ['ALL'],
             isNonClinical: true,
           },
           {
             _id: '3',
-            title: 'Campus Peer Wellness Drop-in Hours',
-            category: 'CAMPUS_RESOURCE',
-            description: 'Connect informally with trained fellow students for confidential, pressure-free check-ins at the Student Union.',
-            durationMinutes: 30,
+            title: 'Victim Compensation Scheme Assistance',
+            category: 'VICTIM_COMPENSATION',
+            description: 'Facilitated access to interim financial relief under Section 357A CrPC and Central Victim Compensation Fund.',
+            durationMinutes: 20,
             targetRiskLevels: ['ALL'],
             isNonClinical: true,
           },
           {
             _id: '4',
-            title: '24/7 University Crisis Helpline',
+            title: 'Witness Protection & Safe Transit Unit',
+            category: 'WITNESS_PROTECTION',
+            description: 'Confidential coordination with the District Witness Protection Committee for identity concealment, safe passage, and threat assessment.',
+            durationMinutes: 30,
+            targetRiskLevels: ['ELEVATED', 'REQUIRES_REVIEW'],
+            isNonClinical: true,
+          },
+          {
+            _id: '5',
+            title: 'National Tele-Mental Health Helpline (KIRAN 1800-599-0019)',
             category: 'CRISIS_CONTACT',
-            description: 'Free confidential support available any time: Dial 988 or Campus Crisis at (800) 273-8255.',
+            description: '24/7 toll-free, multilingual psychological first aid provided by the Ministry of Social Justice and Empowerment.',
             durationMinutes: 0,
             targetRiskLevels: ['REQUIRES_REVIEW'],
             isNonClinical: false,
@@ -64,8 +73,12 @@ export const RecommendationsPage: React.FC = () => {
         return <Wind className="w-5 h-5 text-teal-400" />;
       case 'SLEEP':
         return <Moon className="w-5 h-5 text-indigo-400" />;
-      case 'CAMPUS_RESOURCE':
-        return <Users className="w-5 h-5 text-amber-400" />;
+      case 'LEGAL_AID':
+        return <Shield className="w-5 h-5 text-sky-400" />;
+      case 'VICTIM_COMPENSATION':
+        return <Compass className="w-5 h-5 text-amber-400" />;
+      case 'WITNESS_PROTECTION':
+        return <Users className="w-5 h-5 text-emerald-400" />;
       case 'CRISIS_CONTACT':
         return <PhoneCall className="w-5 h-5 text-rose-400" />;
       default:
@@ -81,7 +94,7 @@ export const RecommendationsPage: React.FC = () => {
           Personalized Non-Clinical Support Recommendations
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Evidence-informed wellness routines, campus facilities, and grounding resources tailored to your signals.
+          Evidence-informed wellness routines, legal aid pathways, and grounding resources tailored to your signals.
         </p>
       </div>
 

@@ -12,6 +12,8 @@ import analyticsRoutes from '../features/analytics/analytics.routes.js';
 import usersRoutes from '../features/users/users.routes.js';
 import adminRoutes from '../features/admin/admin.routes.js';
 
+import casesRoutes from '../features/cases/cases.routes.js';
+
 const router = Router();
 
 // Health route
@@ -26,6 +28,7 @@ router.get('/health', (req, res) => {
 
 // Feature routes
 router.use('/auth', authRoutes);
+router.use('/cases', casesRoutes);
 router.use('/checkins', checkinRoutes);
 router.use('/journal', journalRoutes);
 router.use('/risk', riskRoutes);

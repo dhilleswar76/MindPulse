@@ -1,6 +1,6 @@
-# Database Schema — MindPulse Collections
+# Database Schema — MindPulse Collections (SIH26094)
 
-MindPulse defines 11 specialized Mongoose models designed for data isolation, privacy, and modular extensibility.
+MindPulse defines 12 specialized Mongoose models designed for data isolation, victim privacy, and modular extensibility under SIH26094 guidelines.
 
 ---
 
@@ -10,12 +10,33 @@ MindPulse defines 11 specialized Mongoose models designed for data isolation, pr
 - `passwordHash`: String
 - `fullName`: String
 - `role`: Enum [`USER`, `COUNSELOR`, `ADMIN`]
-- `department`: String (e.g. "Computer Science", "Engineering")
-- `yearOfStudy`: Number
+- `victimType`: Enum [`VICTIM`, `COMPLAINANT`, `WITNESS`, `FAMILY_MEMBER`]
+- `caseId`: String (e.g. "MP-1042")
+- `caseStage`: Enum [`CASE_REGISTRATION`, `INVESTIGATION`, `COURT_TRIAL`, `COMPENSATION`, `REHABILITATION`, `PROTECTION_SUPPORT`]
+- `district`: String (e.g. "District Central")
+- `state`: String (e.g. "State Alpha")
+- `supportStatus`: Enum [`ACTIVE`, `MONITORING`, `ESCALATED`, `RESOLVED`]
+- `consentStatus`: Boolean
+- `assignedCounselor`: String
+- `department`: String
 - `isActive`: Boolean
 - `createdAt`, `updatedAt`: Date
 
-## 2. `Consent`
+## 2. `Case`
+- `_id`: ObjectId
+- `caseId`: String (unique, indexed, e.g. "MP-1042")
+- `victimType`: Enum [`VICTIM`, `COMPLAINANT`, `WITNESS`, `FAMILY_MEMBER`]
+- `currentStage`: Enum [`CASE_REGISTRATION`, `INVESTIGATION`, `COURT_TRIAL`, `COMPENSATION`, `REHABILITATION`, `PROTECTION_SUPPORT`]
+- `priorityScore`: Number (0.00-1.00)
+- `district`: String
+- `state`: String
+- `incidentCategory`: String (e.g. "SC/ST Atrocity Matter")
+- `assignedCounselorId`: Ref -> `User`
+- `status`: Enum [`ACTIVE`, `PENDING_REVIEW`, `CLOSED`]
+- `stages`: Array of `{ stage: String, enteredAt: Date, completedAt: Date, notes: String }`
+- `createdAt`, `updatedAt`: Date
+
+## 3. `Consent`
 - `_id`: ObjectId
 - `userId`: Ref -> `User` (indexed)
 - `dataSharingConsent`: Boolean
@@ -24,47 +45,47 @@ MindPulse defines 11 specialized Mongoose models designed for data isolation, pr
 - `version`: String
 - `agreedAt`: Date
 
-## 3. `CheckIn`
+## 4. `CheckIn`
 - `_id`: ObjectId
 - `userId`: Ref -> `User` (indexed)
+- `caseId`: String
+- `caseStage`: Enum [`CASE_REGISTRATION`, `INVESTIGATION`, `COURT_TRIAL`, `COMPENSATION`, `REHABILITATION`, `PROTECTION_SUPPORT`]
 - `mood`: Number (1-10)
 - `stress`: Number (1-10)
 - `energy`: Number (1-10)
 - `sleepHours`: Number (0-24)
+- `senseOfSafety`: Number (1-10)
+- `caseRelatedStress`: Number (1-10)
+- `supportAvailability`: Number (1-10)
 - `optionalNote`: String
 - `timestamp`: Date (indexed)
 
-## 4. `JournalEntry`
+## 5. `JournalEntry`
 - `_id`: ObjectId
 - `userId`: Ref -> `User` (indexed)
 - `title`: String
 - `content`: String
 - `sentiment`: Enum [`positive`, `neutral`, `negative`]
 - `stressSignal`: Number (0.00-1.00)
-- `emotionSignals`: Array of Strings (e.g. ["anxiety", "fatigue"])
+- `emotionSignals`: Array of Strings (e.g. ["hearing_anxiety", "safety_concern", "hypervigilance"])
 - `isPrivate`: Boolean
 - `createdAt`, `updatedAt`: Date
 
-## 5. `RiskScore`
+## 6. `RiskScore`
 - `_id`: ObjectId
 - `userId`: Ref -> `User` (indexed)
+- `caseId`: String
 - `riskScore`: Number (0.00-1.00)
 - `riskLevel`: Enum [`STABLE`, `WATCH`, `ELEVATED`, `REQUIRES_REVIEW`]
-- `factors`: Array of `{ feature: String, impact: Number }`
+- `factors`: Array of `{ feature: String, impact: Number, description: String }`
 - `anomalyScore`: Number
 - `modelVersion`: String
 - `calculatedAt`: Date (indexed)
 
-## 6. `RiskFactor`
-- `_id`: ObjectId
-- `riskScoreId`: Ref -> `RiskScore`
-- `featureName`: String
-- `shapValue`: Number
-- `baselineDelta`: Number
-
 ## 7. `Alert`
 - `_id`: ObjectId
 - `userId`: Ref -> `User` (indexed)
+- `caseId`: String
 - `riskLevel`: Enum [`WATCH`, `COUNSELOR_REVIEW`]
 - `status`: Enum [`OPEN`, `ACKNOWLEDGED`, `RESOLVED`]
 - `triggerReason`: String
@@ -74,29 +95,27 @@ MindPulse defines 11 specialized Mongoose models designed for data isolation, pr
 ## 8. `Intervention`
 - `_id`: ObjectId
 - `userId`: Ref -> `User` (indexed)
+- `caseId`: String
 - `counselorId`: Ref -> `User` (indexed)
-- `type`: Enum [`CHECK_IN_CHAT`, `COUNSELING_SESSION`, `RESOURCE_REFERRAL`, `ACADEMIC_ADJUSTMENT`]
+- `type`: Enum [`COUNSELLING`, `LEGAL_AID`, `PROTECTION_SUPPORT`, `RELOCATION_SUPPORT`, `FINANCIAL_ASSISTANCE`, `REHABILITATION_SUPPORT`, `PROFESSIONAL_REFERRAL`, `OTHER`]
 - `status`: Enum [`PLANNED`, `ACTIVE`, `COMPLETED`, `FOLLOW_UP_REQUIRED`]
+- `supportPathway`: String
+- `preInterventionStress`: Number
+- `postInterventionStress`: Number
 - `clinicalNotes`: String
 - `scheduledDate`: Date
 - `createdAt`, `updatedAt`: Date
 
-## 9. `FollowUp`
-- `_id`: ObjectId
-- `interventionId`: Ref -> `Intervention` (indexed)
-- `dueDate`: Date
-- `completed`: Boolean
-- `notes`: String
-
-## 10. `Recommendation`
+## 9. `Recommendation`
 - `_id`: ObjectId
 - `title`: String
-- `category`: Enum [`BREATHING`, `SLEEP`, `MINDFULNESS`, `CAMPUS_RESOURCE`, `CRISIS_CONTACT`]
+- `category`: Enum [`BREATHING`, `SLEEP`, `LEGAL_AID`, `VICTIM_COMPENSATION`, `WITNESS_PROTECTION`, `COUNSELING_PATHWAY`, `DISTRICT_WELFARE`, `CRISIS_CONTACT`]
 - `description`: String
 - `actionUrl`: String
 - `targetRiskLevels`: Array of Strings
+- `isNonClinical`: Boolean
 
-## 11. `AuditLog`
+## 10. `AuditLog`
 - `_id`: ObjectId
 - `actorId`: Ref -> `User` (indexed)
 - `action`: String
@@ -104,3 +123,4 @@ MindPulse defines 11 specialized Mongoose models designed for data isolation, pr
 - `resourceId`: String
 - `ipAddress`: String
 - `timestamp`: Date (indexed)
+

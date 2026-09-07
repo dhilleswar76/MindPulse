@@ -1,10 +1,20 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export type InterventionType = 'CHECK_IN_CHAT' | 'COUNSELING_SESSION' | 'RESOURCE_REFERRAL' | 'ACADEMIC_ADJUSTMENT';
+export type InterventionType =
+  | 'COUNSELLING'
+  | 'PROFESSIONAL_REFERRAL'
+  | 'LEGAL_AID'
+  | 'PROTECTION_SUPPORT'
+  | 'RELOCATION_SUPPORT'
+  | 'FINANCIAL_ASSISTANCE'
+  | 'REHABILITATION_SUPPORT'
+  | 'CHECK_IN_CHAT'
+  | 'OTHER';
 export type InterventionStatus = 'PLANNED' | 'ACTIVE' | 'COMPLETED' | 'FOLLOW_UP_REQUIRED';
 
 export interface IIntervention extends Document {
   userId: mongoose.Types.ObjectId;
+  caseId?: string;
   counselorId: mongoose.Types.ObjectId;
   type: InterventionType;
   status: InterventionStatus;
@@ -21,11 +31,22 @@ export interface IIntervention extends Document {
 const InterventionSchema = new Schema<IIntervention>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    caseId: { type: String, index: true },
     counselorId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     type: {
       type: String,
-      enum: ['CHECK_IN_CHAT', 'COUNSELING_SESSION', 'RESOURCE_REFERRAL', 'ACADEMIC_ADJUSTMENT'],
-      default: 'CHECK_IN_CHAT',
+      enum: [
+        'COUNSELLING',
+        'PROFESSIONAL_REFERRAL',
+        'LEGAL_AID',
+        'PROTECTION_SUPPORT',
+        'RELOCATION_SUPPORT',
+        'FINANCIAL_ASSISTANCE',
+        'REHABILITATION_SUPPORT',
+        'CHECK_IN_CHAT',
+        'OTHER',
+      ],
+      default: 'COUNSELLING',
       required: true,
     },
     status: {

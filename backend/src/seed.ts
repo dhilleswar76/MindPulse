@@ -1,10 +1,10 @@
 import bcrypt from 'bcryptjs';
 import { connectDatabase } from './config/db.js';
-import { User, CheckIn, JournalEntry, Recommendation } from './models/index.js';
+import { User, Case, CheckIn, JournalEntry, Recommendation } from './models/index.js';
 import { logger } from './utils/logger.js';
 
 export const seedDatabase = async () => {
-  logger.info('🌱 Starting MindPulse synthetic seed data generation...');
+  logger.info('🌱 Starting MindPulse synthetic seed data generation (SIH26094)...');
   const connected = await connectDatabase();
 
   const password = 'MindPulseDemo2026!';
@@ -15,24 +15,32 @@ export const seedDatabase = async () => {
     {
       email: 'demo.user@mindpulse.local',
       passwordHash,
-      fullName: 'Alex Rivera (Student)',
+      fullName: 'Alex Rivera (Protected Witness)',
       role: 'USER',
-      department: 'Computer Science',
-      yearOfStudy: 3,
+      victimType: 'WITNESS',
+      caseId: 'MP-1042',
+      caseStage: 'COURT_TRIAL',
+      district: 'Central District',
+      state: 'National Capital Region',
+      assignedCounselor: 'Dr. Sarah Jenkins',
+      supportStatus: 'ACTIVE_MONITORING',
+      consentStatus: true,
     },
     {
       email: 'demo.counselor@mindpulse.local',
       passwordHash,
-      fullName: 'Dr. Sarah Jenkins (Counselor)',
+      fullName: 'Dr. Sarah Jenkins (Designated Counselor)',
       role: 'COUNSELOR',
-      department: 'Student Wellness Services',
+      district: 'Central District',
+      state: 'National Capital Region',
     },
     {
       email: 'demo.admin@mindpulse.local',
       passwordHash,
-      fullName: 'Dean Marcus Vance (Admin)',
+      fullName: 'Marcus Vance (District Welfare Official)',
       role: 'ADMIN',
-      department: 'Institutional Health & Analytics',
+      district: 'Central District',
+      state: 'National Capital Region',
     },
   ];
 
@@ -50,10 +58,10 @@ export const seedDatabase = async () => {
   }
 
   logger.info('═══════════════════════════════════════════════════════════');
-  logger.info(' MindPulse Demo Credentials Ready:');
-  logger.info(' • Student:   demo.user@mindpulse.local       / MindPulseDemo2026!');
-  logger.info(' • Counselor: demo.counselor@mindpulse.local  / MindPulseDemo2026!');
-  logger.info(' • Admin:     demo.admin@mindpulse.local      / MindPulseDemo2026!');
+  logger.info(' MindPulse SIH26094 Demo Credentials Ready:');
+  logger.info(' • Victim/Witness: demo.user@mindpulse.local       / MindPulseDemo2026!');
+  logger.info(' • Counselor:      demo.counselor@mindpulse.local  / MindPulseDemo2026!');
+  logger.info(' • Admin/Official: demo.admin@mindpulse.local      / MindPulseDemo2026!');
   logger.info('═══════════════════════════════════════════════════════════');
 };
 

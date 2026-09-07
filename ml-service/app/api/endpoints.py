@@ -5,7 +5,9 @@ from app.schemas.risk import (
     AnomalyDetectionRequest,
     AnomalyDetectionResponse,
     ForecastRequest,
-    ForecastResponse
+    ForecastResponse,
+    VoiceAnalysisRequest,
+    VoiceAnalysisResponse
 )
 from app.schemas.journal import (
     JournalAnalysisRequest,
@@ -15,6 +17,7 @@ from app.services.risk_service import compute_risk_prediction
 from app.services.nlp_service import analyze_journal_text
 from app.services.forecast_service import generate_risk_forecast
 from app.services.anomaly_service import detect_checkin_anomaly
+from app.services.voice_service import extract_voice_stress_signals
 from app.feature_engineering.extractors import extract_longitudinal_features
 from app.explainability.shap_engine import calculate_feature_attribution
 
@@ -34,7 +37,8 @@ def predict_risk_endpoint(request: RiskPredictionRequest):
         return compute_risk_prediction(
             user_id=request.userId,
             check_ins=request.recentCheckIns,
-            baseline=request.historicalBaseline
+            baseline=request.historicalBaseline,
+            case_stage=request.caseStage
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -84,3 +88,15 @@ def analyze_journal_endpoint(request: JournalAnalysisRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/analyze-voice", response_model=VoiceAnalysisResponse)
+def analyze_voice_endpoint(request: VoiceAnalysisRequest):
+    try:
+        return extract_voice_stress_signals(
+            user_id=request.userId,
+            audio_duration_seconds=request.audioDurationSeconds,
+            sample_rate=request.sampleRate or 16000
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

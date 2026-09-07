@@ -26,14 +26,16 @@ export const Navbar: React.FC = () => {
           <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-teal-400 via-indigo-300 to-white bg-clip-text text-transparent">
             MindPulse
           </span>
-          <span className="block text-[10px] uppercase tracking-wider text-teal-400/80 font-medium">Early Support Platform</span>
+          <span className="block text-[10px] uppercase tracking-wider text-teal-400/90 font-semibold">
+            Victim Wellbeing & Support • SIH26094
+          </span>
         </div>
       </Link>
 
       {/* Non-Diagnostic Reminder banner */}
-      <div className="hidden md:flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-full px-3 py-1 text-xs text-slate-400">
+      <div className="hidden md:flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 rounded-full px-3 py-1 text-xs text-slate-300">
         <Shield className="w-3.5 h-3.5 text-teal-400" />
-        <span>Decision-support & early intervention • Non-diagnostic</span>
+        <span>Ministry of Social Justice & Empowerment • Non-Diagnostic Decision Support</span>
       </div>
 
       {/* Role Switcher & User Profile */}
@@ -43,15 +45,15 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => handleRoleChange('USER')}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              user?.role === 'USER' ? 'bg-teal-500 text-slate-900 font-semibold' : 'text-slate-400 hover:text-white'
+              user?.role === 'USER' ? 'bg-teal-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Student
+            Victim / Witness
           </button>
           <button
             onClick={() => handleRoleChange('COUNSELOR')}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              user?.role === 'COUNSELOR' ? 'bg-indigo-500 text-white font-semibold' : 'text-slate-400 hover:text-white'
+              user?.role === 'COUNSELOR' ? 'bg-indigo-500 text-white font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
             Counselor
@@ -59,10 +61,10 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => handleRoleChange('ADMIN')}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              user?.role === 'ADMIN' ? 'bg-amber-500 text-slate-900 font-semibold' : 'text-slate-400 hover:text-white'
+              user?.role === 'ADMIN' ? 'bg-amber-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Admin
+            District Admin
           </button>
         </div>
 

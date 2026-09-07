@@ -34,7 +34,7 @@ export const AppRoutes: React.FC = () => {
 
       {/* Protected App Layout */}
       <Route element={<DashboardLayout />}>
-        {/* User / Student Routes */}
+        {/* Victim / Witness Portal Routes */}
         <Route element={<ProtectedRoute allowedRoles={['USER', 'COUNSELOR', 'ADMIN']} />}>
           <Route path="/dashboard" element={<UserDashboardPage />} />
           <Route path="/checkins" element={<CheckinPage />} />

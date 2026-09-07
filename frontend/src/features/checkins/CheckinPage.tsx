@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Smile, Moon, Zap, Activity, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Smile, Moon, Zap, Activity, CheckCircle2, AlertCircle, Shield, Scale } from 'lucide-react';
 import api from '../../services/api';
 import { WellnessTrendChart } from './WellnessTrendChart';
 
@@ -8,10 +8,14 @@ export const CheckinPage: React.FC = () => {
   const [stress, setStress] = useState(4);
   const [energy, setEnergy] = useState(6);
   const [sleepHours, setSleepHours] = useState(7.5);
+  const [senseOfSafety, setSenseOfSafety] = useState(8);
+  const [caseRelatedStress, setCaseRelatedStress] = useState(4);
   const [optionalNote, setOptionalNote] = useState('');
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string; riskLevel?: string } | null>(null);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string; riskLevel?: string } | null>(
+    null
+  );
   const [trendData, setTrendData] = useState<any[]>([]);
   const [baseline, setBaseline] = useState<any>(null);
 
@@ -25,13 +29,13 @@ export const CheckinPage: React.FC = () => {
     } catch {
       // Use fallback synthetic data
       setTrendData([
-        { date: 'Day 1', mood: 8, stress: 3, energy: 7, sleepHours: 8 },
-        { date: 'Day 2', mood: 7, stress: 4, energy: 6, sleepHours: 7.5 },
-        { date: 'Day 3', mood: 6, stress: 6, energy: 5, sleepHours: 6 },
-        { date: 'Day 4', mood: 5, stress: 7, energy: 4, sleepHours: 5.5 },
-        { date: 'Day 5', mood: 6, stress: 5, energy: 6, sleepHours: 7 },
+        { date: 'Day 1', mood: 8, stress: 3, energy: 7, sleepHours: 8, senseOfSafety: 8, caseRelatedStress: 3 },
+        { date: 'Day 2', mood: 7, stress: 4, energy: 6, sleepHours: 7.5, senseOfSafety: 8, caseRelatedStress: 4 },
+        { date: 'Day 3', mood: 6, stress: 6, energy: 5, sleepHours: 6, senseOfSafety: 6, caseRelatedStress: 6 },
+        { date: 'Day 4', mood: 5, stress: 7, energy: 4, sleepHours: 5.5, senseOfSafety: 5, caseRelatedStress: 8 },
+        { date: 'Day 5', mood: 6, stress: 5, energy: 6, sleepHours: 7, senseOfSafety: 7, caseRelatedStress: 5 },
       ]);
-      setBaseline({ avgMood: 6.4, avgStress: 5.0, avgEnergy: 5.6, avgSleep: 6.8 });
+      setBaseline({ avgMood: 6.4, avgStress: 5.0, avgEnergy: 5.6, avgSleep: 6.8, avgSafety: 7.2 });
     }
   };
 
@@ -50,13 +54,15 @@ export const CheckinPage: React.FC = () => {
         stress,
         energy,
         sleepHours,
+        senseOfSafety,
+        caseRelatedStress,
         optionalNote,
       });
 
       const riskLevel = res.data?.riskAssessment?.riskLevel || 'STABLE';
       setFeedback({
         type: 'success',
-        message: 'Daily check-in logged! Personal baseline updated.',
+        message: 'Wellbeing check-in recorded! Personal baseline updated for decision support.',
         riskLevel,
       });
       setOptionalNote('');
@@ -76,10 +82,10 @@ export const CheckinPage: React.FC = () => {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
           <Smile className="w-7 h-7 text-teal-400" />
-          Daily Mental Wellness Check-In
+          MindPulse Wellbeing Check-In
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
-          Take 60 seconds to log how you are feeling today. All telemetry is encrypted and private.
+        <p className="text-sm text-slate-400 mt-1 max-w-3xl leading-relaxed">
+          Periodic check-ins help identify subtle changes in wellbeing and stress during your case journey (investigation, trial hearings, compensation, or rehabilitation). Telemetry is encrypted, pseudonymous, and reviewed only by authorized support counselors.
         </p>
       </div>
 
@@ -102,8 +108,9 @@ export const CheckinPage: React.FC = () => {
               <p className="text-sm font-semibold">{feedback.message}</p>
               {feedback.riskLevel && (
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Evaluated risk signal status:{' '}
-                  <span className="font-semibold text-teal-400">{feedback.riskLevel}</span>
+                  Observed risk signal status:{' '}
+                  <span className="font-semibold text-teal-400">{feedback.riskLevel}</span> (Non-diagnostic decision
+                  support)
                 </p>
               )}
             </div>
@@ -113,9 +120,9 @@ export const CheckinPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left column: Interactive Slider Form */}
-        <div className="lg:col-span-6 glass-card p-6 border border-slate-800">
+        <div className="lg:col-span-6 glass-card p-6 border border-slate-800 rounded-2xl">
           <h2 className="text-lg font-bold text-slate-100 mb-5 flex items-center gap-2">
-            <span>Log Today's Signals</span>
+            <span>Today’s Wellbeing Telemetry</span>
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -124,7 +131,7 @@ export const CheckinPage: React.FC = () => {
               <div className="flex justify-between items-center mb-2">
                 <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
                   <Smile className="w-4 h-4 text-emerald-400" />
-                  Overall Mood (1 to 10)
+                  General Mood (1 to 10)
                 </label>
                 <span className="text-base font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-lg border border-emerald-500/20">
                   {mood} / 10
@@ -141,7 +148,7 @@ export const CheckinPage: React.FC = () => {
               <div className="flex justify-between text-[11px] text-slate-400 mt-1">
                 <span>1 - Very Low</span>
                 <span>5 - Neutral</span>
-                <span>10 - Excellent</span>
+                <span>10 - Calibrated</span>
               </div>
             </div>
 
@@ -150,7 +157,7 @@ export const CheckinPage: React.FC = () => {
               <div className="flex justify-between items-center mb-2">
                 <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
                   <Activity className="w-4 h-4 text-amber-400" />
-                  Perceived Stress Level (1 to 10)
+                  General Stress Level (1 to 10)
                 </label>
                 <span className="text-base font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-lg border border-amber-500/20">
                   {stress} / 10
@@ -167,33 +174,59 @@ export const CheckinPage: React.FC = () => {
               <div className="flex justify-between text-[11px] text-slate-400 mt-1">
                 <span>1 - Relaxed</span>
                 <span>5 - Manageable</span>
-                <span>10 - Overwhelmed</span>
+                <span>10 - High Stress</span>
               </div>
             </div>
 
-            {/* Energy Slider */}
+            {/* Case-Related Stress */}
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-indigo-400" />
-                  Energy Level (1 to 10)
+                  <Scale className="w-4 h-4 text-rose-400" />
+                  Case / Court-Related Stress (1 to 10)
                 </label>
-                <span className="text-base font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-lg border border-indigo-500/20">
-                  {energy} / 10
+                <span className="text-base font-bold text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded-lg border border-rose-500/20">
+                  {caseRelatedStress} / 10
                 </span>
               </div>
               <input
                 type="range"
                 min="1"
                 max="10"
-                value={energy}
-                onChange={(e) => setEnergy(Number(e.target.value))}
-                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                value={caseRelatedStress}
+                onChange={(e) => setCaseRelatedStress(Number(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500"
               />
               <div className="flex justify-between text-[11px] text-slate-400 mt-1">
-                <span>1 - Exhausted</span>
-                <span>5 - Steady</span>
-                <span>10 - High Energy</span>
+                <span>1 - Minimal Concern</span>
+                <span>5 - Moderate Hearing Tension</span>
+                <span>10 - Acute Legal Pressure</span>
+              </div>
+            </div>
+
+            {/* Perceived Sense of Safety */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-cyan-400" />
+                  Perceived Sense of Safety (1 to 10)
+                </label>
+                <span className="text-base font-bold text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-lg border border-cyan-500/20">
+                  {senseOfSafety} / 10
+                </span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={senseOfSafety}
+                onChange={(e) => setSenseOfSafety(Number(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+              />
+              <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+                <span>1 - Safety Concerns</span>
+                <span>5 - Moderate</span>
+                <span>10 - Fully Secure</span>
               </div>
             </div>
 
@@ -219,7 +252,7 @@ export const CheckinPage: React.FC = () => {
               />
               <div className="flex justify-between text-[11px] text-slate-400 mt-1">
                 <span>0h (Severe Deficit)</span>
-                <span>7-8h (Target Baseline)</span>
+                <span>7-8h (Target Normal)</span>
                 <span>14h</span>
               </div>
             </div>
@@ -227,13 +260,13 @@ export const CheckinPage: React.FC = () => {
             {/* Optional Note */}
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Optional Context / Notes (Private)
+                Optional Context / Notes (Private & Encrypted)
               </label>
               <textarea
                 rows={3}
                 value={optionalNote}
                 onChange={(e) => setOptionalNote(e.target.value)}
-                placeholder="E.g. Final project due tomorrow, slept late studying..."
+                placeholder="E.g., Met with witness support officer today, upcoming hearing on Friday..."
                 className="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
               />
             </div>
@@ -243,39 +276,39 @@ export const CheckinPage: React.FC = () => {
               disabled={isSubmitting}
               className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-semibold rounded-xl text-sm shadow-lg shadow-teal-500/20 transition-all disabled:opacity-50"
             >
-              {isSubmitting ? 'Recording & Evaluating ML Model...' : 'Submit Today’s Check-In'}
+              {isSubmitting ? 'Evaluating Distress Telemetry...' : 'Submit MindPulse Check-In'}
             </button>
           </form>
         </div>
 
         {/* Right column: Longitudinal Trend Visualization */}
         <div className="lg:col-span-6 space-y-6">
-          <div className="glass-card p-6 border border-slate-800">
-            <h2 className="text-lg font-bold text-slate-100 mb-2">14-Day Wellness Telemetry</h2>
+          <div className="glass-card p-6 border border-slate-800 rounded-2xl">
+            <h2 className="text-lg font-bold text-slate-100 mb-2">Longitudinal Wellbeing Telemetry</h2>
             <p className="text-xs text-slate-400 mb-4">
-              Visualizing your mood vs stress trajectory against recommended baselines
+              Visualizing your mood and stress signals against your personal historical baseline
             </p>
             <WellnessTrendChart data={trendData} />
           </div>
 
           {/* Baseline Summary Card */}
           {baseline && (
-            <div className="glass-card p-5 border border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div className="glass-card p-5 border border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center rounded-2xl">
               <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                <span className="text-xs text-slate-400 block mb-1">Avg Mood</span>
+                <span className="text-xs text-slate-400 block mb-1">Baseline Mood</span>
                 <span className="text-lg font-bold text-emerald-400">{baseline.avgMood}</span>
               </div>
               <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                <span className="text-xs text-slate-400 block mb-1">Avg Stress</span>
+                <span className="text-xs text-slate-400 block mb-1">Baseline Stress</span>
                 <span className="text-lg font-bold text-amber-400">{baseline.avgStress}</span>
               </div>
               <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                <span className="text-xs text-slate-400 block mb-1">Avg Energy</span>
-                <span className="text-lg font-bold text-indigo-400">{baseline.avgEnergy}</span>
+                <span className="text-xs text-slate-400 block mb-1">Baseline Sleep</span>
+                <span className="text-lg font-bold text-teal-400">{baseline.avgSleep}h</span>
               </div>
               <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-                <span className="text-xs text-slate-400 block mb-1">Avg Sleep</span>
-                <span className="text-lg font-bold text-teal-400">{baseline.avgSleep}h</span>
+                <span className="text-xs text-slate-400 block mb-1">Baseline Safety</span>
+                <span className="text-lg font-bold text-indigo-400">{baseline.avgSafety || 7.5}</span>
               </div>
             </div>
           )}
@@ -284,3 +317,4 @@ export const CheckinPage: React.FC = () => {
     </div>
   );
 };
+

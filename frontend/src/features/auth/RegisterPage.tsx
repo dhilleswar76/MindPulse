@@ -60,7 +60,7 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Campus Email</label>
+          <label className="block text-xs font-medium text-slate-300 mb-1">Contact Email</label>
           <div className="relative">
             <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
             <input
@@ -68,7 +68,7 @@ export const RegisterPage: React.FC = () => {
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="alex.r@campus.edu"
+              placeholder="alex.r@support.portal"
               className="w-full bg-slate-900/80 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
             />
           </div>
@@ -96,9 +96,9 @@ export const RegisterPage: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
             className="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-teal-500"
           >
-            <option value="USER">Student (Wellness Logging & AI Companion)</option>
-            <option value="COUNSELOR">Counselor (Triage & Case Decision Support)</option>
-            <option value="ADMIN">Institutional Admin (Privacy-preserving Analytics)</option>
+            <option value="USER">Victim / Protected Witness (Distress Logging & AI Companion)</option>
+            <option value="COUNSELOR">Counselor / Case Worker (Triage & Support Pathways)</option>
+            <option value="ADMIN">District / State Welfare Official (Aggregated Telemetry)</option>
           </select>
         </div>
 

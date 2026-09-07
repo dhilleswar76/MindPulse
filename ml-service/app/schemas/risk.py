@@ -6,6 +6,10 @@ class CheckInItem(BaseModel):
     stress: float = Field(..., ge=1, le=10, description="Stress score 1 to 10")
     energy: float = Field(..., ge=1, le=10, description="Energy score 1 to 10")
     sleepHours: float = Field(..., ge=0, le=24, description="Hours of sleep")
+    senseOfSafety: Optional[float] = Field(default=7.0, ge=1, le=10, description="Perceived sense of safety 1 to 10")
+    supportAvailability: Optional[float] = Field(default=7.0, ge=1, le=10, description="Support availability 1 to 10")
+    caseRelatedStress: Optional[float] = Field(default=5.0, ge=1, le=10, description="Case-related stress 1 to 10")
+    caseStage: Optional[str] = Field(default="INVESTIGATION", description="Current stage in case journey")
     timestamp: Optional[str] = None
 
 class RiskFactor(BaseModel):
@@ -16,6 +20,8 @@ class RiskFactor(BaseModel):
 
 class RiskPredictionRequest(BaseModel):
     userId: str
+    caseId: Optional[str] = None
+    caseStage: Optional[str] = None
     recentCheckIns: List[CheckInItem] = Field(..., min_length=1)
     historicalBaseline: Optional[dict] = None
 
@@ -24,6 +30,8 @@ class RiskPredictionResponse(BaseModel):
     riskLevel: str  # STABLE | WATCH | ELEVATED | REQUIRES_REVIEW
     modelVersion: str
     factors: List[RiskFactor]
+    caseStageContext: Optional[str] = None
+    humanReviewRecommended: bool = False
     disclaimer: str = "Non-diagnostic decision-support signal for human review only."
 
 class AnomalyDetectionRequest(BaseModel):
@@ -54,3 +62,18 @@ class ForecastResponse(BaseModel):
     forecast: List[ForecastPoint]
     trajectoryDirection: str  # improving | stable | escalating
     modelVersion: str
+
+class VoiceAnalysisRequest(BaseModel):
+    userId: str
+    audioDurationSeconds: float = 5.0
+    sampleRate: Optional[int] = 16000
+
+class VoiceAnalysisResponse(BaseModel):
+    userId: str
+    voiceStressIndex: float
+    jitterDelta: float
+    shimmerDelta: float
+    pitchVariability: str
+    status: str = "prototype_simulated"
+    disclaimer: str = "Prototype — voice stress analysis module planned. Non-diagnostic decision support only."
+

@@ -14,15 +14,15 @@ export const RiskAssessmentPage: React.FC = () => {
         setRiskData(res.data?.risk || null);
       } catch {
         setRiskData({
-          riskScore: 0.58,
+          riskScore: 0.68,
           riskLevel: 'ELEVATED',
           factors: [
-            { feature: 'Sleep Reduction', impact: 0.22, description: 'Average sleep (4.5h) is 2.5h below target normal' },
-            { feature: 'Elevated Stress', impact: 0.18, description: 'Reported stress levels elevated across last 3 days' },
-            { feature: 'Mood Decline', impact: 0.12, description: 'Mood trajectory down 1.8 points from 14-day baseline' },
-            { feature: 'Energy Depletion', impact: 0.06, description: 'Energy levels below steady baseline' },
+            { feature: 'Hearing / Court Date Proximity', impact: 0.28, description: 'Elevated tension reported coinciding with upcoming trial testimony date' },
+            { feature: 'Severe Sleep Deficit', impact: 0.22, description: 'Average sleep (4.2h) down 2.8h from baseline due to nighttime hypervigilance' },
+            { feature: 'Sense of Safety Volatility', impact: 0.18, description: 'Sense of safety score dropped from 7.5 to 4.0 in the last 72 hours' },
+            { feature: 'Support Isolation Factor', impact: 0.08, description: 'Voluntary check-in interval increased; low perceived immediate support access' },
           ],
-          modelVersion: 'prototype-v1.0',
+          modelVersion: 'sih-xai-v2.1',
         });
       } finally {
         setIsLoading(false);
