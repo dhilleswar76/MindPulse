@@ -13,6 +13,7 @@ import usersRoutes from '../features/users/users.routes.js';
 import adminRoutes from '../features/admin/admin.routes.js';
 
 import casesRoutes from '../features/cases/cases.routes.js';
+import mlRoutes from '../features/ml/ml.routes.js';
 
 const router = Router();
 
@@ -40,5 +41,6 @@ router.use('/interventions', interventionsRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/users', usersRoutes);
 router.use('/admin', adminRoutes);
+router.use('/ml', mlRoutes);
 
 export default router;
