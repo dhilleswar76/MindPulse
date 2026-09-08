@@ -3,22 +3,23 @@ import { Alert } from '../../models/index.js';
 const memoryAlerts: any[] = [
   {
     _id: 'alert_demo_1',
-    userId: 'demo_user_1',
-    studentName: 'Alex Rivera',
-    department: 'Computer Science',
+    userId: 'user_alex_101',
+    studentName: 'Case MP-1042 (Alex Rivera)',
+    department: 'Protected Witness • Court / Trial Stage',
     riskLevel: 'COUNSELOR_REVIEW',
     status: 'OPEN',
-    triggerReason: 'Severe sleep reduction (3.5h avg) combined with 3 consecutive days of stress score >= 8',
+    triggerReason:
+      'Severe sleep reduction (3.5h avg) combined with high pre-trial hearing tension (9/10) and low sense of safety (3/10)',
     createdAt: new Date(Date.now() - 3600000),
   },
   {
     _id: 'alert_demo_2',
-    userId: 'demo_user_2',
-    studentName: 'Jordan Chen',
-    department: 'Biomedical Engineering',
+    userId: 'user_jordan_102',
+    studentName: 'Case MP-1001 (Jordan Chen)',
+    department: 'Direct Complainant • Investigation Stage',
     riskLevel: 'WATCH',
     status: 'OPEN',
-    triggerReason: 'Sudden mood decline deviation (-3.2 from personal baseline)',
+    triggerReason: 'Perceived safety score drop (-3.0) and emerging baseline variance during forensic review',
     createdAt: new Date(Date.now() - 7200000),
   },
 ];

@@ -86,15 +86,26 @@ export const authService = {
     if (!user) {
       // Check for demo seed accounts if fresh run
       if (input.email.toLowerCase().includes('demo.')) {
-        const role = input.email.includes('counselor') ? 'COUNSELOR' : (input.email.includes('admin') ? 'ADMIN' : 'USER');
+        const role = input.email.includes('counselor') ? 'COUNSELOR' : input.email.includes('admin') ? 'ADMIN' : 'USER';
         const id = 'demo_' + role.toLowerCase();
         user = {
           _id: id,
           email: input.email.toLowerCase(),
-          fullName: `Demo ${role.charAt(0) + role.slice(1).toLowerCase()}`,
+          fullName:
+            role === 'USER'
+              ? 'Alex Rivera (Protected Witness)'
+              : role === 'COUNSELOR'
+              ? 'Dr. Sarah Jenkins'
+              : 'Marcus Vance (District Welfare Officer)',
           role,
-          department: 'Computer Science',
-          yearOfStudy: 3,
+          victimType: role === 'USER' ? 'WITNESS' : undefined,
+          caseId: role === 'USER' ? 'MP-1042' : undefined,
+          caseStage: role === 'USER' ? 'COURT_TRIAL' : undefined,
+          district: 'Central District',
+          state: 'National Capital Region',
+          assignedCounselor: role === 'USER' ? 'Dr. Sarah Jenkins' : undefined,
+          supportStatus: role === 'USER' ? 'ACTIVE_MONITORING' : undefined,
+          consentStatus: true,
         };
       } else {
         throw new Error('Invalid email or password');
@@ -109,10 +120,15 @@ export const authService = {
     }
 
     const token = authService.generateToken({
-      userId: user._id.toString(),
+      userId: user._id ? user._id.toString() : user.id,
       email: user.email,
       role: user.role,
       fullName: user.fullName,
+      victimType: user.victimType,
+      caseId: user.caseId,
+      caseStage: user.caseStage,
+      district: user.district,
+      state: user.state,
     });
 
     return { user: authService.sanitizeUser(user), token };
@@ -127,6 +143,14 @@ export const authService = {
     email: user.email,
     fullName: user.fullName,
     role: user.role,
+    victimType: user.victimType,
+    caseId: user.caseId,
+    caseStage: user.caseStage,
+    district: user.district,
+    state: user.state,
+    assignedCounselor: user.assignedCounselor,
+    supportStatus: user.supportStatus,
+    consentStatus: user.consentStatus ?? true,
     department: user.department,
     yearOfStudy: user.yearOfStudy,
   }),

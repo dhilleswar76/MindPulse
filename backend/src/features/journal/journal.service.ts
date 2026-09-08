@@ -54,11 +54,12 @@ export const journalService = {
       {
         _id: 'journal_synth_1',
         userId,
-        title: 'Midterm Preparations & Late Nights',
-        content: 'Studying late for machine learning midterms. Feeling a bit tired and anxious about time management, but taking deep breaths.',
+        title: 'Preparing for Court Hearing & Witness Support',
+        content:
+          'Met with the DLSA victim support advocate today. Feeling some anxiety about the upcoming cross-examination on Friday, but practicing 4-7-8 somatic grounding and confirmed safe transport escort.',
         sentiment: 'neutral',
-        stressSignal: 0.48,
-        emotionSignals: ['fatigue', 'anxiety'],
+        stressSignal: 0.52,
+        emotionSignals: ['hearing_anxiety', 'safety_concern', 'grounding'],
         isPrivate: true,
         createdAt: new Date(Date.now() - 86400000),
       },
