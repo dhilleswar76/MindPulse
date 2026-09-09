@@ -2,10 +2,11 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Sidebar } from '../components/Sidebar';
+import { FloatingSupportChatbot } from '../features/support/FloatingSupportChatbot';
 
 export const DashboardLayout: React.FC = () => {
   return (
-    <div className="h-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
+    <div className="h-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden relative">
       <Navbar />
       <div className="flex-1 flex overflow-hidden min-h-0">
         <Sidebar />
@@ -15,6 +16,9 @@ export const DashboardLayout: React.FC = () => {
           </div>
         </main>
       </div>
+      {/* Global Floating Draggable Support Assistant Trigger & Chat Window */}
+      <FloatingSupportChatbot />
     </div>
   );
 };
+
