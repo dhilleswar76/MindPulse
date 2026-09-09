@@ -67,6 +67,7 @@ class VoiceAnalysisRequest(BaseModel):
     userId: str
     audioDurationSeconds: float = 5.0
     sampleRate: Optional[int] = 16000
+    audioBase64: Optional[str] = None
 
 class VoiceAnalysisResponse(BaseModel):
     userId: str
@@ -74,6 +75,11 @@ class VoiceAnalysisResponse(BaseModel):
     jitterDelta: float
     shimmerDelta: float
     pitchVariability: str
-    status: str = "prototype_simulated"
-    disclaimer: str = "Prototype — voice stress analysis module planned. Non-diagnostic decision support only."
+    acousticFeatures: Optional[dict] = None
+    voiceSignal: Optional[dict] = None
+    summary: Optional[str] = None
+    status: str = "acoustic_processed"
+    isNonDiagnostic: bool = True
+    disclaimer: str = "Non-clinical voice acoustic signal proxy. Not a psychological diagnosis."
+
 

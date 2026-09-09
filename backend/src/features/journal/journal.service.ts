@@ -20,6 +20,9 @@ export const journalService = {
         stressSignal: nlpResult.stressSignal,
         emotionSignals: nlpResult.emotionSignals,
       });
+      doc = doc.toObject();
+      doc.signals = (nlpResult as any).signals || {};
+      doc.signalSummary = (nlpResult as any).signalSummary || '';
     } catch {
       const userList = memoryJournals.get(userId) || [];
       doc = {
@@ -31,6 +34,8 @@ export const journalService = {
         sentiment: nlpResult.sentiment,
         stressSignal: nlpResult.stressSignal,
         emotionSignals: nlpResult.emotionSignals,
+        signals: (nlpResult as any).signals || {},
+        signalSummary: (nlpResult as any).signalSummary || '',
         createdAt: new Date(),
       };
       userList.unshift(doc);

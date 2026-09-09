@@ -122,30 +122,44 @@ export const JournalPage: React.FC = () => {
               </div>
 
               {/* NLP Signals Footer */}
-              <div className="pt-4 border-t border-slate-800/80 space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Sentiment tag */}
-                  <span
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-medium uppercase tracking-wider ${
-                      entry.sentiment === 'positive'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : entry.sentiment === 'negative'
-                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                        : 'bg-slate-700/50 text-slate-300 border border-slate-600/40'
-                    }`}
-                  >
-                    {entry.sentiment} Sentiment
-                  </span>
+              <div className="pt-4 border-t border-slate-800/80 space-y-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    {/* Sentiment tag */}
+                    <span
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-medium uppercase tracking-wider ${
+                        entry.sentiment === 'positive'
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          : entry.sentiment === 'negative'
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          : 'bg-slate-700/50 text-slate-300 border border-slate-600/40'
+                      }`}
+                    >
+                      {entry.sentiment} Sentiment
+                    </span>
 
-                  {/* Stress signal indicator */}
-                  <span className="text-[11px] text-slate-400">
-                    Stress Signal: <strong className="text-slate-200">{Math.round(entry.stressSignal * 100)}%</strong>
+                    {/* Stress signal indicator */}
+                    <span className="text-[11px] text-slate-400">
+                      Stress Signal: <strong className="text-slate-200">{Math.round((entry.stressSignal || 0.3) * 100)}%</strong>
+                    </span>
+                  </div>
+
+                  <span className="text-[10px] text-teal-400/80 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">
+                    Non-Diagnostic Signal
                   </span>
                 </div>
 
+                {/* Signal Summary if present */}
+                {(entry as any).signalSummary && (
+                  <div className="text-[11px] text-slate-400 italic bg-slate-900/60 px-2.5 py-1.5 rounded-lg border border-slate-800 flex items-center gap-1.5">
+                    <Sparkles className="w-3 h-3 text-indigo-400 shrink-0" />
+                    <span>{(entry as any).signalSummary}</span>
+                  </div>
+                )}
+
                 {/* Emotion Tags */}
                 {entry.emotionSignals && entry.emotionSignals.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                     <Tag className="w-3 h-3 text-slate-500" />
                     {entry.emotionSignals.map((tag, idx) => (
                       <span key={idx} className="bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded text-[10px] font-medium">
