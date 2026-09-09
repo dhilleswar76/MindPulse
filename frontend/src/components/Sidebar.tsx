@@ -9,7 +9,6 @@ import {
   AlertTriangle,
   TrendingUp,
   Sparkles,
-  Bot,
   Users,
   ClipboardList,
   BarChart3,
@@ -30,7 +29,6 @@ export const Sidebar: React.FC = () => {
     { to: '/risk', label: 'Distress Signals & XAI', icon: AlertTriangle },
     { to: '/forecast', label: 'Early Risk Forecast', icon: TrendingUp },
     { to: '/recommendations', label: 'Support Pathways', icon: Sparkles },
-    { to: '/support', label: 'Support Assistant', icon: Bot },
   ];
 
   const counselorLinks = [
