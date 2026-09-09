@@ -27,7 +27,7 @@ export const Navbar: React.FC = () => {
             MindPulse
           </span>
           <span className="block text-[10px] uppercase tracking-wider text-teal-400/90 font-semibold">
-            Victim Wellbeing & Support • SIH26094
+            Victim Wellbeing & Support
           </span>
         </div>
       </Link>
@@ -44,25 +44,22 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center bg-slate-800/90 border border-slate-700 rounded-lg p-0.5 text-xs">
           <button
             onClick={() => handleRoleChange('USER')}
-            className={`px-2.5 py-1 rounded-md transition-colors ${
-              user?.role === 'USER' ? 'bg-teal-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-white'
-            }`}
+            className={`px-2.5 py-1 rounded-md transition-colors ${user?.role === 'USER' ? 'bg-teal-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-white'
+              }`}
           >
             Victim / Witness
           </button>
           <button
             onClick={() => handleRoleChange('COUNSELOR')}
-            className={`px-2.5 py-1 rounded-md transition-colors ${
-              user?.role === 'COUNSELOR' ? 'bg-indigo-500 text-white font-bold' : 'text-slate-400 hover:text-white'
-            }`}
+            className={`px-2.5 py-1 rounded-md transition-colors ${user?.role === 'COUNSELOR' ? 'bg-indigo-500 text-white font-bold' : 'text-slate-400 hover:text-white'
+              }`}
           >
             Counselor
           </button>
           <button
             onClick={() => handleRoleChange('ADMIN')}
-            className={`px-2.5 py-1 rounded-md transition-colors ${
-              user?.role === 'ADMIN' ? 'bg-amber-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-white'
-            }`}
+            className={`px-2.5 py-1 rounded-md transition-colors ${user?.role === 'ADMIN' ? 'bg-amber-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-white'
+              }`}
           >
             District Admin
           </button>
