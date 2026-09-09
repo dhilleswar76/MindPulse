@@ -32,16 +32,16 @@ export const Sidebar: React.FC = () => {
   ];
 
   const counselorLinks = [
-    { to: '/counselor', label: 'Prioritized Case Queue', icon: Users },
-    { to: '/counselor/cases', label: 'Case Summaries & AI', icon: ClipboardList },
-    { to: '/counselor/interventions', label: 'Support & Follow-ups', icon: Activity },
+    { to: '/counselor', label: 'Command Center & Triage', icon: LayoutDashboard },
+    { to: '/counselor/cases', label: 'Prioritized Case Queue', icon: Users },
     { to: '/counselor/alerts', label: 'Distress Alerts', icon: Bell },
+    { to: '/counselor/interventions', label: 'Support Pathways & Outcomes', icon: Activity },
   ];
 
   const adminLinks = [
-    { to: '/admin', label: 'District / State Analytics', icon: BarChart3 },
+    { to: '/admin', label: 'Jurisdiction Overview', icon: BarChart3 },
     { to: '/admin/heatmap', label: 'Regional Distress Map', icon: Map },
-    { to: '/admin/simulator', label: 'Intervention Impact Sim', icon: Sliders },
+    { to: '/admin/simulator', label: 'Policy What-If Simulator', icon: Sliders },
   ];
 
   return (
