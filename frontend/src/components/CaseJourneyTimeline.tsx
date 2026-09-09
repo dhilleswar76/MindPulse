@@ -1,12 +1,13 @@
 import React from 'react';
 import { CaseStage } from '../types';
-import { FileText, Search, Scale, Landmark, HeartHandshake, ShieldCheck, CheckCircle2, Clock } from 'lucide-react';
+import { FileText, Search, Scale, Landmark, HeartHandshake, ShieldCheck, CheckCircle2, Clock, Lock } from 'lucide-react';
 
 interface CaseJourneyTimelineProps {
   currentStage: CaseStage;
   caseId?: string;
   victimType?: string;
   onSelectStage?: (stage: CaseStage) => void;
+  isReadOnly?: boolean;
 }
 
 const STAGES: Array<{
@@ -65,9 +66,11 @@ export const CaseJourneyTimeline: React.FC<CaseJourneyTimelineProps> = ({
   caseId = 'MP-1042',
   victimType = 'Protected Witness',
   onSelectStage,
+  isReadOnly = true,
 }) => {
   const currentIndex = STAGES.findIndex((s) => s.key === currentStage);
   const safeCurrentIndex = currentIndex >= 0 ? currentIndex : 2;
+  const isInteractive = !isReadOnly && Boolean(onSelectStage);
 
   return (
     <div className="glass-card p-6 border border-slate-800 bg-slate-900/80 rounded-2xl relative overflow-hidden">
@@ -82,15 +85,23 @@ export const CaseJourneyTimeline: React.FC<CaseJourneyTimelineProps> = ({
           </div>
           <h3 className="text-base font-bold text-slate-100">MindPulse Longitudinal Case Journey</h3>
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-700/50">
-          <Clock className="w-3.5 h-3.5 text-teal-400" />
-          <span>
-            Active Monitoring: <strong className="text-slate-200">{STAGES[safeCurrentIndex]?.label}</strong>
-          </span>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-700/50">
+            <Clock className="w-3.5 h-3.5 text-teal-400" />
+            <span>
+              Current Stage: <strong className="text-slate-200">{STAGES[safeCurrentIndex]?.label}</strong>
+            </span>
+          </div>
+          {isReadOnly && (
+            <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400 bg-slate-800/30 px-2.5 py-1 rounded-lg border border-slate-700/30">
+              <Lock className="w-3 h-3 text-slate-400" />
+              <span>Official Record</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Interactive Horizontal Timeline */}
+      {/* 6-Stage Timeline Display */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 relative">
         {STAGES.map((stage, idx) => {
           const Icon = stage.icon;
@@ -101,13 +112,15 @@ export const CaseJourneyTimeline: React.FC<CaseJourneyTimelineProps> = ({
           return (
             <div
               key={stage.key}
-              onClick={() => onSelectStage && onSelectStage(stage.key)}
-              className={`p-3.5 rounded-xl border transition-all cursor-pointer relative flex flex-col justify-between ${
+              onClick={() => isInteractive && onSelectStage && onSelectStage(stage.key)}
+              className={`p-3.5 rounded-xl border transition-all relative flex flex-col justify-between select-none ${
+                isInteractive ? 'cursor-pointer hover:border-teal-500/50' : 'cursor-default'
+              } ${
                 isCurrent
                   ? 'bg-gradient-to-b from-teal-500/20 to-indigo-600/10 border-teal-500/50 shadow-lg shadow-teal-500/10 ring-1 ring-teal-500/30'
                   : isPassed
-                  ? 'bg-slate-800/60 border-slate-700/60 hover:border-slate-600 text-slate-300'
-                  : 'bg-slate-900/40 border-slate-800/60 text-slate-500 hover:border-slate-700'
+                  ? 'bg-slate-800/60 border-slate-700/60 text-slate-300'
+                  : 'bg-slate-900/40 border-slate-800/60 text-slate-500'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -129,6 +142,7 @@ export const CaseJourneyTimeline: React.FC<CaseJourneyTimelineProps> = ({
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500"></span>
                   </span>
                 )}
+                {isUpcoming && <span className="text-[10px] text-slate-500 font-medium">Pending</span>}
               </div>
 
               <div>
@@ -152,14 +166,24 @@ export const CaseJourneyTimeline: React.FC<CaseJourneyTimelineProps> = ({
                   Active Monitoring
                 </div>
               )}
+              {isPassed && (
+                <div className="mt-2 pt-1.5 border-t border-emerald-500/20 text-[10px] font-semibold text-emerald-400 uppercase tracking-wide">
+                  Completed
+                </div>
+              )}
+              {isUpcoming && (
+                <div className="mt-2 pt-1.5 border-t border-slate-800 text-[10px] text-slate-500 uppercase tracking-wide">
+                  Upcoming Stage
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      <div className="mt-4 text-[11px] text-slate-400 flex items-center justify-between">
+      <div className="mt-4 text-[11px] text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <span>MindPulse tracks longitudinal baseline deltas across each stage of the case journey.</span>
-        <span className="text-teal-400 font-medium">Non-diagnostic telemetry support</span>
+        <span className="text-teal-400 font-medium">Official Case Stage • Non-Diagnostic Decision Support</span>
       </div>
     </div>
   );

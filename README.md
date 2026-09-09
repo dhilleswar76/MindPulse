@@ -89,7 +89,7 @@ MindPulse/
 ### 1. Installation
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/dhilleswar76/MindPulse.git
 cd MindPulse
 
 # Install workspace dependencies

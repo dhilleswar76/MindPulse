@@ -60,7 +60,7 @@ export const UserDashboardPage: React.FC = () => {
   });
 
   const [trendData, setTrendData] = useState<any[]>([]);
-  const [currentStage, setCurrentStage] = useState<CaseStage>(user?.caseStage || 'COURT_TRIAL');
+  const currentStage: CaseStage = user?.caseStage || 'COURT_TRIAL';
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isStageExplanationOpen, setIsStageExplanationOpen] = useState(true);
 
@@ -207,7 +207,7 @@ export const UserDashboardPage: React.FC = () => {
           currentStage={currentStage}
           caseId={user?.caseId || 'MP-1042'}
           victimType={user?.victimType || 'Protected Witness'}
-          onSelectStage={(stage) => setCurrentStage(stage)}
+          isReadOnly={true}
         />
 
         {/* Contextual Stage Explanation Card */}
