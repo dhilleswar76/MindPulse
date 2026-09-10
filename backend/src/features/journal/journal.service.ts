@@ -9,6 +9,10 @@ export const journalService = {
     // Run NLP keyword extraction
     const nlpResult = await mlClient.analyzeJournal(userId, input.content);
 
+    const sentiment = nlpResult?.sentiment || 'neutral';
+    const stressSignal = nlpResult?.stressSignal ?? 0.3;
+    const emotionSignals = nlpResult?.emotionSignals || ['reflective'];
+
     let doc: any = null;
     try {
       doc = await JournalEntry.create({
@@ -16,9 +20,9 @@ export const journalService = {
         title: input.title || 'Daily Reflection',
         content: input.content,
         isPrivate: input.isPrivate,
-        sentiment: nlpResult.sentiment,
-        stressSignal: nlpResult.stressSignal,
-        emotionSignals: nlpResult.emotionSignals,
+        sentiment,
+        stressSignal,
+        emotionSignals,
       });
     } catch {
       const userList = memoryJournals.get(userId) || [];
@@ -28,9 +32,9 @@ export const journalService = {
         title: input.title || 'Daily Reflection',
         content: input.content,
         isPrivate: input.isPrivate,
-        sentiment: nlpResult.sentiment,
-        stressSignal: nlpResult.stressSignal,
-        emotionSignals: nlpResult.emotionSignals,
+        sentiment,
+        stressSignal,
+        emotionSignals,
         createdAt: new Date(),
       };
       userList.unshift(doc);

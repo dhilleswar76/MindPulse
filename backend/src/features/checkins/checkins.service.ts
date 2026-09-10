@@ -62,39 +62,50 @@ export const checkinService = {
     // Trigger ML risk inference
     const mlRisk = await mlClient.predictRisk(userId, [...recentHistory].reverse());
 
-    try {
-      await RiskScore.create({
-        userId,
-        riskScore: mlRisk.riskScore,
-        riskLevel: mlRisk.riskLevel,
-        factors: mlRisk.factors,
-        calculatedAt: new Date(),
-      });
-
-      // If risk is elevated, trigger counselor alert (human-in-the-loop decision support)
-      if (mlRisk.riskLevel === 'ELEVATED' || mlRisk.riskLevel === 'REQUIRES_REVIEW') {
-        const alert = await Alert.create({
-          userId,
-          riskLevel: mlRisk.riskLevel === 'REQUIRES_REVIEW' ? 'COUNSELOR_REVIEW' : 'WATCH',
-          status: 'OPEN',
-          triggerReason: `Elevated distress signal detected (Score: ${mlRisk.riskScore}). Contributing factors: ${mlRisk.factors.map(f => f.feature).join(', ')}`,
-        });
-
-        emitCounselorAlert({
-          alertId: alert._id,
+    if (mlRisk) {
+      try {
+        await RiskScore.create({
           userId,
           riskScore: mlRisk.riskScore,
           riskLevel: mlRisk.riskLevel,
-          timestamp: new Date(),
+          factors: mlRisk.factors,
+          calculatedAt: new Date(),
         });
+
+        // If risk is elevated, trigger counselor alert (human-in-the-loop decision support)
+        if (mlRisk.riskLevel === 'ELEVATED' || mlRisk.riskLevel === 'REQUIRES_REVIEW') {
+          const alert = await Alert.create({
+            userId,
+            riskLevel: mlRisk.riskLevel === 'REQUIRES_REVIEW' ? 'COUNSELOR_REVIEW' : 'WATCH',
+            status: 'OPEN',
+            triggerReason: `Elevated distress signal detected (Score: ${mlRisk.riskScore}). Contributing factors: ${mlRisk.factors.map(f => f.feature).join(', ')}`,
+          });
+
+          emitCounselorAlert({
+            alertId: alert._id,
+            userId,
+            riskScore: mlRisk.riskScore,
+            riskLevel: mlRisk.riskLevel,
+            timestamp: new Date(),
+          });
+        }
+      } catch {
+        // Ignore DB write errors in standalone mode
       }
-    } catch {
-      // Ignore DB write errors in standalone mode
+
+      return {
+        checkin: checkinDoc,
+        riskAssessment: mlRisk,
+        analysisStatus: 'completed',
+      };
     }
 
+    // ML service unavailable: preserve check-in and do not invent fake risk scores
     return {
       checkin: checkinDoc,
-      riskAssessment: mlRisk,
+      riskAssessment: null,
+      analysisStatus: 'temporarily_unavailable',
+      message: 'Analysis temporarily unavailable. Your check-in has been securely recorded.',
     };
   },
 

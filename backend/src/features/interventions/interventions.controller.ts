@@ -42,4 +42,30 @@ export const interventionController = {
       return sendError(res, err.message, 400);
     }
   },
+
+  createFollowUp: async (req: AuthRequest, res: Response) => {
+    try {
+      const { interventionId, userId, dueDate, notes } = req.body;
+      const followUp = await interventionService.createFollowUp({
+        interventionId,
+        userId: userId || req.user!.userId,
+        dueDate: dueDate || new Date(),
+        notes,
+      });
+      return sendSuccess(res, { followUp }, 'Follow-up scheduled', 201);
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
+
+  getFollowUps: async (req: AuthRequest, res: Response) => {
+    try {
+      const { userId } = req.query;
+      const followUps = await interventionService.getFollowUps(userId as string);
+      return sendSuccess(res, { followUps });
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
 };
+

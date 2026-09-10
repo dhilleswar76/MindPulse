@@ -1,21 +1,32 @@
 import os
 import numpy as np
 from typing import List, Dict, Any, Tuple, Optional
-import xgboost as xgb
-import shap
+try:
+    import xgboost as xgb
+    HAS_XGB = True
+except ImportError:
+    HAS_XGB = False
+
+try:
+    import shap
+    HAS_SHAP = True
+except ImportError:
+    HAS_SHAP = False
+
+from sklearn.ensemble import GradientBoostingRegressor
 from app.feature_engineering.extractors import FEATURE_NAMES
 
 class DistressRiskModelEngine:
     """
-    Trained Gradient Boosted Decision Tree (XGBoost) model engine for
-    non-diagnostic trauma-informed distress risk scoring and SHAP feature attribution.
+    Trained Gradient Boosted Decision Tree (XGBoost / Scikit-Learn) model engine for
+    non-diagnostic trauma-informed distress risk scoring and SHAP / feature attribution.
     """
     _instance: Optional["DistressRiskModelEngine"] = None
 
     def __init__(self):
         self.feature_names = FEATURE_NAMES
-        self.model: Optional[xgb.XGBRegressor] = None
-        self.explainer: Optional[shap.TreeExplainer] = None
+        self.model: Any = None
+        self.explainer: Any = None
         self._initialize_and_fit()
 
     @classmethod
@@ -186,21 +197,33 @@ class DistressRiskModelEngine:
         return X, y
 
     def _initialize_and_fit(self):
-        """Fits the XGBoost regressor and prepares the SHAP TreeExplainer."""
-        X, y = self._generate_synthetic_training_data(n_samples=4000, seed=42)
+        """Fits the gradient boosted regressor and prepares feature attribution."""
+        X, y = self._generate_synthetic_training_data(n_samples=2000, seed=42)
         
-        self.model = xgb.XGBRegressor(
-            n_estimators=130,
-            max_depth=5,
-            learning_rate=0.08,
-            subsample=0.88,
-            colsample_bytree=0.88,
-            random_state=42,
-            n_jobs=1,
-            eval_metric="rmse"
-        )
-        self.model.fit(X, y)
-        self.explainer = shap.TreeExplainer(self.model)
+        if HAS_XGB:
+            self.model = xgb.XGBRegressor(
+                n_estimators=100,
+                max_depth=5,
+                learning_rate=0.08,
+                subsample=0.88,
+                colsample_bytree=0.88,
+                random_state=42,
+                n_jobs=1,
+                eval_metric="rmse"
+            )
+            self.model.fit(X, y)
+            if HAS_SHAP:
+                self.explainer = shap.TreeExplainer(self.model)
+        else:
+            self.model = GradientBoostingRegressor(
+                n_estimators=60,
+                max_depth=4,
+                learning_rate=0.08,
+                random_state=42
+            )
+            self.model.fit(X, y)
+            if HAS_SHAP:
+                self.explainer = shap.TreeExplainer(self.model)
 
     def predict_risk(self, feature_vector: List[float]) -> float:
         """Predicts continuous risk score in range [0.00, 1.00]."""
@@ -210,29 +233,37 @@ class DistressRiskModelEngine:
 
     def explain_sample(self, feature_vector: List[float]) -> Dict[str, float]:
         """
-        Computes exact local SHAP feature attributions using TreeExplainer.
+        Computes local feature attributions using TreeExplainer or model importances.
         Returns a dictionary mapping feature_name -> shap_value.
         """
         X = np.array([feature_vector], dtype=np.float32)
-        shap_vals = self.explainer.shap_values(X)
-        if isinstance(shap_vals, list):
-            shap_vals = shap_vals[0]
-        sample_shap = shap_vals[0]
-
+        if self.explainer is not None:
+            shap_vals = self.explainer.shap_values(X)
+            if isinstance(shap_vals, list):
+                shap_vals = shap_vals[0]
+            sample_shap = shap_vals[0]
+            return {
+                self.feature_names[i]: float(sample_shap[i])
+                for i in range(len(self.feature_names))
+            }
+        
+        # Fallback feature attribution using tree feature importances & normalized input delta
+        importances = getattr(self.model, "feature_importances_", np.ones(len(self.feature_names)) / len(self.feature_names))
         return {
-            self.feature_names[i]: float(sample_shap[i])
+            self.feature_names[i]: float(importances[i] * (feature_vector[i] / 10.0 if i < 8 else 0.1))
             for i in range(len(self.feature_names))
         }
 
     def get_model_info(self) -> Dict[str, Any]:
         return {
-            "model_type": "XGBoost Regressor (Trained Decision Support Model)",
+            "model_type": "XGBoost Regressor" if HAS_XGB else "GradientBoostingRegressor (Scikit-Learn)",
             "n_features": len(self.feature_names),
             "feature_names": self.feature_names,
-            "explainability_engine": "SHAP TreeExplainer (Lundberg & Lee)",
-            "framework": "XGBoost + SHAP",
+            "explainability_engine": "SHAP TreeExplainer" if HAS_SHAP else "Tree Feature Attribution",
+            "framework": "XGBoost + SHAP" if (HAS_XGB and HAS_SHAP) else "Scikit-Learn",
             "deterministic_seed": 42,
             "non_diagnostic": True
         }
+
 
 model_engine = DistressRiskModelEngine.get_instance()

@@ -1,3 +1,5 @@
+MAKE := make
+
 .PHONY: help install dev dev-backend dev-frontend dev-ml dev-workers build build-backend build-frontend build-workers seed lint typecheck docker-up docker-down clean
 
 help:
@@ -24,6 +26,7 @@ help:
 	@echo "    make build-backend    - Build Backend only"
 	@echo "    make build-workers    - Build Workers only"
 	@echo "========================================================================"
+
 
 install:
 	@echo "📦 Installing root & component dependencies..."

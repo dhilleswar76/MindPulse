@@ -8,5 +8,7 @@ router.use(authenticateToken);
 
 router.get('/current', riskController.getCurrentRisk);
 router.get('/history', riskController.getRiskHistory);
+router.get('/:caseId', riskController.getRiskByCaseId);
 
 export default router;
+
