@@ -15,10 +15,11 @@ export const userController = {
 
   supportChat: async (req: AuthRequest, res: Response) => {
     try {
-      const { message } = req.body;
+      const { message, history } = req.body;
       if (!message) return sendError(res, 'Message is required', 400);
 
-      const response = await userService.supportAssistantChat(req.user!.userId, message);
+      const userId = req.user?.userId || 'demo_user_1';
+      const response = await userService.supportAssistantChat(userId, message, history || []);
       return sendSuccess(res, response);
     } catch (err: any) {
       return sendError(res, err.message, 400);
