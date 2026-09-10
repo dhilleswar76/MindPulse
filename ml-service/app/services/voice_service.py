@@ -81,15 +81,15 @@ def extract_voice_stress_signals(
     if stress_score >= 0.65:
         pitch_variability = "ELEVATED_VARIANCE"
         level_str = "ELEVATED"
-        summary_text = "acoustic prosody signals indicate elevated voice tension and pitch perturbation during speech"
+        summary_text = "Acoustic prosody signals indicate elevated vocal tension and pitch variation during speech."
     elif stress_score >= 0.45:
         pitch_variability = "MODERATE"
         level_str = "WATCH"
-        summary_text = "acoustic prosody signals show moderate vocal tension and slight cadence variation"
+        summary_text = "Acoustic prosody signals show moderate vocal tension and slight cadence variation."
     else:
         pitch_variability = "LOW_VARIANCE"
         level_str = "STABLE"
-        summary_text = "acoustic speech prosody indicators within steady, baseline vocal parameters"
+        summary_text = "Acoustic speech prosody indicators remain within steady, baseline vocal parameters."
 
     return VoiceAnalysisResponse(
         userId=user_id,
@@ -115,3 +115,4 @@ def extract_voice_stress_signals(
         isNonDiagnostic=True,
         disclaimer="Non-clinical voice acoustic signal proxy. Not a psychological diagnosis."
     )
+

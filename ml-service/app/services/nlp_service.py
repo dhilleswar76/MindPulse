@@ -3,14 +3,14 @@ from typing import Dict, List, Tuple
 from app.schemas.journal import JournalAnalysisResponse
 from app.config import settings
 
-# Non-diagnostic signal lexicons
-STRESS_KEYWORDS = {"stressed", "overwhelmed", "exhausted", "burnout", "pressure", "panic", "failing", "drained", "breaking point", "heavy", "tension"}
-FEAR_KEYWORDS = {"scared", "afraid", "terrified", "fear", "dread", "anxious", "nervous", "threatened", "unsafe", "worry", "worried", "panic"}
-SLEEP_KEYWORDS = {"sleep", "insomnia", "nightmare", "awake", "toss", "turning", "tired", "restless", "exhausted", "sleepless", "waking"}
-CASE_KEYWORDS = {"court", "hearing", "trial", "testimony", "examination", "deposition", "judge", "lawyer", "advocate", "police", "fir", "case", "investigation", "proceeding"}
-SUPPORT_KEYWORDS = {"help", "support", "counselor", "advocate", "talk", "guidance", "reach out", "assistance", "grounding", "escort", "dlsa", "friend", "family"}
+# Non-diagnostic signal lexicons tailored for mental wellbeing and case-related stress
+STRESS_KEYWORDS = {"stressed", "overwhelmed", "exhausted", "burnout", "pressure", "panic", "failing", "drained", "breaking point", "heavy", "tension", "strain", "struggling", "burden"}
+FEAR_KEYWORDS = {"scared", "afraid", "terrified", "fear", "dread", "anxious", "nervous", "threatened", "unsafe", "worry", "worried", "panic", "frightened", "apprehensive"}
+SLEEP_KEYWORDS = {"sleep", "insomnia", "nightmare", "awake", "toss", "turning", "tired", "restless", "exhausted", "sleepless", "waking", "fatigue", "drowsy", "can't sleep"}
+CASE_KEYWORDS = {"court", "hearing", "trial", "testimony", "examination", "deposition", "judge", "lawyer", "advocate", "police", "fir", "case", "investigation", "proceeding", "cross-examination", "summons"}
+SUPPORT_KEYWORDS = {"help", "support", "counselor", "advocate", "talk", "guidance", "reach out", "assistance", "grounding", "escort", "dlsa", "friend", "family", "therapy", "helpline"}
 
-POSITIVE_KEYWORDS = {"grateful", "calm", "happy", "accomplished", "peaceful", "better", "refreshed", "energized", "hopeful", "focused", "good", "relieved", "safe", "reassured"}
+POSITIVE_KEYWORDS = {"grateful", "calm", "happy", "accomplished", "peaceful", "better", "refreshed", "energized", "hopeful", "focused", "good", "relieved", "safe", "reassured", "tranquil", "steady"}
 
 def _calculate_keyword_density(text: str, keywords: set) -> Tuple[int, float]:
     """Calculate match count and normalized intensity score [0.0 - 1.0]."""
@@ -43,7 +43,7 @@ def analyze_journal_text(user_id: str, text: str) -> JournalAnalysisResponse:
                 "case_tension": 0.0,
                 "support_seeking": 0.0
             },
-            signalSummary="minimal text provided - baseline neutral reflection",
+            signalSummary="Minimal text provided — baseline neutral reflection.",
             modelVersion=settings.model_version,
             isNonDiagnostic=True,
             isDemoPlaceholder=False,
@@ -60,7 +60,7 @@ def analyze_journal_text(user_id: str, text: str) -> JournalAnalysisResponse:
     support_cnt, support_score = _calculate_keyword_density(cleaned_text, SUPPORT_KEYWORDS)
     pos_cnt, pos_score = _calculate_keyword_density(cleaned_text, POSITIVE_KEYWORDS)
 
-    # Calculate overall sentiment
+    # Calculate overall sentiment & stress signal
     neg_total = stress_cnt + fear_cnt + sleep_cnt
     if pos_cnt > neg_total:
         sentiment = "positive"
@@ -90,25 +90,25 @@ def analyze_journal_text(user_id: str, text: str) -> JournalAnalysisResponse:
     if not tags:
         tags = ["reflective"]
 
-    # Construct non-diagnostic human-readable summary
+    # Construct human-friendly, neutral non-diagnostic summary
     summary_parts = []
     if stress_score >= 0.30:
-        summary_parts.append("elevated stress-related language")
+        summary_parts.append("signs of stress-related language")
     if fear_score >= 0.30:
-        summary_parts.append("fear-related language detected")
+        summary_parts.append("fear or anxiety cues detected")
     if sleep_score >= 0.30:
-        summary_parts.append("sleep concern signal detected")
+        summary_parts.append("sleep concerns mentioned")
     if case_score >= 0.30:
-        summary_parts.append("case-related tension language detected")
+        summary_parts.append("case-related tension language present")
     if support_score >= 0.30:
-        summary_parts.append("support-seeking language detected")
+        summary_parts.append("support-seeking indicators present")
     if pos_score >= 0.30:
-        summary_parts.append("positive/grounding indicators present")
+        summary_parts.append("positive or grounding reflections present")
 
     if summary_parts:
-        signal_summary = "; ".join(summary_parts)
+        signal_summary = "Your entry contains " + ", ".join(summary_parts) + "."
     else:
-        signal_summary = "general reflection with baseline emotional balance"
+        signal_summary = "General reflection with baseline emotional balance."
 
     return JournalAnalysisResponse(
         sentiment=sentiment,
@@ -127,3 +127,4 @@ def analyze_journal_text(user_id: str, text: str) -> JournalAnalysisResponse:
         isDemoPlaceholder=False,
         disclaimer="Non-clinical linguistic signal proxy. Not a psychological evaluation."
     )
+
