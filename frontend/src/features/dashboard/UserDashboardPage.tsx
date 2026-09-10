@@ -177,17 +177,17 @@ export const UserDashboardPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             <Link
               to="/checkins"
-              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-xs shadow transition-all flex items-center gap-2"
+              className="btn-primary text-xs shadow-md"
             >
               <Smile className="w-4 h-4" />
-              <span>Today's Check-In</span>
+              <span>Record Daily Check-In</span>
             </Link>
             <Link
               to="/support"
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs border border-slate-700 transition-colors flex items-center gap-2"
+              className="btn-secondary text-xs"
             >
               <Bot className="w-4 h-4 text-teal-400" />
-              <span>Support Companion</span>
+              <span>Open Support Companion</span>
             </Link>
           </div>
         </div>
@@ -494,9 +494,9 @@ export const UserDashboardPage: React.FC = () => {
             </div>
             <Link
               to="/support"
-              className="w-full py-2 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 font-semibold rounded-xl text-xs border border-emerald-500/30 transition-colors text-center block"
+              className="w-full py-2.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 font-semibold rounded-xl text-xs border border-emerald-500/30 transition-colors text-center block"
             >
-              Request Follow-Up
+              Request Counselor Follow-up
             </Link>
           </div>
 
@@ -518,9 +518,9 @@ export const UserDashboardPage: React.FC = () => {
             </div>
             <Link
               to="/recommendations"
-              className="w-full py-2 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 font-semibold rounded-xl text-xs border border-indigo-500/30 transition-colors text-center block"
+              className="w-full py-2.5 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 font-semibold rounded-xl text-xs border border-indigo-500/30 transition-colors text-center block"
             >
-              View Legal Aid Details
+              Review Legal Aid Details
             </Link>
           </div>
 
@@ -542,9 +542,9 @@ export const UserDashboardPage: React.FC = () => {
             </div>
             <Link
               to="/recommendations"
-              className="w-full py-2 bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 font-semibold rounded-xl text-xs border border-teal-500/30 transition-colors text-center block"
+              className="w-full py-2.5 bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 font-semibold rounded-xl text-xs border border-teal-500/30 transition-colors text-center block"
             >
-              Explore Welfare Schemes
+              Review Protection & Compensation
             </Link>
           </div>
         </div>
