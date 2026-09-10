@@ -14,6 +14,16 @@ export const riskController = {
     }
   },
 
+  getRiskByCaseId: async (req: AuthRequest, res: Response) => {
+    try {
+      const { caseId } = req.params;
+      const risk = await riskService.getRiskByCaseId(caseId);
+      return sendSuccess(res, { risk });
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
+
   getRiskHistory: async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -24,3 +34,4 @@ export const riskController = {
     }
   },
 };
+

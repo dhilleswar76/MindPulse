@@ -1,12 +1,18 @@
 import axios from 'axios';
 
+const apiBase =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  timeout: 5000,
+  baseURL: apiBase,
+  timeout: 8000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
 
 // Request interceptor for token injection
 api.interceptors.request.use((config) => {

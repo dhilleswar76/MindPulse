@@ -7,5 +7,7 @@ const router = Router();
 router.use(authenticateToken);
 
 router.get('/', forecastingController.getForecast);
+router.get('/:caseId', forecastingController.getForecastByCaseId);
 
 export default router;
+

@@ -8,7 +8,9 @@ router.use(authenticateToken);
 router.use(requireRoles('ADMIN', 'COUNSELOR'));
 
 router.get('/overview', analyticsController.getOverview);
+router.get('/district', analyticsController.getOverview);
 router.get('/heatmap', analyticsController.getHeatmap);
 router.post('/simulate', requireRoles('ADMIN'), analyticsController.simulate);
 
 export default router;
+
