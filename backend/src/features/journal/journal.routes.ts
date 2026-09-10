@@ -10,6 +10,8 @@ router.use(authenticateToken);
 
 router.post('/', validateBody(createJournalSchema), journalController.createEntry);
 router.get('/', journalController.getEntries);
+router.put('/:id', journalController.updateEntry);
 router.delete('/:id', journalController.deleteEntry);
 
 export default router;
+

@@ -33,4 +33,16 @@ export const journalController = {
       return sendError(res, err.message, 400);
     }
   },
+
+  updateEntry: async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user!.userId;
+      const entry = await journalService.updateEntry(userId, req.params.id, req.body);
+      if (!entry) return sendError(res, 'Entry not found', 404);
+      return sendSuccess(res, { entry }, 'Journal entry updated');
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
 };
+

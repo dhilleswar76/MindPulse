@@ -45,7 +45,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-slate-900/95 border-r border-slate-800/80 flex flex-col justify-between py-6 px-4 shrink-0 h-full overflow-y-auto">
+    <aside className="hidden md:flex w-64 bg-slate-900/95 border-r border-slate-800/80 flex-col justify-between py-6 px-4 shrink-0 h-full overflow-y-auto">
       <div className="space-y-6">
         {/* Section: Victim / Witness Portal */}
         {role === 'USER' && (
