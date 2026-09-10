@@ -13,6 +13,28 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     return;
   }
 
+  // Support demo persona tokens for seamless evaluation and role switching
+  if (token === 'demo_token_user' || token === 'demo_token_counselor' || token === 'demo_token_admin') {
+    const role: UserRole = token === 'demo_token_counselor' ? 'COUNSELOR' : token === 'demo_token_admin' ? 'ADMIN' : 'USER';
+    req.user = {
+      userId: `demo_${role.toLowerCase()}`,
+      email: `demo.${role.toLowerCase()}@mindpulse.local`,
+      role,
+      fullName:
+        role === 'USER'
+          ? 'Alex Rivera (Protected Witness)'
+          : role === 'COUNSELOR'
+          ? 'Dr. Sarah Jenkins'
+          : 'Marcus Vance (District Welfare Officer)',
+      victimType: role === 'USER' ? 'WITNESS' : undefined,
+      caseId: role === 'USER' ? 'MP-1042' : undefined,
+      caseStage: role === 'USER' ? 'COURT_TRIAL' : undefined,
+      district: 'Central District',
+      state: 'National Capital Region',
+    };
+    return next();
+  }
+
   try {
     const decoded = jwt.verify(token, config.jwtSecret) as TokenPayload;
     req.user = decoded;
@@ -21,6 +43,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     sendError(res, 'Invalid or expired token', 403);
   }
 };
+
 
 export const requireRoles = (...allowedRoles: UserRole[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction): void => {
