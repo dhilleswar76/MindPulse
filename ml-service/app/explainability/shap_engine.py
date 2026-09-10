@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Tuple
-from app.schemas.risk import ContributingSignal, RiskFactor
+from app.schemas.risk import ContributingSignal, RiskFactor, TopFactorItem
 
 # Human-readable feature metadata and clinical counselor descriptions
 FEATURE_METADATA: Dict[str, Dict[str, Any]] = {
@@ -26,6 +26,18 @@ FEATURE_METADATA: Dict[str, Dict[str, Any]] = {
         "category": "stress",
         "direction_pos": "increased",
         "description_fn": lambda val, base: f"Reported stress averages {val:.1f}/10."
+    },
+    "anxiety_deviation": {
+        "title": "Anxiety Surge Above Normal",
+        "category": "anxiety",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Recent anxiety is {val:+.1f} pts above personal normal ({base:.1f}/10)."
+    },
+    "latest_anxiety": {
+        "title": "Elevated Anxiety",
+        "category": "anxiety",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Reported anxiety level ({val:.1f}/10) reflects heightened tension."
     },
     "case_stress_deviation": {
         "title": "Case-Related Tension Surge",
@@ -57,6 +69,12 @@ FEATURE_METADATA: Dict[str, Dict[str, Any]] = {
         "direction_pos": "decreased",
         "description_fn": lambda val, base: "Restricted sleep under 5 hours recorded, indicating possible hyperarousal."
     },
+    "latest_sleep": {
+        "title": "Reduced Sleep Duration",
+        "category": "sleep",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: f"Recorded sleep duration is {val:.1f} hours."
+    },
     "mood_deviation": {
         "title": "Mood Decline Below Normal",
         "category": "mood",
@@ -68,6 +86,24 @@ FEATURE_METADATA: Dict[str, Dict[str, Any]] = {
         "category": "mood",
         "direction_pos": "decreased",
         "description_fn": lambda val, base: f"Reported mood level ({val:.1f}/10) reflects emotional strain."
+    },
+    "latest_wellbeing": {
+        "title": "Low Overall Wellbeing Index",
+        "category": "wellbeing",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: f"Composite wellbeing index is {val:.1f}/100."
+    },
+    "wellbeing_slope": {
+        "title": "Declining Longitudinal Wellbeing",
+        "category": "trend",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: "Longitudinal trajectory shows consecutive decline in overall wellbeing."
+    },
+    "consecutive_deterioration_count": {
+        "title": "Repeated Consecutive Deterioration",
+        "category": "trend",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Distress has intensified across {int(val)} consecutive check-in observations."
     },
     "stage_is_trial": {
         "title": "Court / Trial Stage Sensitivity",
@@ -118,13 +154,14 @@ def calculate_shap_attributions(
     raw_shap_values: Dict[str, float],
     baseline_info: Dict[str, Any],
     top_k: int = 5
-) -> Tuple[List[ContributingSignal], List[RiskFactor]]:
+) -> Tuple[List[ContributingSignal], List[RiskFactor], List[TopFactorItem]]:
     """
     Translates exact mathematical SHAP tree attributions into counselor-friendly,
-    non-diagnostic contributing signals.
+    non-diagnostic contributing signals and top factors.
     """
     contributing_signals: List[ContributingSignal] = []
     legacy_factors: List[RiskFactor] = []
+    top_factors: List[TopFactorItem] = []
 
     # Filter positive SHAP contributions (features pushing risk upward)
     positive_shaps = [
@@ -135,16 +172,13 @@ def calculate_shap_attributions(
     # Sort descending by SHAP magnitude
     positive_shaps.sort(key=lambda x: x[1], reverse=True)
 
-    # Compute sum of positive SHAP values for relative impact percentage
     total_pos_shap = sum(s[1] for s in positive_shaps) or 1.0
-
     seen_categories = set()
 
     for feat_name, shap_val in positive_shaps:
         meta = FEATURE_METADATA[feat_name]
         cat = meta.get("category", feat_name)
         
-        # Avoid redundant duplicate features in the same category (e.g. stress and stress_dev)
         if cat in seen_categories and len(contributing_signals) >= 3:
             continue
         seen_categories.add(cat)
@@ -155,12 +189,16 @@ def calculate_shap_attributions(
         base_val = 5.0
         if "stress" in feat_name:
             base_val = baseline_info.get("mean_stress", 4.0)
+        elif "anxiety" in feat_name:
+            base_val = baseline_info.get("mean_anxiety", 4.0)
         elif "safety" in feat_name:
             base_val = baseline_info.get("mean_safety", 7.5)
         elif "sleep" in feat_name:
             base_val = baseline_info.get("mean_sleep", 7.5)
         elif "mood" in feat_name:
             base_val = baseline_info.get("mean_mood", 7.0)
+        elif "wellbeing" in feat_name:
+            base_val = baseline_info.get("mean_wellbeing", 72.0)
         elif "case_stress" in feat_name:
             base_val = baseline_info.get("mean_case_stress", 4.0)
 
@@ -169,6 +207,7 @@ def calculate_shap_attributions(
         if normalized_impact < 0.05:
             normalized_impact = 0.05
 
+        impact_tier = "HIGH" if normalized_impact >= 0.25 else ("MODERATE" if normalized_impact >= 0.12 else "LOW")
         desc = meta["description_fn"](feat_val, base_val)
 
         # Baseline comparison string
@@ -193,6 +232,17 @@ def calculate_shap_attributions(
             description=desc
         ))
 
+        # TopFactorItem for Step 11 schema
+        top_factors.append(TopFactorItem(
+            feature=meta["title"],
+            impact=impact_tier,
+            direction="NEGATIVE" if meta["direction_pos"] in ["increased", "decreased", "elevated"] else "STABLE",
+            value=round(feat_val, 2),
+            baseline=round(base_val, 2),
+            reason=desc,
+            impactScore=normalized_impact
+        ))
+
         if len(contributing_signals) >= top_k:
             break
 
@@ -211,8 +261,17 @@ def calculate_shap_attributions(
             direction="decrease",
             description="Metrics are within expected personal normal baseline ranges."
         ))
+        top_factors.append(TopFactorItem(
+            feature="Stable Baseline",
+            impact="LOW",
+            direction="POSITIVE",
+            value=7.5,
+            baseline=7.5,
+            reason="All monitored distress indicators remain within personal baseline ranges.",
+            impactScore=0.05
+        ))
 
-    return contributing_signals, legacy_factors
+    return contributing_signals, legacy_factors, top_factors
 
 def calculate_feature_attribution(features: Dict[str, float]) -> List[RiskFactor]:
     """
@@ -223,7 +282,7 @@ def calculate_feature_attribution(features: Dict[str, float]) -> List[RiskFactor
     
     vec = [features.get(f, 0.0) for f in FEATURE_NAMES]
     shap_vals = model_engine.explain_sample(vec)
-    _, legacy_factors = calculate_shap_attributions(
+    _, legacy_factors, _ = calculate_shap_attributions(
         feature_dict=features,
         raw_shap_values=shap_vals,
         baseline_info={"mean_stress": features.get("avg_stress", 4.0),
