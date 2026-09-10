@@ -81,15 +81,6 @@ export interface JournalEntry {
   sentiment: 'positive' | 'neutral' | 'negative';
   stressSignal: number;
   emotionSignals: string[];
-  signals?: {
-    stress?: number;
-    fear?: number;
-    sleep_concern?: number;
-    case_tension?: number;
-    support_seeking?: number;
-  };
-  signalSummary?: string;
-  moodContext?: string;
   isPrivate: boolean;
   createdAt: string | Date;
 }
