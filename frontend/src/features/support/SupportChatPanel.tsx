@@ -495,13 +495,43 @@ function generateLocalAssistantResponse(
     };
   }
 
-  if (/^good (morning|afternoon|evening)\b/i.test(lower)) {
-    const timeWord = lower.includes('morning') ? 'Good morning! ☀️' : lower.includes('afternoon') ? 'Good afternoon! ☀️' : 'Good evening! 🌙';
+  // Good night
+  if (/^(good ?night|goodnight|gud ?night|good ?nite|night ?night|gn)\b/i.test(lower)) {
     return {
-      reply: `${timeWord} How are you feeling today?`,
+      reply: "Good night! 🌙 Rest well. Give yourself permission to let go of the day. If worries about your case are lingering, remember you are safe to rest and nothing needs to be solved tonight. Take care!",
+      isSafety: false,
+      resources: ['Bedtime NSDR Relaxation', 'Reflection Journal'],
+      followUpSuggestions: ["I can't sleep tonight.", 'Can you guide me through a 4-7-8 breathing exercise?'],
+    };
+  }
+
+  // Good morning / good morrning
+  if (/^(good ?mor+ning|good ?mornin|gud ?mor+ning|good ?mrng|gm)\b/i.test(lower)) {
+    return {
+      reply: "Good morning! ☀️ How are you feeling today? I hope you have a calm and steady day ahead.",
       isSafety: false,
       resources: ['Wellbeing Check-in', '4-7-8 Breathing'],
       followUpSuggestions: ["I'm nervous about my court hearing.", 'Can you guide me through a 4-7-8 breathing exercise?'],
+    };
+  }
+
+  // Good afternoon / good after
+  if (/^(good ?after(noon)?|good ?noon|good ?aftn|afternoon)\b/i.test(lower)) {
+    return {
+      reply: "Good afternoon! ☀️ How is your day going? I'm here if you'd like a quick grounding reset or someone to talk through case questions with.",
+      isSafety: false,
+      resources: ['5-4-3-2-1 Sensory Reset', '4-7-8 Breathing Guide'],
+      followUpSuggestions: ['Can you guide me through a 4-7-8 breathing exercise?', 'Give me a grounding exercise.'],
+    };
+  }
+
+  // Good evening
+  if (/^(good ?evening|good ?eve|evening)\b/i.test(lower)) {
+    return {
+      reply: "Good evening! 🌙 I hope your day went as smoothly as possible. How are you feeling as the evening winds down?",
+      isSafety: false,
+      resources: ['Reflection Journal', '4-7-8 Breathing Guide'],
+      followUpSuggestions: ['Can you guide me through a 4-7-8 breathing exercise?', 'I have court tomorrow.'],
     };
   }
 

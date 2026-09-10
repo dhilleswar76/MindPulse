@@ -33,6 +33,10 @@ export type SupportIntent =
   | 'GREETING_HELLO'
   | 'GREETING_HEY'
   | 'GREETING_TIMED'
+  | 'GREETING_MORNING'
+  | 'GREETING_AFTERNOON'
+  | 'GREETING_EVENING'
+  | 'GREETING_NIGHT'
   | 'SMALLTALK_HOW_ARE_YOU'
   | 'GRATITUDE'
   | 'FAREWELL'
@@ -140,13 +144,33 @@ function classifyIntent(
     return 'GRATITUDE';
   }
 
-  // "bye", "goodbye", "see you", "cya", "good night", "take care"
-  if (/^(bye|goodbye|cya|see you( later)?|good night|talk to you later)\b/i.test(normalized)) {
+  // "bye", "goodbye", "see you", "cya", "take care" (Note: "good night" is handled by GREETING_NIGHT)
+  if (/^(bye|goodbye|cya|see you( later)?|talk to you later|take care)\b/i.test(normalized)) {
     return 'FAREWELL';
   }
 
-  // Timed greetings: "good morning", "good afternoon", "good evening"
-  if (/^good (morning|afternoon|evening)\b/i.test(normalized)) {
+  // "good night", "goodnight", "gud night", "good nite", "night night", "sweet dreams", "gn"
+  if (/^(good ?night|goodnight|gud ?night|good ?nite|night ?night|sweet dreams|gn)\b/i.test(normalized)) {
+    return 'GREETING_NIGHT';
+  }
+
+  // "good morning", "good morrning", "good mornin", "gud morning", "good mrng", "gm"
+  if (/^(good ?mor+ning|good ?mornin|gud ?mor+ning|good ?mrng|gm)\b/i.test(normalized)) {
+    return 'GREETING_MORNING';
+  }
+
+  // "good afternoon", "good after", "good aftn", "good noon", "afternoon"
+  if (/^(good ?after(noon)?|good ?noon|good ?aftn|afternoon)\b/i.test(normalized)) {
+    return 'GREETING_AFTERNOON';
+  }
+
+  // "good evening", "evening", "good eve"
+  if (/^(good ?evening|good ?eve|evening)\b/i.test(normalized)) {
+    return 'GREETING_EVENING';
+  }
+
+  // Fallback timed greetings: "good morning", "good afternoon", "good evening"
+  if (/^good (morning|afternoon|evening|day)\b/i.test(normalized)) {
     return 'GREETING_TIMED';
   }
 
@@ -359,11 +383,67 @@ function generateResponse(
         ],
       };
 
+    case 'GREETING_MORNING':
+      return {
+        reply: "Good morning! ☀️ How are you feeling today? I hope you have a calm and steady day ahead.",
+        intent: 'GREETING_MORNING',
+        isSafetyIntervention: false,
+        resourcesSuggested: ['Wellbeing Check-in', '4-7-8 Breathing Guide'],
+        disclaimer: 'MindPulse Support Companion is a non-clinical conversational guide.',
+        followUpSuggestions: [
+          'I am feeling nervous.',
+          'Can you guide me through a 4-7-8 breathing exercise?',
+          'What can you do?',
+        ],
+      };
+
+    case 'GREETING_AFTERNOON':
+      return {
+        reply: "Good afternoon! ☀️ How is your day going? I'm here if you'd like a quick grounding reset or someone to talk through case questions with.",
+        intent: 'GREETING_AFTERNOON',
+        isSafetyIntervention: false,
+        resourcesSuggested: ['5-4-3-2-1 Sensory Reset', '4-7-8 Breathing Guide'],
+        disclaimer: 'MindPulse Support Companion is a non-clinical conversational guide.',
+        followUpSuggestions: [
+          'Can you guide me through a 4-7-8 breathing exercise?',
+          'Give me a grounding exercise.',
+          "I'm feeling stressed today.",
+        ],
+      };
+
+    case 'GREETING_EVENING':
+      return {
+        reply: "Good evening! 🌙 I hope your day went as smoothly as possible. How are you feeling as the evening winds down?",
+        intent: 'GREETING_EVENING',
+        isSafetyIntervention: false,
+        resourcesSuggested: ['Private Reflection Journal', '4-7-8 Breathing Guide'],
+        disclaimer: 'MindPulse Support Companion is a non-clinical conversational guide.',
+        followUpSuggestions: [
+          'Can you guide me through a 4-7-8 breathing exercise?',
+          'I want to write in my reflection journal.',
+          'I have court tomorrow.',
+        ],
+      };
+
+    case 'GREETING_NIGHT':
+      return {
+        reply: "Good night! 🌙 Rest well. Give yourself permission to let go of the day. If worries about your case are lingering, remember you are safe to rest and nothing needs to be solved tonight. Take care!",
+        intent: 'GREETING_NIGHT',
+        isSafetyIntervention: false,
+        resourcesSuggested: ['Bedtime NSDR Relaxation', 'Private Reflection Journal'],
+        disclaimer: 'MindPulse Support Companion provides non-clinical relaxation support.',
+        followUpSuggestions: [
+          "I can't sleep tonight.",
+          'Can you guide me through a 4-7-8 breathing exercise?',
+          'Give me a grounding exercise.',
+        ],
+      };
+
     case 'GREETING_TIMED': {
       const lower = raw.toLowerCase();
-      const timeWord = lower.includes('morning') ? 'Good morning! ☀️' : lower.includes('afternoon') ? 'Good afternoon! ☀️' : 'Good evening! 🌙';
+      const timeWord = lower.includes('morning') ? 'Good morning! ☀️' : lower.includes('after') ? 'Good afternoon! ☀️' : lower.includes('night') ? 'Good night! 🌙' : 'Good evening! 🌙';
       return {
-        reply: `${timeWord} How are you feeling today?`,
+        reply: `${timeWord} How are you feeling right now?`,
         intent: 'GREETING_TIMED',
         isSafetyIntervention: false,
         resourcesSuggested: ['Check-in Sanctuary', '4-7-8 Breathing'],
