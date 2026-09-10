@@ -1,5 +1,6 @@
 import { User } from '../../models/index.js';
-import { supportAssistantService, ChatMessageContext } from './supportAssistant.service.js';
+import { ChatMessageContext } from './supportAssistant.service.js';
+import { geminiChatbotService } from './geminiChatbot.service.js';
 
 export const userService = {
   getProfile: async (userId: string) => {
@@ -30,7 +31,7 @@ export const userService = {
     history: ChatMessageContext[] = []
   ) => {
     const profile = await userService.getProfile(userId);
-    return supportAssistantService.processChat(userId, message, history, {
+    return geminiChatbotService.processChat(userId, message, history, {
       fullName: profile?.fullName,
       assignedCounselor: profile?.assignedCounselor,
       caseStage: profile?.caseStage,

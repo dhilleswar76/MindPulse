@@ -56,6 +56,7 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
 
   const handleSend = async (e?: React.FormEvent, customText?: string) => {
     if (e) e.preventDefault();
+    if (isTyping) return;
     const textToSend = customText !== undefined ? customText : input;
     if (!textToSend.trim()) return;
 
@@ -85,10 +86,10 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
         ...prev,
         {
           sender: 'assistant',
-          text: res.data?.reply || 'I am here to support your daily wellness routines and case journey orientation.',
-          isSafety: res.data?.isSafetyIntervention,
-          resources: res.data?.resourcesSuggested,
-          followUpSuggestions: res.data?.followUpSuggestions,
+          text: res.data?.reply || res.reply || 'I am here to support your daily wellness routines and case journey orientation.',
+          isSafety: res.data?.isSafetyIntervention ?? res.isSafetyIntervention,
+          resources: res.data?.resourcesSuggested || res.resourcesSuggested,
+          followUpSuggestions: res.data?.followUpSuggestions || res.followUpSuggestions,
           timestamp: replyTime,
         },
       ]);
@@ -250,9 +251,18 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
         ))}
 
         {isTyping && (
-          <div className="flex items-center gap-2 text-[11px] text-slate-400 p-2">
-            <Bot className="w-3.5 h-3.5 text-teal-400 animate-spin" />
-            <span>Support Assistant is thinking...</span>
+          <div className="flex items-start gap-2.5 justify-start">
+            <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-teal-400 shrink-0 mt-0.5">
+              <Bot className="w-3.5 h-3.5 animate-pulse" />
+            </div>
+            <div className="rounded-2xl px-3.5 py-2.5 bg-slate-950/80 border border-slate-800 text-slate-200 rounded-bl-none shadow-sm flex items-center gap-2">
+              <span className="text-[11px] text-slate-400 font-medium">MindPulse Support Assistant</span>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-bounce" />
+              </div>
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -262,8 +272,9 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
       <div className="px-3 py-2 bg-slate-950/80 border-t border-slate-800/80 flex items-center gap-1.5 overflow-x-auto text-[11px] shrink-0 no-scrollbar">
         <button
           type="button"
-          onClick={() => handleQuickPrompt("I have an upcoming court hearing and feeling nervous. Can you guide me through a 4-7-8 breathing exercise?")}
-          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
+          disabled={isTyping}
+          onClick={() => handleQuickPrompt("I have an upcoming hearing. Please guide me through a short grounding exercise.")}
+          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
         >
           <Wind className="w-3 h-3 text-teal-400" />
           <span>Hearing Grounding</span>
@@ -271,8 +282,9 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
 
         <button
           type="button"
+          disabled={isTyping}
           onClick={() => handleQuickPrompt("Can you guide me through a 4-7-8 breathing exercise?")}
-          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
+          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
         >
           <Wind className="w-3 h-3 text-teal-400" />
           <span>4-7-8 Breathing</span>
@@ -280,8 +292,9 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
 
         <button
           type="button"
+          disabled={isTyping}
           onClick={() => handleQuickPrompt("Give me a grounding exercise.")}
-          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
+          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
         >
           <Sparkles className="w-3 h-3 text-teal-400" />
           <span>5-4-3-2-1 Grounding</span>
@@ -289,8 +302,9 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
 
         <button
           type="button"
-          onClick={() => handleQuickPrompt("What is victim compensation?")}
-          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
+          disabled={isTyping}
+          onClick={() => handleQuickPrompt("Can you explain the victim compensation information available in this application?")}
+          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
         >
           <BookOpen className="w-3 h-3 text-amber-400" />
           <span>Compensation Info</span>
@@ -298,8 +312,9 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
 
         <button
           type="button"
+          disabled={isTyping}
           onClick={() => handleQuickPrompt("How can I get free legal assistance?")}
-          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
+          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
         >
           <Scale className="w-3 h-3 text-sky-400" />
           <span>Free Legal Aid (15100)</span>
@@ -307,8 +322,9 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
 
         <button
           type="button"
+          disabled={isTyping}
           onClick={() => handleQuickPrompt("I can't sleep tonight.")}
-          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
+          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
         >
           <Moon className="w-3 h-3 text-indigo-400" />
           <span>Bedtime Rest (NSDR)</span>
@@ -316,8 +332,9 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
 
         <button
           type="button"
+          disabled={isTyping}
           onClick={() => handleQuickPrompt("I want to talk to my counselor.")}
-          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
+          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
         >
           <HeartHandshake className="w-3 h-3 text-emerald-400" />
           <span>Talk to Counselor</span>
@@ -325,8 +342,9 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
 
         <button
           type="button"
+          disabled={isTyping}
           onClick={() => handleQuickPrompt("What are the witness safe travel and protection options?")}
-          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
+          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-full shrink-0 border border-slate-700 flex items-center gap-1.5 transition-colors"
         >
           <Shield className="w-3 h-3 text-cyan-400" />
           <span>Witness Safe Travel</span>
@@ -338,13 +356,14 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
         <input
           type="text"
           value={input}
+          disabled={isTyping}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about 4-7-8 breathing, grounding, legal defense, compensation, or sleep..."
-          className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500"
+          className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-500 disabled:opacity-60"
         />
         <button
           type="submit"
-          disabled={!input.trim()}
+          disabled={!input.trim() || isTyping}
           className="p-2 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white rounded-xl disabled:opacity-40 transition-opacity shadow"
           title="Send message"
         >
