@@ -1,5 +1,12 @@
 import axios from 'axios';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { supportAssistantService, ChatMessageContext, SupportChatResponse } from './supportAssistant.service.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config();
 
 /**
  * System instruction provided to Gemini for the MindPulse Support Assistant.
@@ -92,7 +99,7 @@ export const geminiChatbotService = {
 
     // Read Gemini API Key strictly from server-side environment variables
     const apiKey = (process.env.GEMINI_API_KEY || process.env.LLM_API_KEY || '').trim();
-    const model = (process.env.GEMINI_MODEL || 'gemini-1.5-flash').trim();
+    const model = (process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite').trim();
 
     // If no API key is configured in the environment, engage the local engine
     if (!apiKey) {
@@ -115,13 +122,13 @@ export const geminiChatbotService = {
         contents: geminiContents,
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 800,
+          maxOutputTokens: 600,
           topP: 0.95,
         },
       };
 
       const response = await axios.post(endpoint, requestPayload, {
-        timeout: 10000,
+        timeout: 15000,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -135,7 +142,14 @@ export const geminiChatbotService = {
         throw new Error('Gemini API returned an empty or malformed candidate part');
       }
 
-      const replyText = candidatePart.trim();
+      let replyText = candidatePart.trim();
+      if (replyText.startsWith('**Drafting')) {
+        const sections = replyText.split(/\n\n+/);
+        const finalSection = sections.find(s => !s.startsWith('**Drafting') && s.length > 50);
+        if (finalSection) replyText = finalSection.trim();
+      }
+
+      console.log(`[GeminiChatbotService] Successfully generated live response using Gemini API (${model}).`);
 
       // 4. Derive dynamic follow-up chips and resources
       const meta = deriveMetadata(rawMessage, replyText);
@@ -145,8 +159,9 @@ export const geminiChatbotService = {
         intent: meta.intent,
         isSafetyIntervention: meta.isSafety,
         resourcesSuggested: meta.resources,
-        disclaimer: 'MindPulse Support Companion is an AI-assisted non-clinical supportive guide.',
+        disclaimer: 'MindPulse Support Companion is an AI-assisted non-clinical supportive guide powered by Gemini.',
         followUpSuggestions: meta.followUps,
+        provider: 'gemini',
       };
     } catch (err: any) {
       // Log safe diagnostic information without ever exposing the API key
