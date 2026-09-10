@@ -70,6 +70,11 @@ This document details the technologies chosen for MindPulse, where they are util
 - **Location**: `backend/src/services/socket.service.ts`
 - **Rationale**: Instant notification delivery when user distress triggers a counselor triage review flag.
 
+### Google Gemini API (LLM Integration)
+- **Purpose**: Context-aware, generative supportive assistance for victims and protected witnesses (somatic exercises, statutory legal rights, and DLSA compensation navigation).
+- **Location**: `backend/src/features/users/geminiChatbot.service.ts`
+- **Rationale**: Provides dynamic, compassionate, conversational assistance with multi-turn context tracking and zero hardcoded replies, backed by seamless fallback to the local trauma-informed engine.
+
 ---
 
 ## 3. Machine Learning & Python Microservice
