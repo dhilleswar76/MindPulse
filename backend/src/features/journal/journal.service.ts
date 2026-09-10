@@ -81,4 +81,35 @@ export const journalService = {
     memoryJournals.set(userId, list.filter((j) => j._id !== id));
     return true;
   },
+
+  updateEntry: async (userId: string, id: string, input: Partial<CreateJournalInput>) => {
+    let updateData: any = { ...input };
+    if (input.content) {
+      try {
+        const nlpResult = await mlClient.analyzeJournal(userId, input.content);
+        updateData.sentiment = nlpResult.sentiment;
+        updateData.stressSignal = nlpResult.stressSignal;
+        updateData.emotionSignals = nlpResult.emotionSignals;
+      } catch {}
+    }
+
+    try {
+      const doc = await JournalEntry.findOneAndUpdate(
+        { _id: id, userId },
+        { $set: updateData },
+        { new: true }
+      ).lean();
+      if (doc) return doc;
+    } catch {}
+
+    const list = memoryJournals.get(userId) || [];
+    const idx = list.findIndex((j) => j._id === id);
+    if (idx !== -1) {
+      list[idx] = { ...list[idx], ...updateData, updatedAt: new Date() };
+      memoryJournals.set(userId, list);
+      return list[idx];
+    }
+    return null;
+  },
 };
+
