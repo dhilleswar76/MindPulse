@@ -19,9 +19,14 @@ import { CounselorDashboardPage } from '../features/counselor/CounselorDashboard
 import { CaseDetailsPage } from '../features/counselor/CaseDetailsPage';
 import { InterventionsPage } from '../features/interventions/InterventionsPage';
 import { AlertsQueuePage } from '../features/alerts/AlertsQueuePage';
-import { InstitutionalAnalyticsPage } from '../features/analytics/InstitutionalAnalyticsPage';
+
+// Admin Feature Pages
+import { AdminDashboardPage } from '../features/admin/AdminDashboardPage';
+import { AdminAnalyticsPage } from '../features/admin/AdminAnalyticsPage';
+import { AdminCasesPage } from '../features/admin/AdminCasesPage';
 import { CampusHeatmapPage } from '../features/heatmap/CampusHeatmapPage';
 import { WhatIfSimulatorPage } from '../features/simulator/WhatIfSimulatorPage';
+import { AdminAuditLogsPage } from '../features/admin/AdminAuditLogsPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -57,9 +62,12 @@ export const AppRoutes: React.FC = () => {
 
         {/* Admin Routes */}
         <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-          <Route path="/admin" element={<InstitutionalAnalyticsPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+          <Route path="/admin/cases" element={<AdminCasesPage />} />
           <Route path="/admin/heatmap" element={<CampusHeatmapPage />} />
           <Route path="/admin/simulator" element={<WhatIfSimulatorPage />} />
+          <Route path="/admin/audit" element={<AdminAuditLogsPage />} />
         </Route>
       </Route>
 
