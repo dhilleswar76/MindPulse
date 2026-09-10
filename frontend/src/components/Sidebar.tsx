@@ -9,7 +9,6 @@ import {
   AlertTriangle,
   TrendingUp,
   Sparkles,
-  Bot,
   Users,
   ClipboardList,
   BarChart3,
@@ -31,14 +30,13 @@ export const Sidebar: React.FC = () => {
     { to: '/risk', label: 'Distress Signals & XAI', icon: AlertTriangle },
     { to: '/forecast', label: 'Early Risk Forecast', icon: TrendingUp },
     { to: '/recommendations', label: 'Support Pathways', icon: Sparkles },
-    { to: '/support', label: 'Support Assistant', icon: Bot },
   ];
 
   const counselorLinks = [
-    { to: '/counselor', label: 'Prioritized Case Queue', icon: Users },
-    { to: '/counselor/cases', label: 'Case Summaries & AI', icon: ClipboardList },
-    { to: '/counselor/interventions', label: 'Support & Follow-ups', icon: Activity },
+    { to: '/counselor', label: 'Command Center & Triage', icon: LayoutDashboard },
+    { to: '/counselor/cases', label: 'Prioritized Case Queue', icon: Users },
     { to: '/counselor/alerts', label: 'Distress Alerts', icon: Bell },
+    { to: '/counselor/interventions', label: 'Support Pathways & Outcomes', icon: Activity },
   ];
 
   const adminLinks = [
@@ -51,7 +49,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-slate-900/95 border-r border-slate-800/80 flex flex-col justify-between py-6 px-4 shrink-0">
+    <aside className="w-64 bg-slate-900/95 border-r border-slate-800/80 flex flex-col justify-between py-6 px-4 shrink-0 h-full overflow-y-auto">
       <div className="space-y-6">
         {/* Section: Victim / Witness Portal */}
         {role === 'USER' && (
