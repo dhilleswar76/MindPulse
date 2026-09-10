@@ -4,28 +4,47 @@
 
 @layer base {
   body {
-    @apply bg-slate-900 text-slate-100 font-sans min-h-screen;
+    @apply bg-slate-950 text-slate-100 font-sans min-h-screen antialiased selection:bg-teal-500/30 selection:text-teal-200;
     background-image: 
-      radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.08) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.08) 0px, transparent 45%),
+      radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 45%),
       radial-gradient(at 50% 100%, rgba(13, 148, 136, 0.05) 0px, transparent 50%);
     background-attachment: fixed;
   }
 }
 
 @layer components {
+  /* Surfaces & Containers */
   .glass-card {
-    @apply bg-slate-800/80 backdrop-blur-md border border-slate-700/60 rounded-2xl shadow-glass transition-all duration-200;
+    @apply bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-2xl shadow-glass transition-all duration-200;
   }
 
   .glass-card-hover {
-    @apply hover:border-teal-500/40 hover:shadow-glass-hover hover:-translate-y-0.5;
+    @apply hover:border-slate-700 hover:shadow-glass-hover hover:-translate-y-0.5;
   }
 
   .glass-panel {
-    @apply bg-slate-800/60 backdrop-blur-md border border-slate-700/40 rounded-xl;
+    @apply bg-slate-900/60 backdrop-blur-md border border-slate-800/70 rounded-xl;
   }
 
+  /* Action Hierarchy */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 shadow-md shadow-teal-900/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-slate-200 bg-slate-800/90 border border-slate-700 hover:bg-slate-700 hover:text-white hover:border-slate-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl font-medium text-sm text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-destructive {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-rose-300 bg-rose-950/40 border border-rose-800/60 hover:bg-rose-900/60 hover:text-rose-200 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  /* Risk & Attention Badges (Non-Diagnostic) */
   .badge-stable {
     @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase;
   }
@@ -39,7 +58,22 @@
   }
 
   .badge-review {
-    @apply bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase animate-pulse;
+    @apply bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase;
+  }
+
+  /* Legal Case Stage Badges */
+  .badge-legal-stage {
+    @apply bg-indigo-500/10 text-indigo-300 border border-indigo-500/25 px-2.5 py-1 rounded-lg text-xs font-medium tracking-wide;
+  }
+
+  /* Support Workflow Status Badges */
+  .badge-support-status {
+    @apply bg-teal-500/10 text-teal-300 border border-teal-500/25 px-2.5 py-1 rounded-lg text-xs font-medium tracking-wide;
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+    @apply bg-slate-800/80 animate-pulse rounded-lg;
   }
 }
 

@@ -17,10 +17,14 @@ import {
   FileCheck,
   ChevronRight,
   Sparkles,
+  Mic,
+  PenTool,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { WellnessTrendChart } from './WellnessTrendChart';
+import { VoiceStressModal } from '../voice/VoiceStressModal';
+import { useAuth } from '../../hooks/useAuth';
 
 // Zod schema for type-safe validation following project standards
 const checkinFormSchema = z.object({
@@ -37,7 +41,9 @@ const checkinFormSchema = z.object({
 type CheckinFormData = z.infer<typeof checkinFormSchema>;
 
 export const CheckinPage: React.FC = () => {
+  const { user } = useAuth();
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [consentAgreed, setConsentAgreed] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -166,6 +172,32 @@ export const CheckinPage: React.FC = () => {
         >
           <HelpCircle className="w-4 h-4 text-teal-400" />
           <span>Privacy & Consent Details</span>
+        </button>
+      </div>
+
+      {/* Check-In Mode Switcher */}
+      <div className="bg-slate-900/90 border border-slate-800 p-1.5 rounded-2xl flex flex-wrap items-center gap-1.5 text-xs">
+        <button
+          type="button"
+          className="flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl bg-teal-500/15 text-teal-300 font-semibold border border-teal-500/30 flex items-center justify-center gap-2"
+        >
+          <Smile className="w-4 h-4 text-teal-400" />
+          <span>1. Wellbeing Sliders (Active)</span>
+        </button>
+        <Link
+          to="/journal"
+          className="flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 font-medium flex items-center justify-center gap-2 transition-colors"
+        >
+          <PenTool className="w-4 h-4 text-indigo-400" />
+          <span>2. Reflection Journal</span>
+        </Link>
+        <button
+          type="button"
+          onClick={() => setIsVoiceModalOpen(true)}
+          className="flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 font-medium flex items-center justify-center gap-2 transition-colors"
+        >
+          <Mic className="w-4 h-4 text-teal-400" />
+          <span>3. 5s Voice Screener</span>
         </button>
       </div>
 
@@ -623,6 +655,13 @@ export const CheckinPage: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Voice Stress Screener Modal */}
+      <VoiceStressModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        caseId={user?.caseId || 'MP-1042'}
+        caseStage={user?.caseStage || 'COURT_TRIAL'}
+      />
     </div>
   );
 };
