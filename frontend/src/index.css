@@ -75,6 +75,39 @@
   .skeleton {
     @apply bg-slate-800/80 animate-pulse rounded-lg;
   }
+  .sanctuary-card {
+    @apply bg-slate-900/85 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-sm transition-all duration-200;
+  }
+
+  .sanctuary-card-interactive {
+    @apply hover:border-teal-500/40 hover:bg-slate-900/95 transition-all duration-200;
+  }
+}
+
+/* Somatic breathing circle animation */
+@keyframes breatheCycle {
+  0%, 100% {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.animate-breathe {
+  animation: breatheCycle 8s ease-in-out infinite;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Custom scrollbar */
@@ -92,3 +125,4 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(20, 184, 166, 0.6);
 }
+

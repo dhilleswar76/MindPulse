@@ -94,9 +94,9 @@ export const JournalEditorModal: React.FC<Props> = ({ isOpen, onClose, onSuccess
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 text-white font-semibold rounded-xl text-xs shadow-lg transition-all disabled:opacity-50"
+              className="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-xs shadow transition-all disabled:opacity-50"
             >
-              {isSubmitting ? 'Analyzing & Saving...' : 'Save Entry'}
+              {isSubmitting ? 'Saving...' : 'Save Reflection'}
             </button>
           </div>
         </form>
