@@ -13,29 +13,27 @@ def generate_risk_forecast(
 ) -> ForecastResponse:
     """
     Simulates a non-diagnostic short-term distress trajectory forecast
-    using longitudinal momentum, personal baseline variance, and uncertainty bounds.
+    using longitudinal momentum, personal baseline variance, exponential smoothing,
+    and expanding uncertainty bounds.
+    
+    If insufficient historical observations exist (< 2), returns forecast_available: false
+    with an explicit explanation rather than fabricating future predictions.
     """
     limitations: List[str] = []
-    days = max(1, min(days, 30))
+    days = max(1, min(days, 14))
 
-    if not check_ins:
-        limitations.append("No check-in history provided. Default normative baseline projection used.")
-        points = [
-            ForecastPoint(
-                dayOffset=d,
-                predictedScore=0.25,
-                projectedLevel="STABLE",
-                confidenceLower=0.15,
-                confidenceUpper=0.35
-            )
-            for d in range(1, days + 1)
-        ]
+    # Reject insufficient history
+    if not check_ins or len(check_ins) < 2:
         return ForecastResponse(
             userId=user_id,
-            forecast=points,
+            forecast_available=False,
+            reason=f"Insufficient historical observations ({len(check_ins) if check_ins else 0} provided, minimum 2 required) to project trajectory.",
+            forecast=[],
             trajectoryDirection="stable",
             confidence=0.30,
-            limitations=limitations,
+            data_quality="INSUFFICIENT",
+            observations_used=len(check_ins) if check_ins else 0,
+            limitations=["Insufficient historical data to compute a statistical forecast."],
             modelVersion=settings.model_version,
             disclaimer="Projected trend based on historical trajectory. Non-diagnostic decision support only."
         )
@@ -44,36 +42,34 @@ def generate_risk_forecast(
     feat_data = extract_longitudinal_features(check_ins, case_stage=case_stage)
     feature_vector = feat_data["feature_vector"]
     feat_dict = feat_data["feature_dict"]
-    baseline_info = feat_data["baseline_info"]
+    n_obs = len(check_ins)
 
-    if len(check_ins) < 3:
-        limitations.append(f"Short history ({len(check_ins)} entries): forecast uncertainty bounds are widened.")
+    if n_obs < 3:
+        limitations.append(f"Short history ({n_obs} entries): forecast uncertainty bounds are widened.")
 
     # Starting baseline risk score from model engine
     base_risk = model_engine.predict_risk(feature_vector)
 
     # Calculate trajectory momentum slope
-    # Stress slope (+ means escalating), Safety slope (- means escalating), Mood slope (- means escalating)
     stress_slope = feat_dict.get("stress_slope", 0.0)
     safety_slope = feat_dict.get("safety_slope", 0.0)
     mood_slope = feat_dict.get("mood_slope", 0.0)
+    anxiety_slope = feat_dict.get("anxiety_slope", 0.0)
 
     # Combined daily velocity
-    daily_velocity = (stress_slope * 0.03) - (safety_slope * 0.025) - (mood_slope * 0.02)
+    daily_velocity = (stress_slope * 0.025) + (anxiety_slope * 0.02) - (safety_slope * 0.025) - (mood_slope * 0.02)
     
     # Dampening factor to prevent runaway divergence over horizon
     dampening = 0.88
 
     # Uncertainty dispersion based on personal volatility
     volatility = feat_dict.get("stress_volatility", 0.15) + feat_dict.get("safety_volatility", 0.15)
-    sample_factor = 1.0 / math.sqrt(max(1, len(check_ins)))
+    sample_factor = 1.0 / math.sqrt(max(1, n_obs))
 
     points: List[ForecastPoint] = []
-    current_score = base_risk
     cumulative_delta = 0.0
 
     for day in range(1, days + 1):
-        # Velocity dampened over time
         step_velocity = daily_velocity * (dampening ** (day - 1))
         cumulative_delta += step_velocity
         projected_score = round(max(0.05, min(0.95, base_risk + cumulative_delta)), 2)
@@ -111,12 +107,17 @@ def generate_risk_forecast(
         trajectory = "stable"
 
     confidence = round(feat_data.get("confidence", 0.80), 2)
+    data_quality = feat_data.get("data_quality", "GOOD")
 
     return ForecastResponse(
         userId=user_id,
+        forecast_available=True,
+        reason=None,
         forecast=points,
         trajectoryDirection=trajectory,
         confidence=confidence,
+        data_quality=data_quality,
+        observations_used=n_obs,
         limitations=limitations,
         modelVersion=settings.model_version,
         disclaimer="Projected trend based on historical trajectory. Non-diagnostic decision support only."

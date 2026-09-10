@@ -215,7 +215,7 @@ export const UserDashboardPage: React.FC = () => {
               className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold rounded-2xl shadow-sm transition-all hover:scale-[1.02]"
             >
               <Smile className="w-4 h-4" />
-              <span>Today's Check-In</span>
+              <span>Record Daily Check-In</span>
             </Link>
             <Link
               to="/support"

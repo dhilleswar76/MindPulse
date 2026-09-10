@@ -12,5 +12,8 @@ router.post('/', requireRoles('COUNSELOR', 'ADMIN'), validateBody(createInterven
 router.get('/', requireRoles('COUNSELOR', 'ADMIN'), interventionController.getInterventions);
 router.patch('/:id', requireRoles('COUNSELOR', 'ADMIN'), validateBody(updateInterventionSchema), interventionController.updateIntervention);
 router.get('/outcomes/:userId', requireRoles('COUNSELOR', 'ADMIN'), interventionController.getOutcomes);
+router.post('/followup', requireRoles('COUNSELOR', 'ADMIN'), interventionController.createFollowUp);
+router.get('/followups', requireRoles('COUNSELOR', 'ADMIN'), interventionController.getFollowUps);
 
 export default router;
+

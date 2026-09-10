@@ -10,6 +10,7 @@ router.use(authenticateToken);
 
 router.post('/', validateBody(createCheckInSchema), checkinController.createCheckIn);
 router.get('/', checkinController.getCheckIns);
+router.get('/history', checkinController.getCheckIns);
 router.get('/trend', checkinController.getBaselineAndTrend);
 
 export default router;

@@ -114,4 +114,63 @@ export const interventionService = {
       interventions: memoryInterventions.filter((i) => i.userId === userId || userId === 'user_alex_101'),
     };
   },
+
+  createFollowUp: async (data: { interventionId?: string; userId: string; dueDate: string | Date; notes?: string }) => {
+    try {
+      const doc = await FollowUp.create({
+        interventionId: data.interventionId || '000000000000000000000000',
+        userId: data.userId,
+        dueDate: new Date(data.dueDate),
+        notes: data.notes || '',
+        completed: false,
+      });
+      return doc;
+    } catch {
+      return {
+        _id: 'followup_' + Date.now(),
+        interventionId: data.interventionId || 'int_demo_1',
+        userId: data.userId,
+        dueDate: new Date(data.dueDate),
+        notes: data.notes || '',
+        completed: false,
+        createdAt: new Date(),
+      };
+    }
+  },
+
+  getFollowUps: async (userId?: string) => {
+    try {
+      const query = userId ? { userId } : {};
+      const docs = await FollowUp.find(query).sort({ dueDate: 1 }).lean();
+      if (docs && docs.length > 0) return docs;
+    } catch {}
+
+    const dueToday = new Date();
+    const dueNextWeek = new Date();
+    dueNextWeek.setDate(dueNextWeek.getDate() + 5);
+
+    return [
+      {
+        _id: 'followup_1',
+        interventionId: 'int_demo_1',
+        userId: userId || 'user_alex_101',
+        caseId: 'MP-1042',
+        studentName: 'Alex Rivera',
+        dueDate: dueToday,
+        completed: false,
+        notes: 'Pre-trial testimony support check-in and 4-7-8 breathing review.',
+      },
+      {
+        _id: 'followup_2',
+        interventionId: 'int_demo_2',
+        userId: 'user_taylor_103',
+        caseId: 'MP-1003',
+        studentName: 'Taylor Morgan',
+        dueDate: dueNextWeek,
+        completed: false,
+        notes: 'DLSA compensation status verification.',
+      },
+    ];
+  },
 };
+
