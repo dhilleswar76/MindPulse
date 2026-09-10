@@ -18,8 +18,9 @@ from app.services.nlp_service import analyze_journal_text
 from app.services.forecast_service import generate_risk_forecast
 from app.services.anomaly_service import detect_checkin_anomaly
 from app.services.voice_service import extract_voice_stress_signals
+from app.services.model_engine import model_engine
 from app.feature_engineering.extractors import extract_longitudinal_features
-from app.explainability.shap_engine import calculate_feature_attribution
+from app.explainability.shap_engine import calculate_shap_attributions
 
 router = APIRouter()
 
@@ -28,6 +29,7 @@ def health_check():
     return {
         "status": "ok",
         "service": "MindPulse ML Microservice",
+        "modelInfo": model_engine.get_model_info(),
         "nonDiagnostic": True
     }
 
@@ -38,7 +40,9 @@ def predict_risk_endpoint(request: RiskPredictionRequest):
             user_id=request.userId,
             check_ins=request.recentCheckIns,
             baseline=request.historicalBaseline,
-            case_stage=request.caseStage
+            case_stage=request.caseStage or (request.recentCheckIns[-1].caseStage if request.recentCheckIns else None),
+            journal_stress_signal=request.journalStressSignal,
+            voice_stress_index=request.voiceStressIndex
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -46,13 +50,36 @@ def predict_risk_endpoint(request: RiskPredictionRequest):
 @router.post("/explain-risk")
 def explain_risk_endpoint(request: RiskPredictionRequest):
     try:
-        features = extract_longitudinal_features(request.recentCheckIns)
-        factors = calculate_feature_attribution(features)
+        feat_data = extract_longitudinal_features(
+            check_ins=request.recentCheckIns,
+            baseline_override=request.historicalBaseline,
+            case_stage=request.caseStage,
+            journal_stress_signal=request.journalStressSignal,
+            voice_stress_index=request.voiceStressIndex
+        )
+        feature_vector = feat_data["feature_vector"]
+        feature_dict = feat_data["feature_dict"]
+        baseline_info = feat_data["baseline_info"]
+
+        shap_dict = model_engine.explain_sample(feature_vector)
+        contributing_signals, legacy_factors = calculate_shap_attributions(
+            feature_dict=feature_dict,
+            raw_shap_values=shap_dict,
+            baseline_info=baseline_info,
+            top_k=5
+        )
+
         return {
             "userId": request.userId,
-            "features": features,
-            "factors": factors,
-            "disclaimer": "Non-diagnostic contributing factors estimation."
+            "features": feat_data.get("raw_metrics", feature_dict),
+            "featureDict": feature_dict,
+            "baselineInfo": baseline_info,
+            "contributingSignals": contributing_signals,
+            "factors": legacy_factors,
+            "shapValues": shap_dict,
+            "confidence": feat_data.get("confidence", 0.85),
+            "limitations": feat_data.get("limitations", []),
+            "disclaimer": "Non-diagnostic contributing signals estimation based on SHAP TreeExplainer."
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -63,7 +90,8 @@ def detect_anomaly_endpoint(request: AnomalyDetectionRequest):
         return detect_checkin_anomaly(
             user_id=request.userId,
             current=request.currentCheckIn,
-            history=request.historicalCheckIns
+            history=request.historicalCheckIns,
+            case_stage=request.caseStage
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -74,7 +102,8 @@ def forecast_risk_endpoint(request: ForecastRequest):
         return generate_risk_forecast(
             user_id=request.userId,
             check_ins=request.checkIns,
-            days=request.forecastDays
+            days=request.forecastDays,
+            case_stage=request.caseStage
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -99,4 +128,3 @@ def analyze_voice_endpoint(request: VoiceAnalysisRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

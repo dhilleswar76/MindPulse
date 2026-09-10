@@ -1,89 +1,235 @@
-from typing import List, Dict
-from app.schemas.risk import RiskFactor
+from typing import List, Dict, Any, Tuple
+from app.schemas.risk import ContributingSignal, RiskFactor
+
+# Human-readable feature metadata and clinical counselor descriptions
+FEATURE_METADATA: Dict[str, Dict[str, Any]] = {
+    "safety_deviation": {
+        "title": "Safety Perception Drop",
+        "category": "safety",
+        "direction_pos": "decreased",   # lower safety means higher risk
+        "description_fn": lambda val, base: f"Perceived sense of safety is {abs(val):.1f} pts below personal historical baseline ({base:.1f}/10)."
+    },
+    "latest_safety": {
+        "title": "Low Sense of Safety",
+        "category": "safety",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: f"Reported sense of safety ({val:.1f}/10) indicates heightened vulnerability."
+    },
+    "stress_deviation": {
+        "title": "Stress Surge Above Normal",
+        "category": "stress",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Recent stress level is {val:+.1f} pts above personal baseline ({base:.1f}/10)."
+    },
+    "latest_stress": {
+        "title": "Elevated Subjective Stress",
+        "category": "stress",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Reported stress averages {val:.1f}/10."
+    },
+    "case_stress_deviation": {
+        "title": "Case-Related Tension Surge",
+        "category": "legal_tension",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Legal process tension is {val:+.1f} pts above historical baseline ({base:.1f}/10)."
+    },
+    "latest_case_stress": {
+        "title": "Case-Related Stress",
+        "category": "legal_tension",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Case-related tension reported at {val:.1f}/10."
+    },
+    "sleep_deviation": {
+        "title": "Acute Sleep Loss",
+        "category": "sleep",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: f"Sleep duration is {abs(val):.1f} hours below personal regular baseline ({base:.1f}h)."
+    },
+    "sleep_deficit_ratio": {
+        "title": "Sleep Disruption",
+        "category": "sleep",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: f"Sleep duration deficit observed ({val*100:.0f}% deficit relative to 8h target)."
+    },
+    "sleep_disruption_flag": {
+        "title": "Severe Sleep Deprivation (<5h)",
+        "category": "sleep",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: "Restricted sleep under 5 hours recorded, indicating possible hyperarousal."
+    },
+    "mood_deviation": {
+        "title": "Mood Decline Below Normal",
+        "category": "mood",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: f"Mood rating is {abs(val):.1f} pts below personal historical baseline ({base:.1f}/10)."
+    },
+    "latest_mood": {
+        "title": "Depleted Mood State",
+        "category": "mood",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: f"Reported mood level ({val:.1f}/10) reflects emotional strain."
+    },
+    "stage_is_trial": {
+        "title": "Court / Trial Stage Sensitivity",
+        "category": "case_context",
+        "direction_pos": "elevated",
+        "description_fn": lambda val, base: "Active Court / Trial stage: acute hearing and deposition anxiety typically spike during this milestone."
+    },
+    "stage_is_protection": {
+        "title": "Witness Protection & Threat Context",
+        "category": "case_context",
+        "direction_pos": "elevated",
+        "description_fn": lambda val, base: "Active Witness Protection stage: elevated threat assessment context."
+    },
+    "stress_slope": {
+        "title": "Accelerating Stress Trend",
+        "category": "trend",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: "Upward trajectory in distress velocity over consecutive check-ins."
+    },
+    "safety_slope": {
+        "title": "Deteriorating Safety Trajectory",
+        "category": "trend",
+        "direction_pos": "decreased",
+        "description_fn": lambda val, base: "Downward trajectory in perceived safety over recent window."
+    },
+    "stress_volatility": {
+        "title": "High Stress Volatility",
+        "category": "volatility",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Significant variance across check-ins (volatility index {val:.2f})."
+    },
+    "journal_stress": {
+        "title": "Journal Reflection Distress Signal",
+        "category": "multimodal",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Optional linguistic analysis identified distress cues (stress signal: {val:.2f})."
+    },
+    "voice_stress": {
+        "title": "Voice Acoustic Biomarker Screener",
+        "category": "multimodal",
+        "direction_pos": "increased",
+        "description_fn": lambda val, base: f"Optional acoustic prosody screening indicated vocal tension index of {val:.2f}."
+    },
+}
+
+def calculate_shap_attributions(
+    feature_dict: Dict[str, float],
+    raw_shap_values: Dict[str, float],
+    baseline_info: Dict[str, Any],
+    top_k: int = 5
+) -> Tuple[List[ContributingSignal], List[RiskFactor]]:
+    """
+    Translates exact mathematical SHAP tree attributions into counselor-friendly,
+    non-diagnostic contributing signals.
+    """
+    contributing_signals: List[ContributingSignal] = []
+    legacy_factors: List[RiskFactor] = []
+
+    # Filter positive SHAP contributions (features pushing risk upward)
+    positive_shaps = [
+        (feat, shap_val) for feat, shap_val in raw_shap_values.items()
+        if shap_val > 0.005 and feat in FEATURE_METADATA
+    ]
+
+    # Sort descending by SHAP magnitude
+    positive_shaps.sort(key=lambda x: x[1], reverse=True)
+
+    # Compute sum of positive SHAP values for relative impact percentage
+    total_pos_shap = sum(s[1] for s in positive_shaps) or 1.0
+
+    seen_categories = set()
+
+    for feat_name, shap_val in positive_shaps:
+        meta = FEATURE_METADATA[feat_name]
+        cat = meta.get("category", feat_name)
+        
+        # Avoid redundant duplicate features in the same category (e.g. stress and stress_dev)
+        if cat in seen_categories and len(contributing_signals) >= 3:
+            continue
+        seen_categories.add(cat)
+
+        feat_val = feature_dict.get(feat_name, 0.0)
+        
+        # Determine relevant baseline value
+        base_val = 5.0
+        if "stress" in feat_name:
+            base_val = baseline_info.get("mean_stress", 4.0)
+        elif "safety" in feat_name:
+            base_val = baseline_info.get("mean_safety", 7.5)
+        elif "sleep" in feat_name:
+            base_val = baseline_info.get("mean_sleep", 7.5)
+        elif "mood" in feat_name:
+            base_val = baseline_info.get("mean_mood", 7.0)
+        elif "case_stress" in feat_name:
+            base_val = baseline_info.get("mean_case_stress", 4.0)
+
+        # Impact as normalized percentage of positive risk force
+        normalized_impact = round(min(0.45, shap_val / total_pos_shap), 2)
+        if normalized_impact < 0.05:
+            normalized_impact = 0.05
+
+        desc = meta["description_fn"](feat_val, base_val)
+
+        # Baseline comparison string
+        baseline_comp = None
+        if "deviation" in feat_name or "z_score" in feat_name:
+            baseline_comp = f"Deviation: {feat_val:+.1f} vs personal baseline {base_val:.1f}"
+
+        signal = ContributingSignal(
+            feature=meta["title"],
+            direction=meta["direction_pos"],
+            impact=normalized_impact,
+            description=f"Possible contributing signal: {desc}",
+            baselineComparison=baseline_comp
+        )
+        contributing_signals.append(signal)
+
+        # Legacy RiskFactor for backward compatibility
+        legacy_factors.append(RiskFactor(
+            feature=meta["title"],
+            impact=normalized_impact,
+            direction="increase",
+            description=desc
+        ))
+
+        if len(contributing_signals) >= top_k:
+            break
+
+    # If no positive risk factors detected (stable individual)
+    if not contributing_signals:
+        contributing_signals.append(ContributingSignal(
+            feature="Stable Behavioral Patterns",
+            direction="stable",
+            impact=0.05,
+            description="Possible contributing signal: Recent metrics align with expected personal baseline and normative wellness ranges.",
+            baselineComparison="All signals within personal historical normal."
+        ))
+        legacy_factors.append(RiskFactor(
+            feature="Stable Baseline",
+            impact=0.05,
+            direction="decrease",
+            description="Metrics are within expected personal normal baseline ranges."
+        ))
+
+    return contributing_signals, legacy_factors
 
 def calculate_feature_attribution(features: Dict[str, float]) -> List[RiskFactor]:
     """
-    Computes explainability factors inspired by SHAP local feature importance.
-    Maps feature metrics to non-diagnostic contributing signal percentages.
+    Backward compatible helper for existing callers.
     """
-    factors: List[RiskFactor] = []
-
-    # Sleep deficit factor
-    sleep_def = features.get("sleep_deficit_ratio", 0.0)
-    if sleep_def > 0.15:
-        impact_pct = min(0.35, sleep_def * 0.4)
-        factors.append(RiskFactor(
-            feature="Sleep Reduction",
-            impact=round(impact_pct, 2),
-            direction="increase",
-            description=f"Average sleep ({features.get('avg_sleep', 0)}h) is below target baseline"
-        ))
-
-    # Stress elevation factor
-    avg_stress = features.get("avg_stress", 5.0)
-    if avg_stress > 5.5:
-        impact_pct = min(0.30, (avg_stress - 5.0) / 10.0 * 0.5)
-        factors.append(RiskFactor(
-            feature="Elevated Stress",
-            impact=round(impact_pct, 2),
-            direction="increase",
-            description=f"Reported stress averages {avg_stress}/10"
-        ))
-
-    # Case-related stress factor
-    avg_case_stress = features.get("avg_case_stress", 4.0)
-    if avg_case_stress > 5.5:
-        impact_pct = min(0.30, (avg_case_stress - 5.0) / 10.0 * 0.45)
-        factors.append(RiskFactor(
-            feature="Case-Related Stress",
-            impact=round(impact_pct, 2),
-            direction="increase",
-            description=f"Case-related stress reported at {avg_case_stress}/10 during current stage"
-        ))
-
-    # Sense of safety reduction factor
-    avg_safety = features.get("avg_safety", 7.5)
-    safety_drop = features.get("safety_drop_recent", 0.0)
-    if avg_safety < 6.0 or safety_drop > 0.15:
-        impact_pct = min(0.28, (8.0 - avg_safety) / 10.0 * 0.4)
-        factors.append(RiskFactor(
-            feature="Safety Concern Signal",
-            impact=round(impact_pct, 2),
-            direction="increase",
-            description=f"Reported sense of safety ({avg_safety}/10) shows variance from baseline"
-        ))
-
-    # Mood decline factor
-    avg_mood = features.get("avg_mood", 7.0)
-    if avg_mood < 5.0:
-        impact_pct = min(0.25, (5.0 - avg_mood) / 10.0 * 0.5)
-        factors.append(RiskFactor(
-            feature="Mood Decline",
-            impact=round(impact_pct, 2),
-            direction="increase",
-            description=f"Reported mood averages {avg_mood}/10"
-        ))
-
-    # Energy reduction factor
-    avg_energy = features.get("avg_energy", 6.0)
-    if avg_energy < 4.5:
-        impact_pct = min(0.20, (5.0 - avg_energy) / 10.0 * 0.4)
-        factors.append(RiskFactor(
-            feature="Energy Depletion",
-            impact=round(impact_pct, 2),
-            direction="increase",
-            description=f"Reported energy level is lower ({avg_energy}/10)"
-        ))
-
-    # If no risk factors detected, provide positive baseline balance
-    if not factors:
-        factors.append(RiskFactor(
-            feature="Stable Behavioral Patterns",
-            impact=0.05,
-            direction="decrease",
-            description="Metrics are within expected normal baseline ranges"
-        ))
-
-    # Sort factors by impact descending
-    factors.sort(key=lambda x: x.impact, reverse=True)
-    return factors
+    from app.services.model_engine import model_engine
+    from app.feature_engineering.extractors import FEATURE_NAMES
+    
+    vec = [features.get(f, 0.0) for f in FEATURE_NAMES]
+    shap_vals = model_engine.explain_sample(vec)
+    _, legacy_factors = calculate_shap_attributions(
+        feature_dict=features,
+        raw_shap_values=shap_vals,
+        baseline_info={"mean_stress": features.get("avg_stress", 4.0),
+                       "mean_safety": features.get("avg_safety", 7.5),
+                       "mean_sleep": features.get("avg_sleep", 7.5),
+                       "mean_mood": features.get("avg_mood", 7.0),
+                       "mean_case_stress": features.get("avg_case_stress", 4.0)}
+    )
+    return legacy_factors
