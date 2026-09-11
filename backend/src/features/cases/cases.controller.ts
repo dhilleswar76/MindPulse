@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { AuthRequest } from '../../types/index.js';
+import { AuthRequest, CaseStage } from '../../types/index.js';
 import { casesService } from './cases.service.js';
 import { caseStageService } from './caseStage.service.js';
 import { sendSuccess, sendError } from '../../utils/response.js';
@@ -26,6 +26,16 @@ export const casesController = {
       res.json({ success: true, case: caseItem });
     } catch (error: any) {
       res.status(500).json({ error: error.message || 'Failed to fetch case details' });
+    }
+  },
+
+  getCaseStages: async (req: AuthRequest, res: Response) => {
+    try {
+      const { id: caseId } = req.params;
+      const data = await caseStageService.getCaseStages(caseId);
+      return sendSuccess(res, data);
+    } catch (error: any) {
+      return sendError(res, error.message || 'Failed to fetch case stages', 400);
     }
   },
 
@@ -65,9 +75,9 @@ export const casesController = {
     }
   },
 
-  createStageTransitionRequest: async (req: AuthRequest, res: Response) => {
+  completeStage: async (req: AuthRequest, res: Response) => {
     try {
-      const { id: caseId } = req.params;
+      const { id: caseId, stage } = req.params;
       const { requestedStage, reason, evidenceReference, notes } = req.body;
 
       if (!req.user) {
@@ -75,6 +85,35 @@ export const casesController = {
       }
 
       const newRequest = await caseStageService.submitTransitionRequest(req.user, caseId, {
+        stage: stage as CaseStage,
+        requestedStage,
+        reason,
+        evidenceReference,
+        notes,
+      });
+
+      return sendSuccess(
+        res,
+        { request: newRequest, caseId, stage, status: 'COMPLETION_REQUESTED' },
+        'Stage completion submitted for admin approval.',
+        201
+      );
+    } catch (error: any) {
+      return sendError(res, error.message || 'Failed to complete stage', 400);
+    }
+  },
+
+  createStageTransitionRequest: async (req: AuthRequest, res: Response) => {
+    try {
+      const { id: caseId } = req.params;
+      const { requestedStage, stage, reason, evidenceReference, notes } = req.body;
+
+      if (!req.user) {
+        return sendError(res, 'Authentication required', 401);
+      }
+
+      const newRequest = await caseStageService.submitTransitionRequest(req.user, caseId, {
+        stage,
         requestedStage,
         reason,
         evidenceReference,

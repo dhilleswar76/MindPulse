@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Map, Shield, Building, Info, AlertTriangle, ArrowRight, Sliders, CheckCircle2, Eye } from 'lucide-react';
+import { Map, Shield, Building, Info, AlertTriangle, ArrowRight, Sliders, CheckCircle2, Eye, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 
@@ -53,11 +53,11 @@ export const CampusHeatmapPage: React.FC = () => {
         </div>
 
         <Link
-          to="/admin/simulator"
+          to="/admin/interventions"
           className="px-4 py-2.5 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/20 transition-all self-start md:self-auto"
         >
-          <Sliders className="w-4 h-4" />
-          <span>Launch Policy Simulator</span>
+          <Activity className="w-4 h-4" />
+          <span>Support Pathways & Outcomes</span>
         </Link>
       </div>
 
@@ -163,11 +163,11 @@ export const CampusHeatmapPage: React.FC = () => {
 
               <div className="pt-4 border-t border-slate-800">
                 <Link
-                  to="/admin/simulator"
+                  to="/admin/interventions"
                   className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors border border-slate-700"
                 >
-                  <Sliders className="w-3.5 h-3.5 text-teal-400" />
-                  <span>Simulate Policy Impact for this Zone</span>
+                  <Activity className="w-3.5 h-3.5 text-teal-400" />
+                  <span>View Support Pathways for this Zone</span>
                 </Link>
               </div>
             </div>

@@ -1,7 +1,53 @@
 import mongoose from 'mongoose';
 import { Case, StageTransitionRequest, AuditLog, User } from '../../models/index.js';
-import { CaseStage, TokenPayload, IStageHistoryItem } from '../../types/index.js';
+import { CaseStage, TokenPayload, IStageHistoryItem, ICaseStageItem, StageStatus } from '../../types/index.js';
 import { mockSyntheticCases } from './cases.service.js';
+import { notificationsService } from '../notifications/notifications.service.js';
+
+export const SIX_STAGES_CONFIG: { stage: CaseStage; name: string; shortLabel: string; order: number; description: string }[] = [
+  {
+    stage: 'CASE_REGISTRATION',
+    name: 'Case Registration',
+    shortLabel: 'Registration',
+    order: 1,
+    description: 'Initial reporting and intake under SC/ST POA',
+  },
+  {
+    stage: 'INVESTIGATION',
+    name: 'Investigation',
+    shortLabel: 'Investigation',
+    order: 2,
+    description: 'Evidence, statements and police inquiry',
+  },
+  {
+    stage: 'COURT_TRIAL',
+    name: 'Court / Trial',
+    shortLabel: 'Trial',
+    order: 3,
+    description: 'Special Court hearings & testimony support',
+  },
+  {
+    stage: 'COMPENSATION',
+    name: 'Compensation & Relief',
+    shortLabel: 'Compensation',
+    order: 4,
+    description: 'Statutory welfare relief & Sec 357A CrPC claim',
+  },
+  {
+    stage: 'REHABILITATION',
+    name: 'Rehabilitation',
+    shortLabel: 'Rehabilitation',
+    order: 5,
+    description: 'Social, psychological and vocational support',
+  },
+  {
+    stage: 'PROTECTION_SUPPORT',
+    name: 'Protection & Support',
+    shortLabel: 'Protection',
+    order: 6,
+    description: 'Witness safety audit & ongoing wellbeing tracking',
+  },
+];
 
 export const VALID_CASE_STAGES: CaseStage[] = [
   'CASE_REGISTRATION',
@@ -13,36 +59,151 @@ export const VALID_CASE_STAGES: CaseStage[] = [
   'CLOSED',
 ];
 
+// Helper to get next stage in sequential lifecycle
+export const getNextSequentialStage = (currentStage: CaseStage): CaseStage => {
+  const index = SIX_STAGES_CONFIG.findIndex((s) => s.stage === currentStage);
+  if (index >= 0 && index < SIX_STAGES_CONFIG.length - 1) {
+    return SIX_STAGES_CONFIG[index + 1].stage;
+  }
+  return 'CLOSED';
+};
+
 // In-memory fallback store for requests if MongoDB is not connected or in standalone demo mode
 const memoryRequests: any[] = [];
 
 export const caseStageService = {
   /**
-   * Counselor submits a formal Stage Transition Request with official milestone evidence.
+   * Retrieves comprehensive 6-stage status lifecycle for a case.
+   */
+  getCaseStages: async (caseId: string) => {
+    let dbCase: any = null;
+    try {
+      dbCase = await Case.findOne({
+        $or: [{ caseId }, { _id: mongoose.Types.ObjectId.isValid(caseId) ? caseId : new mongoose.Types.ObjectId() }],
+      });
+    } catch {
+      // ignore
+    }
+
+    const mockCase = !dbCase ? mockSyntheticCases.find((c) => c.caseId === caseId || c.id === caseId) : null;
+    const currentOfficialStage: CaseStage = dbCase?.caseStage || mockCase?.caseStage || 'INVESTIGATION';
+
+    // Find active transition request (if any)
+    let activeRequest: any = null;
+    let latestRequest: any = null;
+    try {
+      const allRequests = await StageTransitionRequest.find({ caseId: dbCase?.caseId || caseId }).sort({ createdAt: -1 });
+      if (allRequests && allRequests.length > 0) {
+        latestRequest = allRequests[0];
+        activeRequest = allRequests.find((r) => ['PENDING', 'CLARIFICATION_REQUIRED'].includes(r.status));
+      }
+    } catch {
+      const mems = memoryRequests.filter((r) => r.caseId === caseId || r.caseId === dbCase?.caseId);
+      if (mems.length > 0) {
+        latestRequest = mems[0];
+        activeRequest = mems.find((r) => ['PENDING', 'CLARIFICATION_REQUIRED'].includes(r.status));
+      }
+    }
+
+    const currentStageIndex = SIX_STAGES_CONFIG.findIndex((s) => s.stage === currentOfficialStage);
+    const safeCurrentIndex = currentStageIndex >= 0 ? currentStageIndex : 0;
+
+    const stages: ICaseStageItem[] = SIX_STAGES_CONFIG.map((conf, idx) => {
+      let status: StageStatus = 'LOCKED';
+      let rejectionReason: string | undefined;
+      let completedBy: string | undefined;
+      let submittedAt: Date | string | undefined;
+      let approvedBy: string | undefined;
+      let approvedAt: Date | string | undefined;
+      let notes: string | undefined;
+      let evidenceReference: string | undefined;
+
+      // Check DB stage history first
+      const histItem = dbCase?.stagesHistory?.find((h: any) => h.stage === conf.stage);
+      if (histItem) {
+        if (histItem.status === 'COMPLETED') status = 'COMPLETED';
+        else if (histItem.status === 'REJECTED') {
+          status = 'REJECTED';
+          rejectionReason = histItem.rejectionReason;
+        } else if (histItem.status === 'COMPLETION_REQUESTED' || histItem.status === 'AWAITING_VERIFICATION') {
+          status = 'COMPLETION_REQUESTED';
+        } else if (histItem.status === 'ACTIVE' || histItem.status === 'IN_PROGRESS') {
+          status = 'ACTIVE';
+        } else if (histItem.status === 'LOCKED' || histItem.status === 'NOT_STARTED') {
+          status = 'LOCKED';
+        }
+        rejectionReason = histItem.rejectionReason || rejectionReason;
+        notes = histItem.notes;
+        evidenceReference = histItem.evidenceReference;
+        submittedAt = histItem.requestedAt;
+        approvedAt = histItem.confirmedAt;
+      }
+
+      // Reconcile status based on position in sequence and pending requests
+      if (idx < safeCurrentIndex) {
+        status = 'COMPLETED';
+      } else if (idx === safeCurrentIndex) {
+        if (activeRequest) {
+          status = 'COMPLETION_REQUESTED';
+          submittedAt = activeRequest.createdAt;
+          evidenceReference = activeRequest.evidenceReference;
+          notes = activeRequest.notes;
+        } else if (latestRequest && latestRequest.status === 'REJECTED' && latestRequest.fromStage === conf.stage) {
+          status = 'REJECTED';
+          rejectionReason = latestRequest.reviewNotes || 'Stage completion documentation rejected by Admin.';
+        } else {
+          status = 'ACTIVE';
+        }
+      } else {
+        // Future stages
+        status = 'LOCKED';
+      }
+
+      return {
+        stage: conf.stage,
+        name: conf.name,
+        order: conf.order,
+        status,
+        completedBy,
+        submittedAt,
+        approvedBy,
+        approvedAt,
+        rejectionReason,
+        notes,
+        evidenceReference,
+      };
+    });
+
+    return {
+      caseId: dbCase?.caseId || mockCase?.caseId || caseId,
+      currentStage: currentOfficialStage,
+      pendingTransition: activeRequest
+        ? {
+            requestId: activeRequest._id,
+            requestedStage: activeRequest.requestedStage,
+            requestedAt: activeRequest.createdAt,
+            status: activeRequest.status,
+          }
+        : null,
+      stages,
+    };
+  },
+
+  /**
+   * Counselor submits a formal Stage Completion / Transition Request for Admin approval.
    */
   submitTransitionRequest: async (
     counselorUser: TokenPayload,
     caseId: string,
     data: {
-      requestedStage: CaseStage;
-      reason: string;
-      evidenceReference: string;
+      stage?: CaseStage;
+      requestedStage?: CaseStage;
+      reason?: string;
+      evidenceReference?: string;
       notes?: string;
     }
   ) => {
-    const { requestedStage, reason, evidenceReference, notes } = data;
-
-    if (!requestedStage || !VALID_CASE_STAGES.includes(requestedStage)) {
-      throw new Error(`Invalid requested stage: ${requestedStage}`);
-    }
-
-    if (!reason || !reason.trim()) {
-      throw new Error('Milestone reason is required');
-    }
-
-    if (!evidenceReference || !evidenceReference.trim()) {
-      throw new Error('Official evidence or milestone reference identifier is required');
-    }
+    let { stage, requestedStage, reason, evidenceReference, notes } = data;
 
     // 1. Locate case
     let dbCase: any = null;
@@ -55,9 +216,22 @@ export const caseStageService = {
     }
 
     const currentOfficialStage: CaseStage = dbCase?.caseStage || 'INVESTIGATION';
+    const stageToComplete = stage || currentOfficialStage;
 
-    if (currentOfficialStage === requestedStage) {
-      throw new Error(`Case is already in stage ${requestedStage}`);
+    if (!requestedStage) {
+      requestedStage = getNextSequentialStage(stageToComplete);
+    }
+
+    if (!requestedStage || !VALID_CASE_STAGES.includes(requestedStage)) {
+      throw new Error(`Invalid requested stage: ${requestedStage}`);
+    }
+
+    if (!reason || !reason.trim()) {
+      reason = `Stage completion submitted by counselor for official milestone verification.`;
+    }
+
+    if (!evidenceReference || !evidenceReference.trim()) {
+      evidenceReference = `MS-${caseId}-${stageToComplete}`;
     }
 
     // 2. Check for existing active pending transition requests
@@ -89,7 +263,7 @@ export const caseStageService = {
       newRequest = await StageTransitionRequest.create({
         caseId: dbCase?.caseId || caseId,
         caseObjId: dbCase?._id,
-        fromStage: currentOfficialStage,
+        fromStage: stageToComplete,
         requestedStage,
         requestedByCounselor: counselorObjectId,
         counselorName: counselorUser.fullName || 'Designated Counselor',
@@ -110,11 +284,12 @@ export const caseStageService = {
 
         // Update stage history item if present
         if (dbCase.stagesHistory && dbCase.stagesHistory.length > 0) {
-          const targetItem = dbCase.stagesHistory.find((s: IStageHistoryItem) => s.stage === requestedStage);
-          if (targetItem) {
-            targetItem.status = 'AWAITING_VERIFICATION';
-            targetItem.requestedAt = new Date();
-            targetItem.requestedBy = counselorObjectId;
+          const currentItem = dbCase.stagesHistory.find((s: IStageHistoryItem) => s.stage === stageToComplete);
+          if (currentItem) {
+            currentItem.status = 'COMPLETION_REQUESTED';
+            currentItem.requestedAt = new Date();
+            currentItem.requestedBy = counselorObjectId;
+            currentItem.rejectionReason = undefined;
           }
         }
         await dbCase.save();
@@ -127,7 +302,7 @@ export const caseStageService = {
         resourceType: 'CASE',
         resourceId: dbCase?.caseId || caseId,
         details: {
-          fromStage: currentOfficialStage,
+          fromStage: stageToComplete,
           requestedStage,
           reason: reason.trim(),
           evidenceReference: evidenceReference.trim(),
@@ -140,7 +315,7 @@ export const caseStageService = {
       newRequest = {
         _id: 'req_' + Date.now(),
         caseId: dbCase?.caseId || caseId,
-        fromStage: currentOfficialStage,
+        fromStage: stageToComplete,
         requestedStage,
         requestedByCounselor: counselorObjectId,
         counselorName: counselorUser.fullName || 'Designated Counselor',
@@ -161,8 +336,29 @@ export const caseStageService = {
           requestedAt: new Date(),
           status: 'PENDING',
         };
+        if (mock.stagesHistory) {
+          const item = mock.stagesHistory.find((s) => s.stage === stageToComplete);
+          if (item) {
+            (item as any).status = 'COMPLETION_REQUESTED';
+            (item as any).rejectionReason = undefined;
+          }
+        }
       }
     }
+
+    // 4. Create persistent Notification for ADMIN
+    const stageDisplayName = SIX_STAGES_CONFIG.find((s) => s.stage === stageToComplete)?.shortLabel || stageToComplete;
+    await notificationsService.createNotification({
+      recipientRole: 'ADMIN',
+      caseId: dbCase?.caseId || caseId,
+      stage: stageDisplayName,
+      type: 'STAGE_COMPLETION_REQUESTED',
+      title: 'Stage completion approval required',
+      message: `Stage completion approval required for Case ${dbCase?.caseId || caseId} (${stageDisplayName}). Submitted by ${counselorUser.fullName || 'Assigned Counselor'}.`,
+      submittedBy: counselorUser.fullName || 'Assigned Counselor',
+      status: 'Pending Approval',
+      requestId: newRequest._id,
+    });
 
     return newRequest;
   },
@@ -286,9 +482,9 @@ export const caseStageService = {
 
       // Update stages history in DB
       if (!dbCase.stagesHistory || dbCase.stagesHistory.length === 0) {
-        dbCase.stagesHistory = VALID_CASE_STAGES.filter((st) => st !== 'CLOSED').map((st) => ({
-          stage: st,
-          status: st === reqDoc.requestedStage ? 'IN_PROGRESS' : 'NOT_STARTED',
+        dbCase.stagesHistory = SIX_STAGES_CONFIG.map((st) => ({
+          stage: st.stage,
+          status: st.stage === reqDoc.requestedStage ? 'ACTIVE' : 'LOCKED',
         }));
       }
 
@@ -297,17 +493,19 @@ export const caseStageService = {
       if (prevStageItem) {
         prevStageItem.status = 'COMPLETED';
         prevStageItem.completedAt = new Date();
+        prevStageItem.rejectionReason = undefined;
       }
 
-      // Mark new stage as in progress & confirmed
+      // Mark new stage as in progress / ACTIVE
       const newStageItem = dbCase.stagesHistory.find((s: IStageHistoryItem) => s.stage === reqDoc.requestedStage);
       if (newStageItem) {
-        newStageItem.status = 'IN_PROGRESS';
+        newStageItem.status = 'ACTIVE';
         newStageItem.enteredAt = new Date();
         newStageItem.confirmedAt = new Date();
         newStageItem.confirmedBy = adminObjectId;
         newStageItem.evidenceReference = reqDoc.evidenceReference;
         newStageItem.notes = reviewNotes || reqDoc.notes;
+        newStageItem.rejectionReason = undefined;
       }
 
       await dbCase.save();
@@ -318,12 +516,16 @@ export const caseStageService = {
         (mock as any).pendingStageTransition = null;
         if (mock.stagesHistory) {
           const prev = mock.stagesHistory.find((s) => s.stage === oldStage);
-          if (prev) prev.status = 'COMPLETED';
+          if (prev) {
+            prev.status = 'COMPLETED' as any;
+            (prev as any).rejectionReason = undefined;
+          }
           const nxt = mock.stagesHistory.find((s) => s.stage === reqDoc.requestedStage);
           if (nxt) {
             nxt.status = 'ACTIVE' as any;
             nxt.date = new Date().toISOString().split('T')[0];
             nxt.note = `Confirmed by ${adminUser.fullName}: ${reqDoc.evidenceReference}`;
+            (nxt as any).rejectionReason = undefined;
           }
         }
       }
@@ -359,6 +561,19 @@ export const caseStageService = {
     } catch {
       // ignore
     }
+
+    // 4. Create persistent Notification for COUNSELOR
+    const nextStageName = SIX_STAGES_CONFIG.find((s) => s.stage === reqDoc.requestedStage)?.shortLabel || reqDoc.requestedStage;
+    await notificationsService.createNotification({
+      recipientRole: 'COUNSELOR',
+      recipientId: reqDoc.requestedByCounselor,
+      caseId: reqDoc.caseId,
+      stage: nextStageName,
+      type: 'STAGE_APPROVED',
+      title: 'Stage approved',
+      message: `Your stage completion has been approved. The next case stage (${nextStageName}) is now active.`,
+      requestId: reqDoc._id,
+    });
 
     return { success: true, case: dbCase, request: reqDoc };
   },
@@ -407,9 +622,10 @@ export const caseStageService = {
     if (dbCase) {
       dbCase.pendingStageTransition = null;
       if (dbCase.stagesHistory) {
-        const target = dbCase.stagesHistory.find((s: IStageHistoryItem) => s.stage === reqDoc.requestedStage);
-        if (target && target.status === 'AWAITING_VERIFICATION') {
-          target.status = 'NOT_STARTED';
+        const currentStageItem = dbCase.stagesHistory.find((s: IStageHistoryItem) => s.stage === reqDoc.fromStage);
+        if (currentStageItem) {
+          currentStageItem.status = 'REJECTED';
+          currentStageItem.rejectionReason = reviewNotes.trim();
         }
       }
       await dbCase.save();
@@ -417,6 +633,13 @@ export const caseStageService = {
       const mock = mockSyntheticCases.find((c) => c.caseId === reqDoc.caseId);
       if (mock) {
         (mock as any).pendingStageTransition = null;
+        if (mock.stagesHistory) {
+          const currentStageItem = mock.stagesHistory.find((s) => s.stage === reqDoc.fromStage);
+          if (currentStageItem) {
+            (currentStageItem as any).status = 'REJECTED';
+            (currentStageItem as any).rejectionReason = reviewNotes.trim();
+          }
+        }
       }
     }
 
@@ -448,6 +671,20 @@ export const caseStageService = {
     } catch {
       // ignore
     }
+
+    // Create persistent Notification for COUNSELOR
+    const fromStageName = SIX_STAGES_CONFIG.find((s) => s.stage === reqDoc.fromStage)?.shortLabel || reqDoc.fromStage;
+    await notificationsService.createNotification({
+      recipientRole: 'COUNSELOR',
+      recipientId: reqDoc.requestedByCounselor,
+      caseId: reqDoc.caseId,
+      stage: fromStageName,
+      type: 'STAGE_REJECTED',
+      title: 'Stage completion rejected',
+      message: `Stage completion request rejected. Reason: ${reviewNotes.trim()}`,
+      rejectionReason: reviewNotes.trim(),
+      requestId: reqDoc._id,
+    });
 
     return { success: true, request: reqDoc };
   },

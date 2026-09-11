@@ -106,11 +106,11 @@ export const InstitutionalAnalyticsPage: React.FC = () => {
             <span>Regional Distress Map</span>
           </Link>
           <Link
-            to="/admin/simulator"
+            to="/admin/interventions"
             className="px-4 py-2.5 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-teal-500/20 transition-all"
           >
-            <Sliders className="w-4 h-4" />
-            <span>Policy What-If Simulator</span>
+            <Activity className="w-4 h-4" />
+            <span>Support Pathways & Outcomes</span>
           </Link>
         </div>
       </div>

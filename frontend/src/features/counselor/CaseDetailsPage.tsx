@@ -80,68 +80,71 @@ export const CaseDetailsPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchCase = async () => {
-      try {
-        const res: any = await api.get(`/counselor/cases/${id}`);
-        setCaseData(res.data?.case || res.data || null);
-      } catch {
-        setCaseData({
-          id: id || 'case_1042',
-          caseId: id?.startsWith('MP') ? id : 'MP-1042',
-          userId: 'user_alex_101',
-          victimName: 'Alex Rivera (Pseudonymous Witness)',
-          victimEmail: 'alex.r@protected.local',
-          victimType: 'WITNESS',
+  const fetchCase = async () => {
+    try {
+      const res: any = await api.get(`/counselor/cases/${id}`);
+      const c = res.data?.case || res.data || null;
+      setCaseData(c);
+    } catch {
+      setCaseData({
+        id: id || 'case_1042',
+        caseId: id?.startsWith('MP') ? id : 'MP-1042',
+        userId: 'user_alex_101',
+        victimName: 'Alex Rivera (Pseudonymous Witness)',
+        victimEmail: 'alex.r@protected.local',
+        victimType: 'WITNESS',
+        caseStage: 'COURT_TRIAL',
+        district: 'Central District',
+        state: 'National Capital Region',
+        riskLevel: 'ELEVATED',
+        riskScore: 0.82,
+        riskTrend: 'INCREASING',
+        daysInDistress: 4,
+        recentCheckIn: {
+          mood: 3,
+          stress: 9,
+          energy: 3,
+          sleepHours: 4.0,
+          senseOfSafety: 4,
+          supportAvailability: 6,
+          caseRelatedStress: 9,
           caseStage: 'COURT_TRIAL',
-          district: 'Central District',
-          state: 'National Capital Region',
-          riskLevel: 'ELEVATED',
-          riskScore: 0.82,
-          riskTrend: 'INCREASING',
-          daysInDistress: 4,
-          recentCheckIn: {
-            mood: 3,
-            stress: 9,
-            energy: 3,
-            sleepHours: 4.0,
-            senseOfSafety: 4,
-            supportAvailability: 6,
-            caseRelatedStress: 9,
-            caseStage: 'COURT_TRIAL',
-            timestamp: new Date().toISOString(),
+          timestamp: new Date().toISOString(),
+        },
+        topSignals: [
+          {
+            feature: 'Sleep Reduction',
+            impact: 0.32,
+            description: '4.0h average sleep during active cross-examination (2.8h below personal baseline of 6.8h)',
           },
-          topSignals: [
-            {
-              feature: 'Sleep Reduction',
-              impact: 0.32,
-              description: '4.0h average sleep during active cross-examination (2.8h below personal baseline of 6.8h)',
-            },
-            {
-              feature: 'Court Hearing Tension',
-              impact: 0.28,
-              description: 'Case-related stress reported 9/10 ahead of upcoming witness testimony',
-            },
-            {
-              feature: 'Safety Perception Delta',
-              impact: 0.22,
-              description: 'Perceived safety score dropped from 8.0 baseline to 4.0',
-            },
-          ],
-          aiSummary:
-            'The person’s recent check-ins indicate increased stress and acute sleep reduction during the active Court / Trial stage. Possible contributing signals: impending testimony dates, reduced sleep hours, and safety perception variance. Designated counselor review and witness liaison accompaniment recommended.',
-          suggestedPathways: [
-            'Trauma-Informed Grounding & Anxiety Reduction',
-            'District Witness Protection Officer Check-in',
-            'Legal Aid Accompaniment Coordination',
-          ],
-          interventionsCount: 1,
-        });
-      }
-      loadStageRequests(id?.startsWith('MP') ? id : 'MP-1042');
-    };
+          {
+            feature: 'Court Hearing Tension',
+            impact: 0.28,
+            description: 'Case-related stress reported 9/10 ahead of upcoming witness testimony',
+          },
+          {
+            feature: 'Safety Perception Delta',
+            impact: 0.22,
+            description: 'Perceived safety score dropped from 8.0 baseline to 4.0',
+          },
+        ],
+        aiSummary:
+          'The person’s recent check-ins indicate increased stress and acute sleep reduction during the active Court / Trial stage. Possible contributing signals: impending testimony dates, reduced sleep hours, and safety perception variance. Designated counselor review and witness liaison accompaniment recommended.',
+        suggestedPathways: [
+          'Trauma-Informed Grounding & Anxiety Reduction',
+          'District Witness Protection Officer Check-in',
+          'Legal Aid Accompaniment Coordination',
+        ],
+        interventionsCount: 1,
+      });
+    }
+    loadStageRequests(id?.startsWith('MP') ? id : 'MP-1042');
+  };
+
+  useEffect(() => {
     fetchCase();
   }, [id]);
+
 
   // Telemetry trend synthetic chart series based on timeframe
   const telemetryData7d = [
@@ -381,6 +384,7 @@ export const CaseDetailsPage: React.FC = () => {
         currentStage={caseData.caseStage || 'COURT_TRIAL'}
         caseId={caseData.caseId || 'MP-1042'}
         victimType={caseData.victimType || 'Protected Witness'}
+        onStageUpdated={fetchCase}
       />
 
       {/* Request Case Stage Update Form / Modal */}

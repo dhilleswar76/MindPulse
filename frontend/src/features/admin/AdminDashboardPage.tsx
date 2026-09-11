@@ -138,7 +138,7 @@ export const AdminDashboardPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2.5">
             <LayoutDashboard className="w-7 h-7 text-amber-400" />
-            Executive Admin Dashboard (SIH26094)
+            Executive Admin Dashboard
           </h1>
           <p className="text-sm text-slate-400 mt-1 max-w-3xl leading-relaxed">
             System-level overview for District Welfare Officers and State Nodal Administrators under the Ministry of Social Justice & Empowerment.
