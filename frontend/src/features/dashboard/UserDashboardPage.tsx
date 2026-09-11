@@ -590,10 +590,10 @@ export const UserDashboardPage: React.FC = () => {
             </div>
 
             <Link
-              to="/recommendations"
+              to="/compensation"
               className="w-full py-2.5 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 font-semibold rounded-xl text-xs border border-indigo-500/30 transition-colors text-center block"
             >
-              View Legal & Compensation Details
+              Calculate & Apply for Compensation
             </Link>
           </div>
 

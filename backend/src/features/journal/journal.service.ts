@@ -87,9 +87,11 @@ export const journalService = {
     if (input.content) {
       try {
         const nlpResult = await mlClient.analyzeJournal(userId, input.content);
-        updateData.sentiment = nlpResult.sentiment;
-        updateData.stressSignal = nlpResult.stressSignal;
-        updateData.emotionSignals = nlpResult.emotionSignals;
+        if (nlpResult) {
+          updateData.sentiment = nlpResult.sentiment;
+          updateData.stressSignal = nlpResult.stressSignal;
+          updateData.emotionSignals = nlpResult.emotionSignals;
+        }
       } catch {}
     }
 

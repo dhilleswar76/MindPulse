@@ -27,6 +27,10 @@ import { WellnessTrendChart } from './WellnessTrendChart';
 import { VoiceStressModal } from '../voice/VoiceStressModal';
 import { PrivacyConsentModal } from '../auth/PrivacyConsentModal';
 import { useAuth } from '../../hooks/useAuth';
+import { analyzeCase, UnifiedAnalysisResponse, CheckInItem } from '../../services/mlApi';
+import { getStoredCheckIns, storeCheckIns } from '../../services/checkinHistory';
+import { RiskCard } from '../ai-insights/components/RiskCard';
+import { AnomalyCard } from '../ai-insights/components/AnomalyCard';
 
 export const CheckinPage: React.FC = () => {
   const { user } = useAuth();
@@ -143,6 +147,10 @@ export const CheckinPage: React.FC = () => {
     setEnergy(item.energyVal);
   };
 
+  // Dedicated AI response state
+  const [aiAnalysis, setAiAnalysis] = useState<UnifiedAnalysisResponse | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const toggleFactor = (factorId: string) => {
     if (affectingFactors.includes(factorId)) {
       setAffectingFactors(affectingFactors.filter((f) => f !== factorId));
@@ -153,31 +161,73 @@ export const CheckinPage: React.FC = () => {
 
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
-    try {
-      const payload = {
-        mood,
-        stress,
-        energy,
-        sleepHours,
-        senseOfSafety,
-        caseRelatedStress,
-        supportAvailability,
-        optionalNote: affectingFactors.length > 0
-          ? `Factors: ${affectingFactors.join(', ')}. ${optionalNote}`.trim()
-          : optionalNote,
-        caseStage: user?.caseStage || 'COURT_TRIAL',
-      };
+    setIsAnalyzing(true);
+    setAiAnalysis(null);
 
-      await api.post('/checkins', payload);
-      setSubmissionSuccess(true);
-      setCurrentStep(5);
-      fetchTrends();
+    const newCheckIn: CheckInItem = {
+      mood,
+      stress,
+      energy,
+      sleepHours,
+      senseOfSafety,
+      caseRelatedStress,
+      supportAvailability,
+      optionalNote: affectingFactors.length > 0
+        ? `Factors: ${affectingFactors.join(', ')}. ${optionalNote}`.trim()
+        : optionalNote,
+      caseStage: user?.caseStage || 'COURT_TRIAL',
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log("NEW CHECK-IN:", newCheckIn);
+
+    // 1. Get existing history and build updated history synchronously
+    const storedHistory = getStoredCheckIns(user?.id || 'user_alex_101');
+    const updatedCheckIns = [...storedHistory, newCheckIn];
+    console.log("UPDATED HISTORY:", updatedCheckIns);
+
+    // 2. Persist updated check-ins and broadcast update event
+    storeCheckIns(updatedCheckIns, user?.id || 'user_alex_101');
+
+    try {
+      await api.post('/checkins', newCheckIn);
     } catch {
-      // In offline mode, complete gracefully
-      setSubmissionSuccess(true);
-      setCurrentStep(5);
+      // Offline fallback
+    }
+
+    setSubmissionSuccess(true);
+    setCurrentStep(5);
+    setIsSubmitting(false);
+
+    // 3. Build /analyze request using the UPDATED history
+    const mlPayload = {
+      userId: user?.id || 'user_alex_101',
+      caseId: user?.caseId || 'MP-1042',
+      caseStage: user?.caseStage || 'COURT_TRIAL',
+      recentCheckIns: updatedCheckIns,
+      historicalBaseline: {
+        mood: 7.0,
+        stress: 3.5,
+        sleepHours: 7.5,
+        anxiety: 3.0,
+        senseOfSafety: 8.0,
+      },
+      journalStressSignal: 0.85,
+      voiceStressIndex: 0.80,
+      forecastDays: 7,
+    };
+
+    console.log("ANALYZE REQUEST:", mlPayload);
+
+    try {
+      const mlResponse = await analyzeCase(mlPayload);
+      console.log("NEW ML RESPONSE:", mlResponse);
+      setAiAnalysis(mlResponse);
+    } catch (e) {
+      console.warn("ML Analysis request error:", e);
     } finally {
-      setIsSubmitting(false);
+      setIsAnalyzing(false);
+      fetchTrends();
     }
   };
 
@@ -638,6 +688,42 @@ export const CheckinPage: React.FC = () => {
                   </li>
                 </ul>
               </div>
+
+              {/* Dynamic Live AI Insights Update */}
+              {isAnalyzing ? (
+                <div className="p-5 rounded-2xl bg-teal-950/20 border border-teal-500/30 text-center space-y-2 animate-pulse max-w-xl mx-auto">
+                  <div className="w-8 h-8 rounded-full border-2 border-teal-400 border-t-transparent animate-spin mx-auto" />
+                  <span className="text-xs font-semibold text-teal-300 block">
+                    Updating AI analysis with your latest check-in...
+                  </span>
+                  <span className="text-[11px] text-slate-400 block">
+                    Calling ML engine at http://localhost:8000/analyze
+                  </span>
+                </div>
+              ) : aiAnalysis ? (
+                <div className="space-y-4 pt-4 text-left max-w-xl mx-auto border-t border-slate-800 animate-in fade-in">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-teal-400" />
+                      <span>Updated AI Telemetry Signals</span>
+                    </span>
+                    <Link
+                      to="/risk"
+                      className="text-xs text-teal-400 hover:text-teal-300 font-semibold inline-flex items-center gap-1"
+                    >
+                      <span>View Full AI Insights</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <RiskCard risk={aiAnalysis.risk} />
+                    <AnomalyCard
+                      anomaly={aiAnalysis.anomaly}
+                      observationsUsed={aiAnalysis.data_quality?.observations_used}
+                    />
+                  </div>
+                </div>
+              ) : null}
 
               {/* Quick Grounding Action */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
