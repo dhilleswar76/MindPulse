@@ -4,8 +4,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { Lock, Mail, ArrowRight, ShieldCheck, Landmark, KeyRound, AlertCircle } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
-  const [email, setEmail] = useState('demo.admin@mindpulse.local');
-  const [password, setPassword] = useState('MindPulseDemo2026!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -19,11 +19,6 @@ export const AdminLoginPage: React.FC = () => {
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
     }
-  };
-
-  const fillAdminDemo = () => {
-    setEmail('demo.admin@mindpulse.local');
-    setPassword('MindPulseDemo2026!');
   };
 
   return (
@@ -109,32 +104,6 @@ export const AdminLoginPage: React.FC = () => {
               <ArrowRight className="w-4 h-4 text-slate-950" />
             </button>
           </form>
-
-          {/* Quick Demo Credential Button */}
-          <div className="pt-4 border-t border-slate-800 space-y-2">
-            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-              Demo Admin Credentials:
-            </div>
-            <button
-              type="button"
-              onClick={fillAdminDemo}
-              className="w-full p-2.5 rounded-xl text-left border bg-amber-500/10 hover:bg-amber-500/15 border-amber-500/30 text-amber-300 transition-all flex items-center justify-between"
-            >
-              <div>
-                <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                  Marcus Vance (District Welfare Officer)
-                </div>
-                <div className="text-[11px] text-slate-400 font-mono">demo.admin@mindpulse.local</div>
-              </div>
-              <span className="text-[10px] uppercase font-semibold tracking-wider bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">
-                Auto-Fill
-              </span>
-            </button>
-            <p className="text-[11px] text-slate-500 text-center">
-              Default Demo Password: <code className="text-amber-300 font-mono">MindPulseDemo2026!</code>
-            </p>
-          </div>
         </div>
 
         {/* Back Link */}
