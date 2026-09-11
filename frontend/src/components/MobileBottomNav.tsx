@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth';
 import {
   LayoutDashboard,
   Smile,
-  BookOpen,
   Activity,
   Sparkles,
   Users,
