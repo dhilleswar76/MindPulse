@@ -108,6 +108,42 @@ export const AdminInboxPage: React.FC = () => {
     }
   };
 
+  const defaultDistrictCounsellors: AvailableCounsellorItem[] = [
+    {
+      id: 'counselor_sarah_201',
+      _id: 'counselor_sarah_201',
+      fullName: 'Dr. Sarah Jenkins',
+      email: 'counsellor@gmail.com',
+      specialization: 'Trauma-Informed Crisis Intervention & Legal Aid',
+      experienceYears: 12,
+      district: 'Central District',
+      currentCases: 1,
+      availability: 'AVAILABLE',
+    },
+    {
+      id: 'c2',
+      _id: 'c2',
+      fullName: 'Dr. David Wilson',
+      email: 'david.w@counselor.mindpulse.local',
+      specialization: 'Psychological Support & PTSD Rehabilitation',
+      experienceYears: 9,
+      district: 'North District',
+      currentCases: 0,
+      availability: 'AVAILABLE',
+    },
+    {
+      id: 'c3',
+      _id: 'c3',
+      fullName: 'Dr. Ananya Iyer',
+      email: 'ananya.i@counselor.mindpulse.local',
+      specialization: 'Witness Safety Accompaniment & Youth Trauma Support',
+      experienceYears: 7,
+      district: 'East District',
+      currentCases: 0,
+      availability: 'AVAILABLE',
+    },
+  ];
+
   // Fetch Counsellor Requests & Available Counsellors
   const fetchCounsellingRequests = async () => {
     try {
@@ -122,12 +158,26 @@ export const AdminInboxPage: React.FC = () => {
       const reqList: CounsellingRequest[] = allocData.pendingRequests || allocData.requests || [];
       setCounsellingRequests(reqList);
 
-      const counsellorsList: AvailableCounsellorItem[] = Array.isArray(counsellorsData) ? counsellorsData : [];
+      const rawCounsellors =
+        counsellorsRes?.data?.counsellors ||
+        counsellorsRes?.counsellors ||
+        counsellorsData?.counsellors ||
+        (Array.isArray(counsellorsData) ? counsellorsData : []);
+
+      const counsellorsList: AvailableCounsellorItem[] =
+        Array.isArray(rawCounsellors) && rawCounsellors.length > 0
+          ? rawCounsellors
+          : defaultDistrictCounsellors;
+
       setAvailableCounsellors(counsellorsList);
-      if (counsellorsList.length > 0 && !selectedCounsellorId) {
+      if (counsellorsList.length > 0) {
         setSelectedCounsellorId(counsellorsList[0]._id || counsellorsList[0].id);
       }
     } catch {
+      setAvailableCounsellors(defaultDistrictCounsellors);
+      if (defaultDistrictCounsellors.length > 0) {
+        setSelectedCounsellorId(defaultDistrictCounsellors[0]._id || defaultDistrictCounsellors[0].id);
+      }
       // Fallback mock
       setCounsellingRequests([
         {
