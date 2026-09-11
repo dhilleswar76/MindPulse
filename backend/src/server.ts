@@ -45,6 +45,22 @@ app.use((req, res, next) => {
   next();
 });
 
+// Root route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    name: 'MindPulse Backend API',
+    status: 'operational',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      apiHealth: '/api/health',
+      apiDocs: '/api',
+    },
+    nonDiagnostic: true,
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Top-level Health route for cloud deployments (Render, Railway, etc.)
 app.get('/health', (req, res) => {
   res.status(200).json({
