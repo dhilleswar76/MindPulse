@@ -118,13 +118,15 @@ cd backend && npm run seed
 
 ## 🔑 Pre-Configured Synthetic Demo Personas
 
-| Role | Email | Password | Case ID & Context |
-| :--- | :--- | :--- | :--- |
-| **Protected Witness (Victim)** | `demo.user@mindpulse.local` | `MindPulseDemo2026!` | **Case MP-1042** (Alex Rivera) • *Court/Trial Stage* • Experiencing acute testimony anxiety & sleep disruption |
-| **Support Counselor** | `demo.counselor@mindpulse.local` | `MindPulseDemo2026!` | **Dr. Sarah Jenkins** • *District Legal Aid & Victim Support Cell* • Triages case queue & logs legal aid pathways |
-| **District Welfare Official** | `demo.admin@mindpulse.local` | `MindPulseDemo2026!` | **Marcus Vance** • *District Social Justice Division* • Monitors anonymized regional distress trends ($k \ge 5$) |
+> For a complete guide with route breakdowns and access scopes, see [DEMO_CREDS.md](DEMO_CREDS.md).
 
-*(A Quick Role Switcher is accessible on the top navigation bar for seamless judge/evaluator demonstration!)*
+| Role | Email | Password | Landing Route | Case ID & Context |
+| :--- | :--- | :--- | :--- | :--- |
+| **Protected Witness (Victim)** | `demo.user@mindpulse.local` | `MindPulseDemo2026!` | `/dashboard` | **Case MP-1042** (Alex Rivera) • *Court/Trial Stage* • Experiencing acute testimony anxiety & sleep disruption |
+| **Support Counselor** | `demo.counselor@mindpulse.local` | `MindPulseDemo2026!` | `/counselor` | **Dr. Sarah Jenkins** • *District Legal Aid & Victim Support Cell* • Triages case queue & logs legal aid pathways |
+| **District Welfare Official** | `demo.admin@mindpulse.local` | `MindPulseDemo2026!` | `/admin` *(Hidden Route)* | **Marcus Vance** • *District Social Justice Division* • Monitors anonymized regional distress trends ($k \ge 5$) |
+
+*(Demo accounts can be auto-filled with one click directly on the `/login` page)*
 
 ---
 
