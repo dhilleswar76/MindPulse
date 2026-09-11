@@ -1,11 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
+import { AuthRequest } from '../../types/index.js';
 import { counsellorChatService } from './counsellorChat.service.js';
 
 export const counsellorChatController = {
   // Victim Endpoints
-  getVictimConversation: async (req: Request, res: Response, next: NextFunction) => {
+  getVictimConversation: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const result = await counsellorChatService.getOrCreateVictimConversation(req.user.userId);
+      const result = await counsellorChatService.getOrCreateVictimConversation(req.user!.userId);
       res.json({
         status: 'success',
         data: result,
@@ -15,9 +16,9 @@ export const counsellorChatController = {
     }
   },
 
-  getVictimMessages: async (req: Request, res: Response, next: NextFunction) => {
+  getVictimMessages: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const result = await counsellorChatService.getVictimMessages(req.user.userId);
+      const result = await counsellorChatService.getVictimMessages(req.user!.userId);
       res.json({
         status: 'success',
         data: result,
@@ -27,10 +28,10 @@ export const counsellorChatController = {
     }
   },
 
-  sendVictimMessage: async (req: Request, res: Response, next: NextFunction) => {
+  sendVictimMessage: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const { message } = req.body;
-      const result = await counsellorChatService.sendVictimMessage(req.user, message);
+      const result = await counsellorChatService.sendVictimMessage(req.user!, message);
       res.status(201).json({
         status: 'success',
         data: result,
@@ -40,10 +41,10 @@ export const counsellorChatController = {
     }
   },
 
-  requestVictimSuggestion: async (req: Request, res: Response, next: NextFunction) => {
+  requestVictimSuggestion: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const { notes } = req.body;
-      const result = await counsellorChatService.requestCounsellorSuggestion(req.user, notes);
+      const result = await counsellorChatService.requestCounsellorSuggestion(req.user!, notes);
       res.status(201).json({
         status: 'success',
         data: result,
@@ -53,9 +54,9 @@ export const counsellorChatController = {
     }
   },
 
-  getVictimSuggestions: async (req: Request, res: Response, next: NextFunction) => {
+  getVictimSuggestions: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const result = await counsellorChatService.getVictimSuggestions(req.user.userId);
+      const result = await counsellorChatService.getVictimSuggestions(req.user!.userId);
       res.json({
         status: 'success',
         data: result,
@@ -66,9 +67,9 @@ export const counsellorChatController = {
   },
 
   // Counsellor Endpoints
-  getCounsellorInbox: async (req: Request, res: Response, next: NextFunction) => {
+  getCounsellorInbox: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const result = await counsellorChatService.getCounsellorInbox(req.user);
+      const result = await counsellorChatService.getCounsellorInbox(req.user!);
       res.json({
         status: 'success',
         data: result,
@@ -78,10 +79,10 @@ export const counsellorChatController = {
     }
   },
 
-  getCounsellorConversationMessages: async (req: Request, res: Response, next: NextFunction) => {
+  getCounsellorConversationMessages: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const { conversationId } = req.params;
-      const result = await counsellorChatService.getCounsellorConversationMessages(req.user, conversationId);
+      const result = await counsellorChatService.getCounsellorConversationMessages(req.user!, conversationId);
       res.json({
         status: 'success',
         data: result,
@@ -91,11 +92,11 @@ export const counsellorChatController = {
     }
   },
 
-  sendCounsellorMessage: async (req: Request, res: Response, next: NextFunction) => {
+  sendCounsellorMessage: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const { conversationId } = req.params;
       const { message } = req.body;
-      const result = await counsellorChatService.sendCounsellorMessage(req.user, conversationId, message);
+      const result = await counsellorChatService.sendCounsellorMessage(req.user!, conversationId, message);
       res.status(201).json({
         status: 'success',
         data: result,
@@ -105,9 +106,9 @@ export const counsellorChatController = {
     }
   },
 
-  getCounsellorSuggestionRequests: async (req: Request, res: Response, next: NextFunction) => {
+  getCounsellorSuggestionRequests: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const result = await counsellorChatService.getCounsellorSuggestionRequests(req.user);
+      const result = await counsellorChatService.getCounsellorSuggestionRequests(req.user!);
       res.json({
         status: 'success',
         data: result,
@@ -117,12 +118,12 @@ export const counsellorChatController = {
     }
   },
 
-  respondCounsellorSuggestion: async (req: Request, res: Response, next: NextFunction) => {
+  respondCounsellorSuggestion: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const { requestId } = req.params;
       const { suggestionMessage } = req.body;
       const result = await counsellorChatService.respondCounsellorSuggestion(
-        req.user,
+        req.user!,
         requestId,
         suggestionMessage
       );
