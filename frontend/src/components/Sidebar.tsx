@@ -28,7 +28,7 @@ export const Sidebar: React.FC = () => {
     { to: '/checkins', label: 'Wellbeing Check-in', icon: Smile },
     { to: '/journal', label: 'Journal & Reflections', icon: BookOpen },
     { to: '/wellness', label: 'Personal Baseline', icon: Activity },
-    { to: '/risk', label: 'Distress Signals & XAI', icon: AlertTriangle },
+    { to: '/risk', label: 'Wellbeing Signals & Support', icon: Activity },
     { to: '/forecast', label: 'Early Risk Forecast', icon: TrendingUp },
     { to: '/recommendations', label: 'Support Pathways', icon: Sparkles },
     { to: '/compensation', label: 'Victim Compensation', icon: Scale },
@@ -36,6 +36,7 @@ export const Sidebar: React.FC = () => {
 
   const counselorLinks = [
     { to: '/counselor', label: 'Command Center & Triage', icon: LayoutDashboard },
+    { to: '/risk', label: 'AI Case Insights & Telemetry', icon: Sparkles },
     { to: '/counselor/cases', label: 'Prioritized Case Queue', icon: Users },
     { to: '/counselor/alerts', label: 'Distress Alerts', icon: Bell },
     { to: '/counselor/interventions', label: 'Support Pathways & Outcomes', icon: Activity },
