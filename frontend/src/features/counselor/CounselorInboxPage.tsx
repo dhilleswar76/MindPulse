@@ -103,9 +103,10 @@ export const CounselorInboxPage: React.FC = () => {
 
       // Fetch pending allocation requests
       try {
-        const reqRes: any = await api.get('/counsellor/allocation-requests');
+        const reqRes: any = await api.get('/counselor/my-counselling-requests');
         const reqData = reqRes.data || reqRes;
-        setAllocationRequests(Array.isArray(reqData) ? reqData : []);
+        const incoming = reqData?.incomingRequests || reqData?.requests || (Array.isArray(reqData) ? reqData : []);
+        setAllocationRequests(incoming);
       } catch {
         // Fallback
       }

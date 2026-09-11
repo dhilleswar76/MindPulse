@@ -66,7 +66,12 @@ export const AvailableVictimsPage: React.FC = () => {
       // Fetch available victims
       const victimsRes: any = await api.get('/counselor/available-victims');
       const victimsData = victimsRes.data || victimsRes;
-      setAvailableVictims(Array.isArray(victimsData) ? victimsData : []);
+      const rawVictims =
+        victimsRes?.data?.victims ||
+        victimsRes?.victims ||
+        victimsData?.victims ||
+        (Array.isArray(victimsData) ? victimsData : []);
+      setAvailableVictims(Array.isArray(rawVictims) ? rawVictims : []);
     } catch (err: any) {
       console.error('Error fetching available victims data:', err);
       // Mock fallback
