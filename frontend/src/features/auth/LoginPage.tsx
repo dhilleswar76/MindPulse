@@ -82,33 +82,77 @@ export const LoginPage: React.FC = () => {
 
       {/* Demo Credentials Helper */}
       <div className="mt-6 pt-5 border-t border-slate-800">
-        <div className="flex items-center gap-1 text-xs font-semibold text-teal-400 mb-2">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-teal-400 mb-2.5">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Quick Demo One-Click Fill:</span>
+          <span>Demo Accounts (Click to Auto-Fill):</span>
         </div>
-        <div className="grid grid-cols-3 gap-2 text-xs">
+        <div className="space-y-2">
           <button
             type="button"
             onClick={() => fillQuickDemo('demo.user@mindpulse.local')}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-300 text-center transition-colors"
+            className={`w-full p-2.5 rounded-xl text-left border transition-all flex items-center justify-between ${
+              email === 'demo.user@mindpulse.local'
+                ? 'bg-teal-500/15 border-teal-500/40 text-teal-300'
+                : 'bg-slate-900/60 hover:bg-slate-800/80 border-slate-800 text-slate-300'
+            }`}
           >
-            Victim / Witness
+            <div>
+              <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-teal-400"></span>
+                Victim / Protected Witness
+              </div>
+              <div className="text-[11px] text-slate-400 font-mono">demo.user@mindpulse.local</div>
+            </div>
+            <span className="text-[10px] uppercase font-semibold tracking-wider bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded border border-teal-500/30">
+              /dashboard
+            </span>
           </button>
+
           <button
             type="button"
             onClick={() => fillQuickDemo('demo.counselor@mindpulse.local')}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-300 text-center transition-colors"
+            className={`w-full p-2.5 rounded-xl text-left border transition-all flex items-center justify-between ${
+              email === 'demo.counselor@mindpulse.local'
+                ? 'bg-indigo-500/15 border-indigo-500/40 text-indigo-300'
+                : 'bg-slate-900/60 hover:bg-slate-800/80 border-slate-800 text-slate-300'
+            }`}
           >
-            Counselor
+            <div>
+              <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
+                Designated Counselor
+              </div>
+              <div className="text-[11px] text-slate-400 font-mono">demo.counselor@mindpulse.local</div>
+            </div>
+            <span className="text-[10px] uppercase font-semibold tracking-wider bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30">
+              /counselor
+            </span>
           </button>
+
           <button
             type="button"
             onClick={() => fillQuickDemo('demo.admin@mindpulse.local')}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-300 text-center transition-colors"
+            className={`w-full p-2.5 rounded-xl text-left border transition-all flex items-center justify-between ${
+              email === 'demo.admin@mindpulse.local'
+                ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+                : 'bg-slate-900/60 hover:bg-slate-800/80 border-slate-800 text-slate-300'
+            }`}
           >
-            District Admin
+            <div>
+              <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                District Welfare Admin (Hidden)
+              </div>
+              <div className="text-[11px] text-slate-400 font-mono">demo.admin@mindpulse.local</div>
+            </div>
+            <span className="text-[10px] uppercase font-semibold tracking-wider bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">
+              /admin
+            </span>
           </button>
         </div>
+        <p className="mt-2 text-[11px] text-slate-400 text-center">
+          Default Password: <code className="bg-slate-800 px-1.5 py-0.5 rounded text-teal-300 font-mono">MindPulseDemo2026!</code>
+        </p>
       </div>
 
       <p className="mt-6 text-center text-xs text-slate-400">
