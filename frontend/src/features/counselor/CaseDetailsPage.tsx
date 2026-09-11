@@ -24,6 +24,7 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianG
 import api from '../../services/api';
 import { CounselorCase, SupportType } from '../../types';
 import { CaseJourneyTimeline } from '../../components/CaseJourneyTimeline';
+import { AIInsightsDashboard } from '../ai-insights/AIInsightsDashboard';
 
 export const CaseDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -516,42 +517,16 @@ export const CaseDetailsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* AI-Assisted Telemetry Review & Contributing Signals */}
-      <div className="glass-card p-6 border border-slate-800 rounded-2xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-teal-400" />
-            <h2 className="text-base font-bold text-white">AI-Assisted Telemetry Synthesis</h2>
-          </div>
-          <span className="text-[11px] uppercase tracking-wider text-teal-400 bg-teal-500/10 px-3 py-1 rounded-full border border-teal-500/20 font-semibold">
-            Human Review Required • Non-Diagnostic
-          </span>
-        </div>
-
-        <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed">
-          {caseData.aiSummary}
-        </div>
-
-        <div>
-          <span className="text-xs font-semibold text-slate-200 block mb-2">
-            Possible Contributing Signal Drivers (Explainable AI):
-          </span>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {caseData.topSignals.map((sig, idx) => (
-              <div key={idx} className="bg-slate-900/70 p-3.5 rounded-xl border border-slate-800">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-indigo-300 text-xs">{sig.feature}</span>
-                  <span className="text-[11px] font-bold text-teal-400">+{Math.round(sig.impact * 100)}% weight</span>
-                </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">{sig.description}</p>
-              </div>
-            ))}
-          </div>
-          <p className="text-[10px] text-slate-500 mt-2">
-            * Note: Signal weights represent directional feature contributions from longitudinal models; they indicate observable telemetry changes and do not claim causal certainty.
-          </p>
-        </div>
-      </div>
+      {/* Real ML Service AI-Powered Case Insights Dashboard */}
+      <AIInsightsDashboard
+        userId={caseData.userId}
+        caseId={caseData.caseId}
+        caseStage={caseData.caseStage}
+        initialCheckIns={
+          caseData.recentCheckIn ? [caseData.recentCheckIn] : undefined
+        }
+        onTakeAction={() => setIsCreatingIntervention(true)}
+      />
 
       {/* Longitudinal Case Timeline & Logged Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

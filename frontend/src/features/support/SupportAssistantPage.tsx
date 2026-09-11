@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 import { Bot, Shield, Sparkles, Wind, HeartHandshake, PhoneCall, HelpCircle, Lock } from 'lucide-react';
 import { SupportChatPanel } from './SupportChatPanel';
 import { PrivacyConsentModal } from '../auth/PrivacyConsentModal';
+import { useAuth } from '../../hooks/useAuth';
 
 export const SupportAssistantPage: React.FC = () => {
+  const { user } = useAuth();
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const counselorName =
+    user?.assignedCounselor && user.assignedCounselor !== 'Dr. Sarah Jenkins' && !user.assignedCounselor.includes('Jenkins')
+      ? user.assignedCounselor
+      : 'your assigned counselor';
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
@@ -55,7 +61,7 @@ export const SupportAssistantPage: React.FC = () => {
         <div className="flex items-center gap-2.5 text-slate-300">
           <HeartHandshake className="w-4 h-4 text-teal-400" />
           <span>
-            Would you prefer to talk with a human counselor? <strong>Dr. Sarah Jenkins</strong> is assigned to your case.
+            Would you prefer to talk with a human counselor? <strong>{counselorName === 'your assigned counselor' ? 'Your assigned counselor' : counselorName}</strong> is available for case support.
           </span>
         </div>
         <span className="text-[11px] text-teal-400 font-semibold">
