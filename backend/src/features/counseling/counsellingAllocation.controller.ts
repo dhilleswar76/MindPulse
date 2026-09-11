@@ -125,7 +125,8 @@ export const counsellingAllocationController = {
     try {
       if (!req.user) return sendError(res, 'Authentication required', 401);
       const { victimId } = req.params;
-      const { counselorId, notes } = req.body;
+      const counselorId = req.body.counselorId || req.body.counsellorId;
+      const notes = req.body.notes;
       if (!counselorId) {
         return sendError(res, 'Counselor ID is required', 400);
       }

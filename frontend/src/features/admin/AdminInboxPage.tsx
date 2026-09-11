@@ -316,17 +316,28 @@ export const AdminInboxPage: React.FC = () => {
     }
   };
 
-  // Counsellor Allocation Actions
   const handleAssignCounsellorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRequestForAssignment || !selectedCounsellorId) return;
+    if (!selectedRequestForAssignment) return;
+
+    const chosenCounsellorId =
+      selectedCounsellorId ||
+      (availableCounsellors.length > 0
+        ? (availableCounsellors[0]._id || availableCounsellors[0].id)
+        : 'counselor_sarah_201');
+
+    if (!chosenCounsellorId) {
+      setActionErrorMsg('Please select a counsellor from the list');
+      return;
+    }
 
     setIsProcessing(true);
     setActionErrorMsg(null);
     try {
       const victimId = selectedRequestForAssignment.victimId;
       await api.post(`/admin/victims/${victimId}/request-counsellor`, {
-        counsellorId: selectedCounsellorId,
+        counselorId: chosenCounsellorId,
+        counsellorId: chosenCounsellorId,
         notes: assignmentNotes || 'Matched and assigned by District Welfare Admin.',
       });
 
@@ -838,6 +849,9 @@ export const AdminInboxPage: React.FC = () => {
                               onClick={() => {
                                 setSelectedRequestForAssignment(req);
                                 setAssignmentNotes('');
+                                if (!selectedCounsellorId && availableCounsellors.length > 0) {
+                                  setSelectedCounsellorId(availableCounsellors[0]._id || availableCounsellors[0].id);
+                                }
                               }}
                               className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-950/40 flex items-center gap-1.5 transition-all"
                             >

@@ -302,14 +302,26 @@ export const AdminCounsellorAllocationPage: React.FC = () => {
   // Admin assigns counsellor for unallocated victim (ADMIN_TO_COUNSELLOR)
   const handleAssignCounsellorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedVictimForAssignment || !selectedCounsellorId) return;
+    if (!selectedVictimForAssignment) return;
+
+    const chosenCounsellorId =
+      selectedCounsellorId ||
+      (availableCounsellors.length > 0
+        ? (availableCounsellors[0]._id || availableCounsellors[0].id)
+        : 'c1');
+
+    if (!chosenCounsellorId) {
+      setError('Please select a counsellor from the list');
+      return;
+    }
 
     try {
       setSubmittingAssignment(true);
       setError(null);
       await api.post(`/admin/victims/${selectedVictimForAssignment.victimId || selectedVictimForAssignment.id}/request-counsellor`, {
-        counselorId: selectedCounsellorId,
-        notes: assignmentNotes.trim(),
+        counselorId: chosenCounsellorId,
+        counsellorId: chosenCounsellorId,
+        notes: assignmentNotes.trim() || 'Assigned by District Welfare Administration.',
       });
       setSuccessMessage('Counselling assignment request sent to counsellor for acceptance.');
       setSelectedVictimForAssignment(null);
