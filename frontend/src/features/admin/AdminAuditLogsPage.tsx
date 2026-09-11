@@ -71,7 +71,7 @@ export const AdminAuditLogsPage: React.FC = () => {
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2.5">
           <Lock className="w-7 h-7 text-amber-400" />
-          Security, Privacy & Audit Trail (SIH26094)
+          Security, Privacy & Audit Trail
         </h1>
         <p className="text-sm text-slate-400 mt-1 max-w-3xl leading-relaxed">
           System audit logs, differential privacy compliance verification, and microservice health monitoring for MindPulse.

@@ -50,11 +50,22 @@ export interface IRiskFactorItem {
   description?: string;
 }
 
+export type StageStatus =
+  | 'LOCKED'
+  | 'ACTIVE'
+  | 'COMPLETION_REQUESTED'
+  | 'COMPLETED'
+  | 'REJECTED';
+
 export type StageVerificationStatus =
+  | 'LOCKED'
+  | 'ACTIVE'
+  | 'COMPLETION_REQUESTED'
+  | 'COMPLETED'
+  | 'REJECTED'
   | 'NOT_STARTED'
   | 'IN_PROGRESS'
   | 'AWAITING_VERIFICATION'
-  | 'COMPLETED'
   | 'REOPENED';
 
 export type StageTransitionRequestStatus =
@@ -62,6 +73,20 @@ export type StageTransitionRequestStatus =
   | 'APPROVED'
   | 'REJECTED'
   | 'CLARIFICATION_REQUIRED';
+
+export interface ICaseStageItem {
+  stage: CaseStage;
+  name: string;
+  order: number;
+  status: StageStatus;
+  completedBy?: string;
+  submittedAt?: Date | string;
+  approvedBy?: string;
+  approvedAt?: Date | string;
+  rejectionReason?: string;
+  notes?: string;
+  evidenceReference?: string;
+}
 
 export interface IStageHistoryItem {
   stage: CaseStage;
@@ -75,6 +100,7 @@ export interface IStageHistoryItem {
   evidenceReference?: string;
   notes?: string;
   reopenReason?: string;
+  rejectionReason?: string;
   date?: string;
 }
 
@@ -84,4 +110,5 @@ export interface IPendingStageTransition {
   requestedAt: Date;
   status: 'PENDING' | 'CLARIFICATION_REQUIRED';
 }
+
 

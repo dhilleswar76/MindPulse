@@ -46,7 +46,7 @@ export const Sidebar: React.FC = () => {
     { to: '/admin/analytics', label: 'Risk & Wellbeing Analytics', icon: BarChart3 },
     { to: '/admin/cases', label: 'System Case Table', icon: Users },
     { to: '/admin/heatmap', label: 'Regional Distress Map', icon: Map },
-    { to: '/admin/simulator', label: 'Intervention Impact Sim', icon: Sliders },
+    { to: '/admin/interventions', label: 'Support Pathways & Outcomes', icon: Activity },
     { to: '/admin/audit', label: 'Security & Audit Trail', icon: Lock },
   ];
 

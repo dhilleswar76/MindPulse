@@ -41,8 +41,18 @@ const StageHistoryItemSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['NOT_STARTED', 'IN_PROGRESS', 'AWAITING_VERIFICATION', 'COMPLETED', 'REOPENED'],
-      default: 'NOT_STARTED',
+      enum: [
+        'LOCKED',
+        'ACTIVE',
+        'COMPLETION_REQUESTED',
+        'COMPLETED',
+        'REJECTED',
+        'NOT_STARTED',
+        'IN_PROGRESS',
+        'AWAITING_VERIFICATION',
+        'REOPENED',
+      ],
+      default: 'LOCKED',
     },
     enteredAt: { type: Date },
     completedAt: { type: Date },
@@ -53,6 +63,7 @@ const StageHistoryItemSchema = new Schema(
     evidenceReference: { type: String },
     notes: { type: String },
     reopenReason: { type: String },
+    rejectionReason: { type: String },
     date: { type: String },
   },
   { _id: false }

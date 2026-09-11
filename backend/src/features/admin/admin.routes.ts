@@ -15,7 +15,12 @@ router.get('/heatmap', adminController.getHeatmap);
 router.get('/audit-logs', adminController.getAuditLogs);
 router.get('/status', adminController.getStatus);
 
-// Stage Transition Requests Inbox & Review Endpoints
+// Stage Transition & Approval Requests Inbox & Review Endpoints
+router.get('/stage-approval-requests', adminController.getStageTransitionRequests);
+router.get('/stage-approval-requests/:requestId', adminController.getStageTransitionRequestById);
+router.post('/stage-approval-requests/:requestId/approve', adminController.approveStageTransition);
+router.post('/stage-approval-requests/:requestId/reject', adminController.rejectStageTransition);
+
 router.get('/stage-transition-requests', adminController.getStageTransitionRequests);
 router.get('/stage-transition-requests/:requestId', adminController.getStageTransitionRequestById);
 router.post('/stage-transition-requests/:requestId/approve', adminController.approveStageTransition);
@@ -23,3 +28,4 @@ router.post('/stage-transition-requests/:requestId/reject', adminController.reje
 router.post('/stage-transition-requests/:requestId/clarification', adminController.requestStageTransitionClarification);
 
 export default router;
+

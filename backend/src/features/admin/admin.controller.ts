@@ -142,16 +142,20 @@ export const adminController = {
   rejectStageTransition: async (req: AuthRequest, res: Response) => {
     try {
       const { requestId } = req.params;
-      const { reviewNotes } = req.body;
+      const reviewNotes = req.body.reason || req.body.reviewNotes;
 
       if (!req.user) {
         return sendError(res, 'Authentication required', 401);
       }
 
+      if (!reviewNotes || !reviewNotes.trim()) {
+        return sendError(res, 'Rejection reason is required', 400);
+      }
+
       const result = await caseStageService.rejectTransition(
         req.user,
         requestId,
-        reviewNotes
+        reviewNotes.trim()
       );
       return sendSuccess(res, {
         message: 'Stage transition request rejected.',

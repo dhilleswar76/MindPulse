@@ -161,11 +161,22 @@ export interface CaseJourneyStage {
   order: number;
 }
 
+export type StageStatus =
+  | 'LOCKED'
+  | 'ACTIVE'
+  | 'COMPLETION_REQUESTED'
+  | 'COMPLETED'
+  | 'REJECTED';
+
 export type StageVerificationStatus =
+  | 'LOCKED'
+  | 'ACTIVE'
+  | 'COMPLETION_REQUESTED'
+  | 'COMPLETED'
+  | 'REJECTED'
   | 'NOT_STARTED'
   | 'IN_PROGRESS'
   | 'AWAITING_VERIFICATION'
-  | 'COMPLETED'
   | 'REOPENED';
 
 export type StageTransitionRequestStatus =
@@ -173,6 +184,20 @@ export type StageTransitionRequestStatus =
   | 'APPROVED'
   | 'REJECTED'
   | 'CLARIFICATION_REQUIRED';
+
+export interface CaseStageInfo {
+  stage: CaseStage;
+  name: string;
+  order: number;
+  status: StageStatus;
+  completedBy?: string;
+  submittedAt?: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectionReason?: string;
+  notes?: string;
+  evidenceReference?: string;
+}
 
 export interface StageTransitionRequest {
   _id: string;
@@ -200,4 +225,24 @@ export interface PendingStageTransition {
   requestedAt: string;
   status: 'PENDING' | 'CLARIFICATION_REQUIRED';
 }
+
+export interface AppNotification {
+  _id: string;
+  recipientRole: 'ADMIN' | 'COUNSELOR' | 'USER';
+  recipientId?: string;
+  caseId?: string;
+  stage?: string;
+  type: 'STAGE_COMPLETION_REQUESTED' | 'STAGE_APPROVED' | 'STAGE_REJECTED' | 'GENERAL';
+  title: string;
+  message: string;
+  submittedBy?: string;
+  status?: string;
+  rejectionReason?: string;
+  requestId?: string;
+  read: boolean;
+  readAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 

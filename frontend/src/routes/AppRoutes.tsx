@@ -71,6 +71,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           <Route path="/admin/cases" element={<AdminCasesPage />} />
           <Route path="/admin/heatmap" element={<CampusHeatmapPage />} />
+          <Route path="/admin/interventions" element={<InterventionsPage />} />
           <Route path="/admin/simulator" element={<WhatIfSimulatorPage />} />
           <Route path="/admin/audit" element={<AdminAuditLogsPage />} />
         </Route>

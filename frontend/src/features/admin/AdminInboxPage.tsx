@@ -4,18 +4,13 @@ import {
   Scale,
   CheckCircle2,
   XCircle,
-  HelpCircle,
   Clock,
   ShieldCheck,
   Search,
-  Filter,
   ArrowRight,
   AlertTriangle,
-  FileText,
-  User,
-  Calendar,
   ChevronRight,
-  ExternalLink,
+  RotateCcw,
 } from 'lucide-react';
 import api from '../../services/api';
 import { StageTransitionRequest, StageTransitionRequestStatus } from '../../types';
@@ -28,63 +23,57 @@ export const AdminInboxPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRequest, setSelectedRequest] = useState<StageTransitionRequest | null>(null);
   const [reviewNotes, setReviewNotes] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
   const [actionErrorMsg, setActionErrorMsg] = useState<string | null>(null);
   const [isConfirmingApproval, setIsConfirmingApproval] = useState(false);
+  const [isConfirmingRejection, setIsConfirmingRejection] = useState(false);
 
   const fetchRequests = async () => {
     setIsLoading(true);
     try {
       const statusParam = activeTab === 'ALL' ? '' : `?status=${activeTab}`;
-      const res: any = await api.get(`/admin/stage-transition-requests${statusParam}`);
+      const res: any = await api.get(`/admin/stage-approval-requests${statusParam}`);
       const list = res.data?.requests || res.data?.data?.requests || [];
       setRequests(list);
     } catch {
-      // Fallback synthetic requests for demo presentation
-      setRequests([
-        {
-          _id: 'req_demo_101',
-          caseId: 'MP-1042',
-          fromStage: 'INVESTIGATION',
-          requestedStage: 'COURT_TRIAL',
-          counselorName: 'Dr. Sarah Jenkins',
-          reason: 'Police investigation concluded and formal chargesheet has been submitted to the Special Court under SC/ST Act.',
-          evidenceReference: 'INV-2026-1042 / Chargesheet No. 88/2026',
-          notes: 'Special Court summons issued for witness deposition on 24 Sep 2026.',
-          status: 'PENDING',
-          createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          _id: 'req_demo_102',
-          caseId: 'MP-1001',
-          fromStage: 'CASE_REGISTRATION',
-          requestedStage: 'INVESTIGATION',
-          counselorName: 'Dr. Sarah Jenkins',
-          reason: 'Initial FIR registered and IO assigned; witness identity protection initiated.',
-          evidenceReference: 'FIR-2026-90812',
-          notes: 'Preliminary statement recorded.',
-          status: 'PENDING',
-          createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          _id: 'req_demo_103',
-          caseId: 'MP-1003',
-          fromStage: 'COMPENSATION',
-          requestedStage: 'REHABILITATION',
-          counselorName: 'Dr. Sarah Jenkins',
-          reason: 'Statutory interim financial relief disbursed to beneficiary bank account via DLSA.',
-          evidenceReference: 'DLSA-RELIEF-2025-081',
-          status: 'APPROVED',
-          reviewerName: 'Marcus Vance (District Welfare Officer)',
-          reviewedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-          reviewNotes: 'Verified with District Treasury disbursement scroll.',
-          createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ]);
+      try {
+        const statusParam = activeTab === 'ALL' ? '' : `?status=${activeTab}`;
+        const res: any = await api.get(`/admin/stage-transition-requests${statusParam}`);
+        const list = res.data?.requests || res.data?.data?.requests || [];
+        setRequests(list);
+      } catch {
+        // Fallback synthetic requests for demo presentation
+        setRequests([
+          {
+            _id: 'req_demo_101',
+            caseId: 'MP-1042',
+            fromStage: 'COURT_TRIAL',
+            requestedStage: 'COMPENSATION',
+            counselorName: 'Dr. Sarah Jenkins',
+            reason: 'Trial hearings and witness cross-examination successfully concluded in Special Court.',
+            evidenceReference: 'CRT-2026-1042-DEPOSITION',
+            notes: 'Special Court order certified.',
+            status: 'PENDING',
+            createdAt: new Date(Date.now() - 3600000 * 3).toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            _id: 'req_demo_102',
+            caseId: 'MP-1001',
+            fromStage: 'INVESTIGATION',
+            requestedStage: 'COURT_TRIAL',
+            counselorName: 'Dr. Sarah Jenkins',
+            reason: 'Police investigation concluded and formal chargesheet submitted.',
+            evidenceReference: 'INV-2026-1001 / Chargesheet 44',
+            notes: 'Special Court summons issued.',
+            status: 'PENDING',
+            createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ]);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -93,6 +82,16 @@ export const AdminInboxPage: React.FC = () => {
   useEffect(() => {
     fetchRequests();
   }, [activeTab]);
+
+  // Lock background body scroll when review modal is open
+  useEffect(() => {
+    if (!selectedRequest) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selectedRequest]);
 
   const filteredRequests = requests.filter((r) => {
     const matchesSearch =
@@ -107,18 +106,32 @@ export const AdminInboxPage: React.FC = () => {
     setIsProcessing(true);
     setActionErrorMsg(null);
     try {
-      await api.post(`/admin/stage-transition-requests/${selectedRequest._id}/approve`, {
+      await api.post(`/admin/stage-approval-requests/${selectedRequest._id}/approve`, {
         reviewNotes: reviewNotes || 'Official milestone verified and approved.',
       });
       setActionSuccessMsg(
-        `Stage transition approved for Case ${selectedRequest.caseId}. Official stage updated to ${selectedRequest.requestedStage}.`
+        `Stage completion approved for Case ${selectedRequest.caseId}. ${selectedRequest.requestedStage} stage is now ACTIVE.`
       );
       setIsConfirmingApproval(false);
       setSelectedRequest(null);
       setReviewNotes('');
       fetchRequests();
     } catch (err: any) {
-      setActionErrorMsg(err.response?.data?.error || err.message || 'Approval failed');
+      // Fallback endpoint if needed
+      try {
+        await api.post(`/admin/stage-transition-requests/${selectedRequest._id}/approve`, {
+          reviewNotes: reviewNotes || 'Official milestone verified and approved.',
+        });
+        setActionSuccessMsg(
+          `Stage completion approved for Case ${selectedRequest.caseId}. ${selectedRequest.requestedStage} stage is now ACTIVE.`
+        );
+        setIsConfirmingApproval(false);
+        setSelectedRequest(null);
+        setReviewNotes('');
+        fetchRequests();
+      } catch (err2: any) {
+        setActionErrorMsg(err2.response?.data?.error || err2.message || 'Approval failed');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -126,22 +139,38 @@ export const AdminInboxPage: React.FC = () => {
 
   const handleReject = async () => {
     if (!selectedRequest) return;
-    if (!reviewNotes.trim()) {
-      setActionErrorMsg('Rejection reason / review notes are required before rejecting.');
+    if (!rejectionReason.trim()) {
+      setActionErrorMsg('Rejection reason is required.');
       return;
     }
     setIsProcessing(true);
     setActionErrorMsg(null);
     try {
-      await api.post(`/admin/stage-transition-requests/${selectedRequest._id}/reject`, {
-        reviewNotes: reviewNotes.trim(),
+      await api.post(`/admin/stage-approval-requests/${selectedRequest._id}/reject`, {
+        reason: rejectionReason.trim(),
+        reviewNotes: rejectionReason.trim(),
       });
-      setActionSuccessMsg(`Stage transition request rejected for Case ${selectedRequest.caseId}.`);
+      setActionSuccessMsg(`Stage completion request rejected for Case ${selectedRequest.caseId}.`);
+      setIsConfirmingRejection(false);
       setSelectedRequest(null);
+      setRejectionReason('');
       setReviewNotes('');
       fetchRequests();
     } catch (err: any) {
-      setActionErrorMsg(err.response?.data?.error || err.message || 'Rejection failed');
+      try {
+        await api.post(`/admin/stage-transition-requests/${selectedRequest._id}/reject`, {
+          reason: rejectionReason.trim(),
+          reviewNotes: rejectionReason.trim(),
+        });
+        setActionSuccessMsg(`Stage completion request rejected for Case ${selectedRequest.caseId}.`);
+        setIsConfirmingRejection(false);
+        setSelectedRequest(null);
+        setRejectionReason('');
+        setReviewNotes('');
+        fetchRequests();
+      } catch (err2: any) {
+        setActionErrorMsg(err2.response?.data?.error || err2.message || 'Rejection failed');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -213,13 +242,13 @@ export const AdminInboxPage: React.FC = () => {
         <ShieldCheck className="w-5 h-5 text-teal-400 shrink-0 mt-0.5" />
         <div className="text-xs text-slate-300 leading-relaxed">
           <strong className="text-white block mb-0.5">Statutory Decision Support Boundary</strong>
-          Only authorized District Welfare Admins can confirm official case transitions. AI distress scores, victim check-ins, or counselor support interventions do not advance legal stages. Every transition confirmation is permanently signed and logged to the system audit trail.
+          Only authorized District Welfare Admins can approve stage completion. AI distress scores, victim check-ins, or counselor support interventions do not advance legal stages. Every approval activates the next case stage and permanently signs the system audit trail.
         </div>
       </div>
 
       {/* Alerts */}
       {actionSuccessMsg && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-300 text-xs flex items-center justify-between">
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-300 text-xs flex items-center justify-between animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{actionSuccessMsg}</span>
@@ -231,7 +260,7 @@ export const AdminInboxPage: React.FC = () => {
       )}
 
       {actionErrorMsg && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-xs flex items-center justify-between">
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-xs flex items-center justify-between animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{actionErrorMsg}</span>
@@ -250,7 +279,7 @@ export const AdminInboxPage: React.FC = () => {
             onClick={() => setActiveTab('PENDING')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
               activeTab === 'PENDING'
-                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-bold'
                 : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
             }`}
           >
@@ -280,7 +309,7 @@ export const AdminInboxPage: React.FC = () => {
             onClick={() => setActiveTab('APPROVED')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'APPROVED'
-                ? 'bg-emerald-600 text-white'
+                ? 'bg-emerald-600 text-white font-bold'
                 : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
             }`}
           >
@@ -291,7 +320,7 @@ export const AdminInboxPage: React.FC = () => {
             onClick={() => setActiveTab('REJECTED')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'REJECTED'
-                ? 'bg-rose-600 text-white'
+                ? 'bg-rose-600 text-white font-bold'
                 : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
             }`}
           >
@@ -344,9 +373,9 @@ export const AdminInboxPage: React.FC = () => {
               <thead className="bg-slate-900/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800 font-bold">
                 <tr>
                   <th className="p-4">Case ID</th>
-                  <th className="p-4">Transition Requested</th>
+                  <th className="p-4">Current Stage → Next</th>
                   <th className="p-4">Milestone Evidence Ref</th>
-                  <th className="p-4">Counselor</th>
+                  <th className="p-4">Counsellor</th>
                   <th className="p-4">Submitted</th>
                   <th className="p-4">Status</th>
                   <th className="p-4 text-right">Action</th>
@@ -360,9 +389,9 @@ export const AdminInboxPage: React.FC = () => {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-1.5 font-semibold text-slate-200">
-                        <span className="text-slate-400">{req.fromStage.replace(/_/g, ' ')}</span>
+                        <span className="text-slate-300">{req.fromStage.replace(/_/g, ' ')}</span>
                         <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
-                        <span className="text-white">{req.requestedStage.replace(/_/g, ' ')}</span>
+                        <span className="text-teal-300">{req.requestedStage.replace(/_/g, ' ')}</span>
                       </div>
                     </td>
                     <td className="p-4 font-mono text-slate-300">
@@ -388,7 +417,7 @@ export const AdminInboxPage: React.FC = () => {
                             : 'bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-pulse'
                         }`}
                       >
-                        {req.status.replace(/_/g, ' ')}
+                        {req.status === 'PENDING' ? 'Pending Approval' : req.status.replace(/_/g, ' ')}
                       </span>
                     </td>
                     <td className="p-4 text-right">
@@ -396,11 +425,14 @@ export const AdminInboxPage: React.FC = () => {
                         onClick={() => {
                           setSelectedRequest(req);
                           setReviewNotes(req.reviewNotes || '');
+                          setRejectionReason('');
+                          setIsConfirmingApproval(false);
+                          setIsConfirmingRejection(false);
                           setActionErrorMsg(null);
                         }}
                         className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-semibold text-xs border border-slate-700 transition-all inline-flex items-center gap-1.5"
                       >
-                        <span>{req.status === 'PENDING' ? 'Review' : 'View'}</span>
+                        <span>{req.status === 'PENDING' ? 'Review' : 'View Details'}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </td>
@@ -414,163 +446,216 @@ export const AdminInboxPage: React.FC = () => {
 
       {/* Review Drawer / Modal */}
       {selectedRequest && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 max-w-2xl w-full space-y-5 shadow-2xl animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-                  Case Stage Review
-                </span>
-                <h3 className="text-lg font-bold text-white mt-1">
-                  Milestone Verification for Case <span className="font-mono text-teal-400">{selectedRequest.caseId}</span>
-                </h3>
-              </div>
-              <button
-                onClick={() => {
-                  setSelectedRequest(null);
-                  setIsConfirmingApproval(false);
-                }}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
-              >
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Stage Transition Visualizer */}
-            <div className="p-4 bg-slate-950/90 rounded-2xl border border-slate-800 flex items-center justify-around text-center">
-              <div>
-                <span className="text-[10px] uppercase text-slate-500 font-bold block mb-1">
-                  Current Official Stage
-                </span>
-                <span className="text-xs sm:text-sm font-bold text-slate-300">
-                  {selectedRequest.fromStage.replace(/_/g, ' ')}
-                </span>
-              </div>
-              <ArrowRight className="w-5 h-5 text-amber-400" />
-              <div>
-                <span className="text-[10px] uppercase text-amber-400 font-bold block mb-1">
-                  Requested Official Stage
-                </span>
-                <span className="text-xs sm:text-sm font-bold text-teal-300">
-                  {selectedRequest.requestedStage.replace(/_/g, ' ')}
-                </span>
-              </div>
-            </div>
-
-            {/* Request Details Grid */}
-            <div className="space-y-3 text-xs">
-              <div>
-                <span className="text-slate-400 font-semibold block mb-1">Official Evidence / Milestone Reference</span>
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-teal-300 font-bold">
-                  {selectedRequest.evidenceReference}
-                </div>
-              </div>
-
-              <div>
-                <span className="text-slate-400 font-semibold block mb-1">Counselor Reason & Legal Basis</span>
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 leading-relaxed">
-                  {selectedRequest.reason}
-                </div>
-              </div>
-
-              {selectedRequest.notes && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="min-h-full flex items-center justify-center p-3 sm:p-4 md:p-6">
+            <div
+              className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+              role="dialog"
+              aria-modal="true"
+            >
+              {/* Modal Header (Fixed / Shrink-0) */}
+              <div className="shrink-0 flex items-center justify-between p-5 sm:p-6 border-b border-slate-800 bg-slate-900 z-10">
                 <div>
-                  <span className="text-slate-400 font-semibold block mb-1">Additional Context Notes</span>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-300">
-                    {selectedRequest.notes}
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                    STAGE COMPLETION REQUEST
+                  </span>
+                  <h3 className="text-lg font-bold text-white mt-1">
+                    Review Stage Completion for Case <span className="font-mono text-teal-400">{selectedRequest.caseId}</span>
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedRequest(null);
+                    setIsConfirmingApproval(false);
+                    setIsConfirmingRejection(false);
+                  }}
+                  className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors shrink-0"
+                  aria-label="Close review modal"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Scrollable Content Body */}
+              <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 space-y-4">
+                {/* Stage Transition Visualizer */}
+                <div className="p-4 bg-slate-950/90 rounded-2xl border border-slate-800 flex items-center justify-around text-center">
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-400 font-bold block mb-1">
+                      Completed Stage (Under Review)
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold text-slate-200">
+                      {selectedRequest.fromStage.replace(/_/g, ' ')}
+                    </span>
+                    <span className="block text-[10px] text-amber-300 font-semibold mt-0.5">
+                      COMPLETION_REQUESTED
+                    </span>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-amber-400" />
+                  <div>
+                    <span className="text-[10px] uppercase text-slate-400 font-bold block mb-1">
+                      Next Stage (To Activate)
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold text-teal-300">
+                      {selectedRequest.requestedStage.replace(/_/g, ' ')}
+                    </span>
+                    <span className="block text-[10px] text-slate-500 font-semibold mt-0.5">
+                      Currently LOCKED
+                    </span>
                   </div>
                 </div>
+
+                {/* Request Details Grid */}
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-semibold block mb-1">Official Evidence / Milestone Reference</span>
+                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-teal-300 font-bold">
+                      {selectedRequest.evidenceReference}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 font-semibold block mb-1">Counsellor Justification & Legal Basis</span>
+                    <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 leading-relaxed">
+                      {selectedRequest.reason}
+                    </div>
+                  </div>
+
+                  {selectedRequest.notes && (
+                    <div>
+                      <span className="text-slate-400 font-semibold block mb-1">Additional Counselor Notes</span>
+                      <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-300">
+                        {selectedRequest.notes}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3 text-slate-400 text-[11px] pt-1">
+                    <div>
+                      Submitted By: <strong className="text-slate-200">{selectedRequest.counselorName}</strong>
+                    </div>
+                    <div className="text-right">
+                      Submitted: <strong className="text-slate-200">{new Date(selectedRequest.createdAt).toLocaleString()}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rejection Prompt & Reason Entry Modal */}
+                {isConfirmingRejection && (
+                  <div className="p-4 bg-rose-500/10 border border-rose-500/40 rounded-2xl text-xs space-y-3 animate-in fade-in duration-150">
+                    <div className="flex items-center gap-2 font-bold text-rose-300 text-sm">
+                      <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                      <span>Reject Stage Completion Request</span>
+                    </div>
+                    <p className="text-slate-300 text-xs">
+                      Please provide a required reason for rejection. The counselor will receive a persistent notification with this reason and can resubmit after resolving the deficiency.
+                    </p>
+                    <div>
+                      <label className="block text-slate-200 font-semibold mb-1">
+                        Rejection Reason <span className="text-rose-400">*</span>
+                      </label>
+                      <textarea
+                        required
+                        rows={2}
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        placeholder="e.g. Required documentation is incomplete. Please attach certified court order."
+                        className="w-full bg-slate-950 border border-rose-500/40 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-400"
+                      />
+                    </div>
+                    <div className="flex items-center justify-end gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsConfirmingRejection(false)}
+                        className="px-3.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleReject}
+                        disabled={isProcessing || !rejectionReason.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
+                      >
+                        {isProcessing ? 'Rejecting...' : 'Confirm Rejection'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Approval Prompt */}
+                {isConfirmingApproval && (
+                  <div className="p-4 bg-amber-500/10 border border-amber-500/40 rounded-2xl text-xs space-y-3 animate-in fade-in duration-150">
+                    <div className="flex items-center gap-2 font-bold text-amber-300 text-sm">
+                      <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>Confirm Official Case-Stage Approval?</span>
+                    </div>
+                    <p className="text-slate-300 leading-relaxed text-xs">
+                      Approving will mark <strong className="text-white">{selectedRequest.fromStage.replace(/_/g, ' ')}</strong> as <strong className="text-emerald-400">COMPLETED</strong> and automatically activate <strong className="text-teal-300">{selectedRequest.requestedStage.replace(/_/g, ' ')}</strong> as <strong className="text-teal-400">ACTIVE</strong>. The assigned counselor will be notified.
+                    </p>
+                    <div className="flex items-center justify-end gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsConfirmingApproval(false)}
+                        className="px-3.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleApprove}
+                        disabled={isProcessing}
+                        className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
+                      >
+                        {isProcessing ? 'Approving...' : 'Approve Stage'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Accessible Footer (Shrink-0) */}
+              {!isConfirmingRejection && !isConfirmingApproval && (
+                <div className="shrink-0 p-4 sm:p-5 border-t border-slate-800 bg-slate-900/95 z-10 flex items-center justify-end gap-3">
+                  {selectedRequest.status === 'PENDING' ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setIsConfirmingRejection(true)}
+                        disabled={isProcessing}
+                        className="px-4 py-2.5 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 font-semibold rounded-xl text-xs transition-colors"
+                      >
+                        Reject Stage
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleClarification()}
+                        disabled={isProcessing}
+                        className="px-4 py-2.5 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 font-semibold rounded-xl text-xs transition-colors"
+                      >
+                        Request Clarification
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsConfirmingApproval(true)}
+                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition-all"
+                      >
+                        Approve Stage
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRequest(null)}
+                      className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
+                    >
+                      Close
+                    </button>
+                  )}
+                </div>
               )}
-
-              <div className="grid grid-cols-2 gap-3 text-slate-400 text-[11px] pt-1">
-                <div>
-                  Submitted By: <strong className="text-slate-200">{selectedRequest.counselorName}</strong>
-                </div>
-                <div className="text-right">
-                  Submitted: <strong className="text-slate-200">{new Date(selectedRequest.createdAt).toLocaleString()}</strong>
-                </div>
-              </div>
             </div>
-
-            {/* Review Notes Entry */}
-            {selectedRequest.status === 'PENDING' && (
-              <div className="space-y-1.5 pt-2 border-t border-slate-800">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Official Administrative Review Notes
-                </label>
-                <textarea
-                  rows={2}
-                  value={reviewNotes}
-                  onChange={(e) => setReviewNotes(e.target.value)}
-                  placeholder="Record verification remarks, court order references, or clarification requirements..."
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-            )}
-
-            {/* Confirmation Dialog for Approval */}
-            {isConfirmingApproval ? (
-              <div className="p-4 bg-amber-500/10 border border-amber-500/40 rounded-2xl text-xs space-y-3">
-                <div className="flex items-center gap-2 font-bold text-amber-300 text-sm">
-                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Confirm Official Case-Stage Transition?</span>
-                </div>
-                <p className="text-slate-300 leading-relaxed text-xs">
-                  This action will atomically update <strong className="text-white">Case {selectedRequest.caseId}</strong> from <strong className="text-slate-200">{selectedRequest.fromStage}</strong> to <strong className="text-teal-300">{selectedRequest.requestedStage}</strong>. The victim dashboard, case timeline, and system audit logs will be updated.
-                </p>
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    onClick={() => setIsConfirmingApproval(false)}
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleApprove}
-                    disabled={isProcessing}
-                    className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md disabled:opacity-50"
-                  >
-                    {isProcessing ? 'Confirming...' : 'Yes, Authorize Transition'}
-                  </button>
-                </div>
-              </div>
-            ) : selectedRequest.status === 'PENDING' ? (
-              <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => handleReject()}
-                  disabled={isProcessing}
-                  className="px-4 py-2.5 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 font-semibold rounded-xl text-xs transition-colors"
-                >
-                  Reject Request
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleClarification()}
-                  disabled={isProcessing}
-                  className="px-4 py-2.5 bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 font-semibold rounded-xl text-xs transition-colors"
-                >
-                  Request Clarification
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsConfirmingApproval(true)}
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition-all"
-                >
-                  Approve Transition
-                </button>
-              </div>
-            ) : (
-              <div className="pt-3 border-t border-slate-800 flex justify-end">
-                <button
-                  onClick={() => setSelectedRequest(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
-                >
-                  Close
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}

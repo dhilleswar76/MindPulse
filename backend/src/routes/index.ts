@@ -15,6 +15,7 @@ import adminRoutes from '../features/admin/admin.routes.js';
 import casesRoutes from '../features/cases/cases.routes.js';
 import mlRoutes from '../features/ml/ml.routes.js';
 import compensationRoutes from '../features/compensation/compensation.routes.js';
+import notificationsRoutes from '../features/notifications/notifications.routes.js';
 
 const router = Router();
 
@@ -44,5 +45,7 @@ router.use('/users', usersRoutes);
 router.use('/admin', adminRoutes);
 router.use('/ml', mlRoutes);
 router.use('/compensation', compensationRoutes);
+router.use('/notifications', notificationsRoutes);
+
 
 export default router;

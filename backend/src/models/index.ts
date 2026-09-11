@@ -11,3 +11,5 @@ export * from './Recommendation.js';
 export * from './Case.js';
 export * from './AuditLog.js';
 export * from './StageTransitionRequest.js';
+export * from './Notification.js';
+
