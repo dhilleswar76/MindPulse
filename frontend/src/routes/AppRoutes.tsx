@@ -26,6 +26,7 @@ import { AlertsQueuePage } from '../features/alerts/AlertsQueuePage';
 import { AdminDashboardPage } from '../features/admin/AdminDashboardPage';
 import { AdminAnalyticsPage } from '../features/admin/AdminAnalyticsPage';
 import { AdminCasesPage } from '../features/admin/AdminCasesPage';
+import { AdminInboxPage } from '../features/admin/AdminInboxPage';
 import { CampusHeatmapPage } from '../features/heatmap/CampusHeatmapPage';
 import { WhatIfSimulatorPage } from '../features/simulator/WhatIfSimulatorPage';
 import { AdminAuditLogsPage } from '../features/admin/AdminAuditLogsPage';
@@ -66,6 +67,7 @@ export const AppRoutes: React.FC = () => {
         {/* Hidden District Admin Routes */}
         <Route element={<AdminProtectedRoute />}>
           <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/inbox" element={<AdminInboxPage />} />
           <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           <Route path="/admin/cases" element={<AdminCasesPage />} />
           <Route path="/admin/heatmap" element={<CampusHeatmapPage />} />

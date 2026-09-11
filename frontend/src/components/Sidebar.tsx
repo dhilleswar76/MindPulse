@@ -4,19 +4,18 @@ import { useAuth } from '../hooks/useAuth';
 import {
   LayoutDashboard,
   Smile,
-  BookOpen,
   Activity,
   AlertTriangle,
   TrendingUp,
   Sparkles,
   Scale,
   Users,
-  ClipboardList,
   BarChart3,
   Map,
   Sliders,
   Bell,
   Lock,
+  Inbox,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -26,7 +25,6 @@ export const Sidebar: React.FC = () => {
   const userLinks = [
     { to: '/dashboard', label: 'Case Journey & Home', icon: LayoutDashboard },
     { to: '/checkins', label: 'Wellbeing Check-in', icon: Smile },
-    { to: '/journal', label: 'Journal & Reflections', icon: BookOpen },
     { to: '/wellness', label: 'Personal Baseline', icon: Activity },
     { to: '/risk', label: 'Distress Signals & XAI', icon: AlertTriangle },
     { to: '/forecast', label: 'Early Risk Forecast', icon: TrendingUp },
@@ -43,6 +41,7 @@ export const Sidebar: React.FC = () => {
 
   const adminLinks = [
     { to: '/admin', label: 'Executive Overview', icon: LayoutDashboard },
+    { to: '/admin/inbox', label: 'Stage Transition Inbox', icon: Inbox },
     { to: '/admin/analytics', label: 'Risk & Wellbeing Analytics', icon: BarChart3 },
     { to: '/admin/cases', label: 'System Case Table', icon: Users },
     { to: '/admin/heatmap', label: 'Regional Distress Map', icon: Map },

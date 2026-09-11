@@ -8,7 +8,19 @@ router.use(authenticateToken);
 
 router.get('/', casesController.getCases);
 router.get('/:id', casesController.getCaseById);
-router.put('/:id/stage', requireRoles('COUNSELOR', 'ADMIN'), casesController.updateCaseStage);
+router.put('/:id/stage', requireRoles('ADMIN'), casesController.updateCaseStage);
 router.get('/:id/timeline', casesController.getCaseTimeline);
+
+// Stage Transition Requests
+router.post(
+  '/:id/stage-transition-requests',
+  requireRoles('COUNSELOR'),
+  casesController.createStageTransitionRequest
+);
+router.get(
+  '/:id/stage-transition-requests',
+  requireRoles('COUNSELOR', 'ADMIN'),
+  casesController.getStageTransitionRequests
+);
 
 export default router;

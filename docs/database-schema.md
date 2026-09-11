@@ -25,15 +25,36 @@ MindPulse defines 12 specialized Mongoose models designed for data isolation, vi
 ## 2. `Case`
 - `_id`: ObjectId
 - `caseId`: String (unique, indexed, e.g. "MP-1042")
-- `victimType`: Enum [`VICTIM`, `COMPLAINANT`, `WITNESS`, `FAMILY_MEMBER`]
-- `currentStage`: Enum [`CASE_REGISTRATION`, `INVESTIGATION`, `COURT_TRIAL`, `COMPENSATION`, `REHABILITATION`, `PROTECTION_SUPPORT`]
+- `victimId`: Ref -> `User`
+- `victimType`: Enum [`VICTIM`, `COMPLAINANT`, `WITNESS`, `FAMILY_MEMBER`, `OTHER_AFFECTED_PERSON`]
+- `caseStage`: Enum [`CASE_REGISTRATION`, `INVESTIGATION`, `COURT_TRIAL`, `COMPENSATION`, `REHABILITATION`, `PROTECTION_SUPPORT`, `CLOSED`]
+- `caseStatus`: Enum [`ACTIVE`, `UNDER_REVIEW`, `SUPPORT_IN_PROGRESS`, `CLOSED`]
 - `priorityScore`: Number (0.00-1.00)
 - `district`: String
 - `state`: String
-- `incidentCategory`: String (e.g. "SC/ST Atrocity Matter")
 - `assignedCounselorId`: Ref -> `User`
-- `status`: Enum [`ACTIVE`, `PENDING_REVIEW`, `CLOSED`]
-- `stages`: Array of `{ stage: String, enteredAt: Date, completedAt: Date, notes: String }`
+- `assignedCounselorName`: String
+- `stagesHistory`: Array of `{ stage: String, status: Enum ['NOT_STARTED', 'IN_PROGRESS', 'AWAITING_VERIFICATION', 'COMPLETED', 'REOPENED'], enteredAt: Date, completedAt: Date, requestedAt: Date, requestedBy: Ref -> User, confirmedAt: Date, confirmedBy: Ref -> User, evidenceReference: String, notes: String, reopenReason: String }`
+- `pendingStageTransition`: `{ requestId: Ref -> StageTransitionRequest, requestedStage: String, requestedAt: Date, status: Enum ['PENDING', 'CLARIFICATION_REQUIRED'] }`
+- `createdAt`, `updatedAt`: Date
+
+## 2.1. `StageTransitionRequest`
+- `_id`: ObjectId
+- `caseId`: String (indexed)
+- `caseObjId`: Ref -> `Case`
+- `fromStage`: Enum [`CASE_REGISTRATION`, `INVESTIGATION`, `COURT_TRIAL`, `COMPENSATION`, `REHABILITATION`, `PROTECTION_SUPPORT`, `CLOSED`]
+- `requestedStage`: Enum [`CASE_REGISTRATION`, `INVESTIGATION`, `COURT_TRIAL`, `COMPENSATION`, `REHABILITATION`, `PROTECTION_SUPPORT`, `CLOSED`]
+- `requestedByCounselor`: Ref -> `User` (indexed)
+- `counselorName`: String
+- `reason`: String (detailed milestone justification)
+- `evidenceReference`: String (e.g. "INV-2026-1042 / Chargesheet 44/2026")
+- `notes`: String
+- `status`: Enum [`PENDING`, `APPROVED`, `REJECTED`, `CLARIFICATION_REQUIRED`]
+- `reviewedBy`: Ref -> `User`
+- `reviewerName`: String
+- `reviewedAt`: Date
+- `reviewNotes`: String
+- `reopenReason`: String
 - `createdAt`, `updatedAt`: Date
 
 ## 3. `Consent`

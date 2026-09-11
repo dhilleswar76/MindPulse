@@ -23,4 +23,5 @@ This document maps all features across their respective frontend folders, backen
 | **17. Regional Distress Heatmap** | `frontend/src/features/heatmap/` | `backend/src/features/analytics/` | Jurisdictional Aggregation | `User`, `RiskScore` | Admin Team |
 | **18. What-If Policy Simulator** | `frontend/src/features/simulator/` | `backend/src/features/analytics/` | Statistical projection | N/A | ML Team |
 | **19. Privacy & Audit Guard** | `frontend/src/features/auth/` | `backend/src/features/admin/` | N/A | `Consent`, `AuditLog` | Security Team |
+| **20. Case Stage Confirmation & Admin Inbox** | `frontend/src/features/admin/AdminInboxPage.tsx` | `backend/src/features/cases/` | N/A | `StageTransitionRequest`, `Case`, `AuditLog` | Legal Workflow Team |
 

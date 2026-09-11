@@ -10,11 +10,20 @@ Base URL: `http://localhost:5000/api`
 - `GET /auth/me` — Get current authenticated user profile.
 - `GET /users` *(ADMIN)* — List users with role and district filter.
 
-## 2. 6-Stage Case Journey Tracking
+## 2. 6-Stage Case Journey Tracking & Official Confirmation
 - `GET /cases` *(COUNSELOR, ADMIN)* — List cases indexed by stage and priority score.
 - `GET /cases/:id` — Retrieve case details and journey metadata.
-- `PUT /cases/:id/stage` *(COUNSELOR, ADMIN)* — Update case stage (`CASE_REGISTRATION` -> `INVESTIGATION` -> `COURT_TRIAL` -> `COMPENSATION` -> `REHABILITATION` -> `PROTECTION_SUPPORT`).
-- `GET /cases/:id/timeline` — Retrieve stage history timeline.
+- `PUT /cases/:id/stage` *(ADMIN only)* — Direct administrative stage update / reopening.
+- `GET /cases/:id/timeline` — Retrieve official stage history timeline.
+- `POST /cases/:id/stage-transition-requests` *(COUNSELOR)* — Submit an official stage transition request with milestone reason and evidence reference identifier.
+- `GET /cases/:id/stage-transition-requests` *(COUNSELOR, ADMIN)* — Retrieve stage transition history for a specific case.
+
+## 2.1. Admin Stage Confirmation & Inbox
+- `GET /admin/stage-transition-requests` *(ADMIN)* — List transition requests with status filter (`PENDING`, `APPROVED`, `REJECTED`, `CLARIFICATION_REQUIRED`).
+- `GET /admin/stage-transition-requests/:requestId` *(ADMIN)* — Get detailed request metadata with evidence reference.
+- `POST /admin/stage-transition-requests/:requestId/approve` *(ADMIN)* — Officially approve transition, atomically advance `Case.caseStage`, record stage history, and create `AuditLog`.
+- `POST /admin/stage-transition-requests/:requestId/reject` *(ADMIN)* — Reject transition with required administrative review reason.
+- `POST /admin/stage-transition-requests/:requestId/clarification` *(ADMIN)* — Request additional documentation or clarification from counselor.
 
 ## 3. Trauma-Informed Check-ins & Voice Screening
 - `POST /checkins` *(USER)* — Submit wellbeing check-in (Mood, Stress, Sleep, Sense of Safety, Case Tension).

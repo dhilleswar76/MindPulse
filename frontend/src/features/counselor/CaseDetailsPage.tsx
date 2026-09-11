@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import api from '../../services/api';
-import { CounselorCase, SupportType } from '../../types';
+import { CounselorCase, SupportType, CaseStage } from '../../types';
 import { CaseJourneyTimeline } from '../../components/CaseJourneyTimeline';
 import { AIInsightsDashboard } from '../ai-insights/AIInsightsDashboard';
 
@@ -37,6 +37,18 @@ export const CaseDetailsPage: React.FC = () => {
     mood: true,
     safety: true,
   });
+
+  // Stage Transition Request state
+  const [isRequestingStage, setIsRequestingStage] = useState(false);
+  const [requestedStage, setRequestedStage] = useState<CaseStage>('COURT_TRIAL');
+  const [stageReason, setStageReason] = useState('');
+  const [evidenceReference, setEvidenceReference] = useState('');
+  const [stageNotes, setStageNotes] = useState('');
+  const [isSubmittingStage, setIsSubmittingStage] = useState(false);
+  const [stageSuccessMsg, setStageSuccessMsg] = useState<string | null>(null);
+  const [stageErrorMsg, setStageErrorMsg] = useState<string | null>(null);
+  const [pendingStageRequest, setPendingStageRequest] = useState<any>(null);
+  const [stageRequestsHistory, setStageRequestsHistory] = useState<any[]>([]);
 
   // Intervention form state
   const [interventionType, setInterventionType] = useState<SupportType>('COUNSELLING');
@@ -55,6 +67,18 @@ export const CaseDetailsPage: React.FC = () => {
       scheduledDate: new Date(Date.now() - 86400000).toISOString(),
     }
   ]);
+
+  const loadStageRequests = async (caseIdStr: string) => {
+    try {
+      const res: any = await api.get(`/cases/${caseIdStr}/stage-transition-requests`);
+      const reqs = res.data?.requests || res.data?.data?.requests || [];
+      setStageRequestsHistory(reqs);
+      const active = reqs.find((r: any) => ['PENDING', 'CLARIFICATION_REQUIRED'].includes(r.status));
+      setPendingStageRequest(active || null);
+    } catch {
+      // ignore
+    }
+  };
 
   useEffect(() => {
     const fetchCase = async () => {
@@ -114,6 +138,7 @@ export const CaseDetailsPage: React.FC = () => {
           interventionsCount: 1,
         });
       }
+      loadStageRequests(id?.startsWith('MP') ? id : 'MP-1042');
     };
     fetchCase();
   }, [id]);
@@ -137,6 +162,48 @@ export const CaseDetailsPage: React.FC = () => {
   ];
 
   const telemetryData = timeframe === '7d' ? telemetryData7d : telemetryData30d;
+
+  const handleSubmitStageRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmittingStage(true);
+    setStageErrorMsg(null);
+    setStageSuccessMsg(null);
+    try {
+      const caseIdStr = caseData?.caseId || id || 'MP-1042';
+      const res: any = await api.post(`/cases/${caseIdStr}/stage-transition-requests`, {
+        requestedStage,
+        reason: stageReason,
+        evidenceReference,
+        notes: stageNotes,
+      });
+      const createdReq = res.data?.data?.request || res.data?.request || {
+        _id: 'req_' + Date.now(),
+        caseId: caseIdStr,
+        fromStage: caseData?.caseStage || 'INVESTIGATION',
+        requestedStage,
+        reason: stageReason,
+        evidenceReference,
+        status: 'PENDING',
+        createdAt: new Date().toISOString(),
+      };
+      setPendingStageRequest(createdReq);
+      setStageRequestsHistory((prev) => [createdReq, ...prev]);
+      setStageSuccessMsg(
+        'Your stage transition request has been submitted for official review. The case stage will change only after authorized confirmation.'
+      );
+      setTimeout(() => {
+        setIsRequestingStage(false);
+        setStageReason('');
+        setEvidenceReference('');
+        setStageNotes('');
+        setStageSuccessMsg(null);
+      }, 3000);
+    } catch (err: any) {
+      setStageErrorMsg(err.response?.data?.error || err.message || 'Failed to submit transition request');
+    } finally {
+      setIsSubmittingStage(false);
+    }
+  };
 
   const handleCreateIntervention = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,9 +268,22 @@ export const CaseDetailsPage: React.FC = () => {
           <span>Return to Prioritized Caseload Queue</span>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={() => setIsCreatingIntervention(true)}
+            onClick={() => {
+              setIsRequestingStage(true);
+              setIsCreatingIntervention(false);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-semibold shadow-sm transition-all"
+          >
+            <Scale className="w-4 h-4" />
+            <span>Request Case Stage Update</span>
+          </button>
+          <button
+            onClick={() => {
+              setIsCreatingIntervention(true);
+              setIsRequestingStage(false);
+            }}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all"
           >
             <Plus className="w-4 h-4" />
@@ -247,12 +327,197 @@ export const CaseDetailsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Pending Stage Transition Request Banner if active */}
+      {pendingStageRequest && (
+        <div className={`p-4 rounded-2xl border flex items-start gap-3.5 ${
+          pendingStageRequest.status === 'CLARIFICATION_REQUIRED'
+            ? 'bg-amber-500/10 border-amber-500/30 text-amber-200'
+            : 'bg-teal-500/10 border-teal-500/30 text-teal-200'
+        }`}>
+          <div className="p-2 rounded-xl bg-slate-900 shrink-0">
+            <Clock className="w-4 h-4 text-teal-400" />
+          </div>
+          <div className="flex-1 text-xs">
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`px-2 py-0.5 rounded-full font-bold uppercase text-[10px] ${
+                pendingStageRequest.status === 'CLARIFICATION_REQUIRED'
+                  ? 'bg-amber-500/20 text-amber-300'
+                  : 'bg-teal-500/20 text-teal-300'
+              }`}>
+                {pendingStageRequest.status === 'CLARIFICATION_REQUIRED' ? 'Clarification Required' : 'Stage Transition Pending Confirmation'}
+              </span>
+              <span className="text-slate-400 text-[11px]">
+                Submitted: {new Date(pendingStageRequest.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+            <p className="text-slate-300 leading-relaxed">
+              Requested Transition: <strong className="text-white font-mono">{pendingStageRequest.fromStage} → {pendingStageRequest.requestedStage}</strong> • Evidence Ref: <strong className="text-teal-300">{pendingStageRequest.evidenceReference}</strong>
+            </p>
+            {pendingStageRequest.reviewNotes && (
+              <p className="mt-1 text-amber-300/90 text-[11px] bg-slate-900/60 p-2 rounded-lg border border-amber-500/20">
+                <strong>Admin Reviewer Note:</strong> {pendingStageRequest.reviewNotes}
+              </p>
+            )}
+            <p className="mt-1 text-slate-400 text-[11px]">
+              Note: The official case stage will change only after authorization by the District Welfare Admin.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setRequestedStage(pendingStageRequest.requestedStage);
+              setEvidenceReference(pendingStageRequest.evidenceReference);
+              setStageReason(pendingStageRequest.reason);
+              setIsRequestingStage(true);
+            }}
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition-colors shrink-0"
+          >
+            Update Details
+          </button>
+        </div>
+      )}
+
       {/* Case Journey Timeline Tracker */}
       <CaseJourneyTimeline
         currentStage={caseData.caseStage || 'COURT_TRIAL'}
         caseId={caseData.caseId || 'MP-1042'}
         victimType={caseData.victimType || 'Protected Witness'}
       />
+
+      {/* Request Case Stage Update Form / Modal */}
+      {isRequestingStage && (
+        <div className="glass-card p-6 border border-amber-500/40 bg-slate-900/95 rounded-2xl animate-in fade-in zoom-in-95 duration-150 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div>
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Scale className="w-5 h-5 text-amber-400" />
+                <span>Submit Case Stage Transition Request</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Official milestone verification for Case <strong className="text-teal-400 font-mono">{caseData.caseId}</strong>
+              </p>
+            </div>
+            <span className="text-[11px] bg-amber-500/10 text-amber-300 px-3 py-1 rounded-full border border-amber-500/20 font-medium">
+              Requires Admin Approval
+            </span>
+          </div>
+
+          <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1">
+            <span className="text-amber-400 font-bold block flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5" />
+              Official Milestone Verification Policy
+            </span>
+            <p className="text-slate-400 leading-relaxed text-[11px]">
+              Case stages represent official administrative and legal milestones. Counselors submit transition requests with documented evidence references. Only an authorized District Welfare Officer can confirm and advance the official stage. AI risk scores or wellbeing improvements do not alter case stages.
+            </p>
+          </div>
+
+          {stageSuccessMsg && (
+            <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <span>{stageSuccessMsg}</span>
+            </div>
+          )}
+
+          {stageErrorMsg && (
+            <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+              <span>{stageErrorMsg}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmitStageRequest} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Current Official Stage
+                </label>
+                <div className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-400 font-mono">
+                  {caseData.caseStage || 'INVESTIGATION'}
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Requested Next Stage <span className="text-amber-400">*</span>
+                </label>
+                <select
+                  value={requestedStage}
+                  onChange={(e) => setRequestedStage(e.target.value as CaseStage)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="CASE_REGISTRATION">1. Case Registration (Formal reporting / FIR verified)</option>
+                  <option value="INVESTIGATION">2. Investigation (Police statements / inquiry)</option>
+                  <option value="COURT_TRIAL">3. Court / Trial (Chargesheet / trial hearings)</option>
+                  <option value="COMPENSATION">4. Compensation & Relief (Sec 357A CrPC / Scheme review)</option>
+                  <option value="REHABILITATION">5. Rehabilitation (Vocational / social reintegration)</option>
+                  <option value="PROTECTION_SUPPORT">6. Protection & Support (Ongoing safety audit)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Official Evidence / Milestone Reference Identifier <span className="text-amber-400">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={evidenceReference}
+                onChange={(e) => setEvidenceReference(e.target.value)}
+                placeholder="e.g. INV-2026-1042, Chargesheet Ref No. 44/2026, Court Order Cr-8821"
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              />
+              <span className="text-[11px] text-slate-500 mt-1 block">
+                Provide the official government or judicial reference number confirming milestone completion.
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Milestone Justification & Reason <span className="text-amber-400">*</span>
+              </label>
+              <textarea
+                required
+                rows={3}
+                value={stageReason}
+                onChange={(e) => setStageReason(e.target.value)}
+                placeholder="Detail how the formal legal/administrative milestone has been fulfilled according to the case record..."
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Additional Counselor Notes (Optional)
+              </label>
+              <textarea
+                rows={2}
+                value={stageNotes}
+                onChange={(e) => setStageNotes(e.target.value)}
+                placeholder="Any special accommodations or trial coordination context..."
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setIsRequestingStage(false)}
+                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmittingStage || !stageReason.trim() || !evidenceReference.trim()}
+                className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition-all disabled:opacity-50 shadow-md shadow-amber-500/10"
+              >
+                {isSubmittingStage ? 'Submitting Request...' : 'Submit for Official Confirmation'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
 
       {/* Record Support Action Modal / Drawer */}
       {isCreatingIntervention && (

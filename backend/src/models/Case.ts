@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { VictimType, CaseStage, CaseStatus } from '../types/index.js';
+import { VictimType, CaseStage, CaseStatus, IStageHistoryItem, IPendingStageTransition } from '../types/index.js';
 
 export interface ICase extends Document {
   _id: mongoose.Types.ObjectId;
@@ -18,9 +18,71 @@ export interface ICase extends Document {
   incidentYear?: number;
   lastCheckInAt?: Date;
   notes?: string;
+  stagesHistory?: IStageHistoryItem[];
+  pendingStageTransition?: IPendingStageTransition;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const StageHistoryItemSchema = new Schema(
+  {
+    stage: {
+      type: String,
+      enum: [
+        'CASE_REGISTRATION',
+        'INVESTIGATION',
+        'COURT_TRIAL',
+        'COMPENSATION',
+        'REHABILITATION',
+        'PROTECTION_SUPPORT',
+        'CLOSED',
+      ],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['NOT_STARTED', 'IN_PROGRESS', 'AWAITING_VERIFICATION', 'COMPLETED', 'REOPENED'],
+      default: 'NOT_STARTED',
+    },
+    enteredAt: { type: Date },
+    completedAt: { type: Date },
+    requestedAt: { type: Date },
+    requestedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    confirmedAt: { type: Date },
+    confirmedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    evidenceReference: { type: String },
+    notes: { type: String },
+    reopenReason: { type: String },
+    date: { type: String },
+  },
+  { _id: false }
+);
+
+const PendingStageTransitionSchema = new Schema(
+  {
+    requestId: { type: Schema.Types.ObjectId, ref: 'StageTransitionRequest' },
+    requestedStage: {
+      type: String,
+      enum: [
+        'CASE_REGISTRATION',
+        'INVESTIGATION',
+        'COURT_TRIAL',
+        'COMPENSATION',
+        'REHABILITATION',
+        'PROTECTION_SUPPORT',
+        'CLOSED',
+      ],
+      required: true,
+    },
+    requestedAt: { type: Date, default: Date.now },
+    status: {
+      type: String,
+      enum: ['PENDING', 'CLARIFICATION_REQUIRED'],
+      default: 'PENDING',
+    },
+  },
+  { _id: false }
+);
 
 const CaseSchema = new Schema<ICase>(
   {
@@ -68,6 +130,8 @@ const CaseSchema = new Schema<ICase>(
     incidentYear: { type: Number, default: 2025 },
     lastCheckInAt: { type: Date },
     notes: { type: String },
+    stagesHistory: [StageHistoryItemSchema],
+    pendingStageTransition: { type: PendingStageTransitionSchema, default: null },
   },
   { timestamps: true }
 );

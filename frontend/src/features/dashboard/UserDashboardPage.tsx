@@ -16,7 +16,6 @@ import {
   ChevronRight,
   Shield,
   Moon,
-  PenTool,
   Lock,
   Wind,
   Compass,
@@ -64,12 +63,13 @@ export const UserDashboardPage: React.FC = () => {
   });
 
   const [trendData, setTrendData] = useState<any[]>([]);
+  const [officialCase, setOfficialCase] = useState<any>(null);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isStageGuideOpen, setIsStageGuideOpen] = useState(false);
   const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
 
-  const currentStage: CaseStage = user?.caseStage || 'COURT_TRIAL';
+  const officialStage: CaseStage = officialCase?.caseStage || user?.caseStage || 'INVESTIGATION';
 
   useEffect(() => {
     const loadOverview = async () => {
@@ -97,9 +97,20 @@ export const UserDashboardPage: React.FC = () => {
           { date: 'Sat', mood: 6.5, stress: 5.5, energy: 6.0, sleepHours: 6.8, senseOfSafety: 7.0, caseRelatedStress: 5.5 },
         ]);
       }
+
+      // Fetch official case status & pending stage transition
+      try {
+        const caseIdStr = user?.caseId || 'MP-1042';
+        const caseRes: any = await api.get(`/cases/${caseIdStr}`);
+        if (caseRes.data?.case) {
+          setOfficialCase(caseRes.data.case);
+        }
+      } catch {
+        // Safe fallback
+      }
     };
     loadOverview();
-  }, []);
+  }, [user]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -156,7 +167,7 @@ export const UserDashboardPage: React.FC = () => {
     }
   };
 
-  const stageInfo = getStageInfo(currentStage);
+  const stageInfo = getStageInfo(officialStage);
   const firstName = user?.fullName?.split(' ')[0] || 'Alex';
 
   return (
@@ -267,23 +278,8 @@ export const UserDashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 3 Secondary Reflection Options */}
-        <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <Link
-            to="/journal"
-            className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800/80 border border-slate-700/40 text-slate-300 hover:text-white transition-all group"
-          >
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
-              <PenTool className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="font-semibold block text-white group-hover:text-teal-300">
-                Write in Journal
-              </span>
-              <span className="text-[11px] text-slate-400">Private, unshared reflection</span>
-            </div>
-          </Link>
-
+        {/* Secondary Wellbeing Options */}
+        <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <button
             type="button"
             onClick={() => setIsVoiceModalOpen(true)}
@@ -333,10 +329,11 @@ export const UserDashboardPage: React.FC = () => {
         </div>
 
         <CaseJourneyTimeline
-          currentStage={currentStage}
+          currentStage={officialStage}
           caseId={user?.caseId || 'MP-1042'}
           victimType={user?.victimType || 'Protected Witness'}
           isReadOnly={true}
+          pendingTransition={officialCase?.pendingStageTransition || null}
         />
 
         {/* Calm Stage Guide */}
@@ -672,7 +669,7 @@ export const UserDashboardPage: React.FC = () => {
         isOpen={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
         caseId={user?.caseId || 'MP-1042'}
-        caseStage={currentStage}
+        caseStage={officialStage}
       />
 
       {/* Privacy & Rights Consent Modal */}

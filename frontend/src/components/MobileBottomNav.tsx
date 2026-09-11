@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth';
 import {
   LayoutDashboard,
   Smile,
-  BookOpen,
   Activity,
   Sparkles,
   Users,
@@ -12,6 +11,7 @@ import {
   BarChart3,
   Map,
   Sliders,
+  Inbox,
 } from 'lucide-react';
 
 export const MobileBottomNav: React.FC = () => {
@@ -21,7 +21,6 @@ export const MobileBottomNav: React.FC = () => {
   const userItems = [
     { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
     { to: '/checkins', label: 'Check-in', icon: Smile },
-    { to: '/journal', label: 'Journal', icon: BookOpen },
     { to: '/wellness', label: 'History', icon: Activity },
     { to: '/recommendations', label: 'Support', icon: Sparkles },
   ];
@@ -35,8 +34,9 @@ export const MobileBottomNav: React.FC = () => {
 
   const adminItems = [
     { to: '/admin', label: 'Overview', icon: BarChart3 },
+    { to: '/admin/inbox', label: 'Inbox', icon: Inbox },
+    { to: '/admin/cases', label: 'Cases', icon: Users },
     { to: '/admin/heatmap', label: 'Heatmap', icon: Map },
-    { to: '/admin/simulator', label: 'Simulator', icon: Sliders },
   ];
 
   const items =

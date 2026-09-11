@@ -16,6 +16,7 @@ import {
   Zap,
   ChevronRight,
   ShieldAlert,
+  Inbox,
 } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import api from '../../services/api';
@@ -143,7 +144,14 @@ export const AdminDashboardPage: React.FC = () => {
             System-level overview for District Welfare Officers and State Nodal Administrators under the Ministry of Social Justice & Empowerment.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/admin/inbox"
+            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-amber-500/20"
+          >
+            <Inbox className="w-4 h-4" />
+            <span>Stage Confirmation Inbox</span>
+          </Link>
           <Link
             to="/admin/analytics"
             className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5"
@@ -153,9 +161,9 @@ export const AdminDashboardPage: React.FC = () => {
           </Link>
           <Link
             to="/admin/cases"
-            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-amber-500/20"
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5"
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4 text-amber-400" />
             <span>System Cases</span>
           </Link>
         </div>
