@@ -50,3 +50,38 @@ export interface IRiskFactorItem {
   description?: string;
 }
 
+export type StageVerificationStatus =
+  | 'NOT_STARTED'
+  | 'IN_PROGRESS'
+  | 'AWAITING_VERIFICATION'
+  | 'COMPLETED'
+  | 'REOPENED';
+
+export type StageTransitionRequestStatus =
+  | 'PENDING'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'CLARIFICATION_REQUIRED';
+
+export interface IStageHistoryItem {
+  stage: CaseStage;
+  status: StageVerificationStatus;
+  enteredAt?: Date;
+  completedAt?: Date;
+  requestedAt?: Date;
+  requestedBy?: string;
+  confirmedAt?: Date;
+  confirmedBy?: string;
+  evidenceReference?: string;
+  notes?: string;
+  reopenReason?: string;
+  date?: string;
+}
+
+export interface IPendingStageTransition {
+  requestId?: string;
+  requestedStage: CaseStage;
+  requestedAt: Date;
+  status: 'PENDING' | 'CLARIFICATION_REQUIRED';
+}
+

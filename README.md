@@ -133,6 +133,7 @@ cd backend && npm run seed
 | Feature Module | SIH26094 Scope | Status |
 | :--- | :--- | :---: |
 | **Case Journey Tracking (6 Stages)** | Milestone-based stress calibration across legal journey | **Implemented** |
+| **Case Stage Confirmation & Admin Inbox** | Official milestone verification with counselor request & admin approval | **Implemented** |
 | **Trauma-Informed Telemetry** | Mood, sleep deficit, perceived safety, and case tension | **Implemented** |
 | **Explainable AI (XAI) Engine** | Tree-based classification with SHAP factor attributions | **Implemented** |
 | **Voice Acoustic Biomarker Screener** | Jitter, shimmer, and speech rate screening interface | **Prototype** |
@@ -142,6 +143,8 @@ cd backend && npm run seed
 | **District Aggregated Analytics** | Minimum cohort size ($k \ge 5$) privacy-preserving reporting | **Implemented** |
 | **Regional Distress Heatmap** | Jurisdictional cluster distress tracking without PII exposure | **Implemented** |
 | **What-If Policy Simulator** | Legal aid capacity and transit protection impact modeling | **Implemented** |
+
+> **Administrative Stage Governance Principle**: Case-stage changes are official administrative/legal milestones. Counselors can recommend or request a transition with documented milestone evidence (e.g., `INV-2026-1042`), but only an authorized District Welfare Officer can confirm it. AI-generated wellbeing signals support prioritization and intervention and never automatically change the official case stage.
 
 ---
 

@@ -8,6 +8,10 @@ interface CaseJourneyTimelineProps {
   victimType?: string;
   onSelectStage?: (stage: CaseStage) => void;
   isReadOnly?: boolean;
+  pendingTransition?: {
+    requestedStage: CaseStage;
+    requestedAt?: string;
+  } | null;
 }
 
 const STAGES: Array<{
@@ -67,6 +71,7 @@ export const CaseJourneyTimeline: React.FC<CaseJourneyTimelineProps> = ({
   victimType = 'Protected Witness',
   onSelectStage,
   isReadOnly = true,
+  pendingTransition = null,
 }) => {
   const currentIndex = STAGES.findIndex((s) => s.key === currentStage);
   const safeCurrentIndex = currentIndex >= 0 ? currentIndex : 2;
@@ -85,11 +90,17 @@ export const CaseJourneyTimeline: React.FC<CaseJourneyTimelineProps> = ({
           </div>
           <h3 className="text-base font-bold text-slate-100">MindPulse Longitudinal Case Journey</h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {pendingTransition && (
+            <div className="flex items-center gap-1.5 text-xs text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/30">
+              <Clock className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+              <span>Stage update under official review</span>
+            </div>
+          )}
           <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-700/50">
             <Clock className="w-3.5 h-3.5 text-teal-400" />
             <span>
-              Current Stage: <strong className="text-slate-200">{STAGES[safeCurrentIndex]?.label}</strong>
+              Official Stage: <strong className="text-slate-200">{STAGES[safeCurrentIndex]?.label}</strong>
             </span>
           </div>
           {isReadOnly && (

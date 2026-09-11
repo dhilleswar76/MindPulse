@@ -161,3 +161,43 @@ export interface CaseJourneyStage {
   order: number;
 }
 
+export type StageVerificationStatus =
+  | 'NOT_STARTED'
+  | 'IN_PROGRESS'
+  | 'AWAITING_VERIFICATION'
+  | 'COMPLETED'
+  | 'REOPENED';
+
+export type StageTransitionRequestStatus =
+  | 'PENDING'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'CLARIFICATION_REQUIRED';
+
+export interface StageTransitionRequest {
+  _id: string;
+  caseId: string;
+  fromStage: CaseStage;
+  requestedStage: CaseStage;
+  requestedByCounselor?: { _id: string; fullName: string; email: string } | string;
+  counselorName: string;
+  reason: string;
+  evidenceReference: string;
+  notes?: string;
+  status: StageTransitionRequestStatus;
+  reviewedBy?: { _id: string; fullName: string; email: string } | string;
+  reviewerName?: string;
+  reviewedAt?: string;
+  reviewNotes?: string;
+  reopenReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PendingStageTransition {
+  requestId?: string;
+  requestedStage: CaseStage;
+  requestedAt: string;
+  status: 'PENDING' | 'CLARIFICATION_REQUIRED';
+}
+

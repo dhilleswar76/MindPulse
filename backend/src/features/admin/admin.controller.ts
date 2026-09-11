@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { adminService } from './admin.service.js';
+import { caseStageService } from '../cases/caseStage.service.js';
 import { sendSuccess, sendError } from '../../utils/response.js';
 import { AuthRequest } from '../../types/index.js';
 
@@ -85,6 +86,100 @@ export const adminController = {
     try {
       const status = await adminService.getSystemStatus();
       return sendSuccess(res, status);
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
+
+  // Official Case-Stage Transition Confirmation & Admin Inbox
+  getStageTransitionRequests: async (req: AuthRequest, res: Response) => {
+    try {
+      const { status, caseId, counselorId } = req.query;
+      const requests = await caseStageService.getTransitionRequests({
+        status: status as string,
+        caseId: caseId as string,
+        counselorId: counselorId as string,
+      });
+      return sendSuccess(res, { requests });
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
+
+  getStageTransitionRequestById: async (req: AuthRequest, res: Response) => {
+    try {
+      const { requestId } = req.params;
+      const requestItem = await caseStageService.getRequestById(requestId);
+      return sendSuccess(res, { request: requestItem });
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
+
+  approveStageTransition: async (req: AuthRequest, res: Response) => {
+    try {
+      const { requestId } = req.params;
+      const { reviewNotes } = req.body;
+
+      if (!req.user) {
+        return sendError(res, 'Authentication required', 401);
+      }
+
+      const result = await caseStageService.approveTransition(
+        req.user,
+        requestId,
+        reviewNotes
+      );
+      return sendSuccess(res, {
+        message: 'Official case stage transition approved and recorded.',
+        ...result,
+      });
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
+
+  rejectStageTransition: async (req: AuthRequest, res: Response) => {
+    try {
+      const { requestId } = req.params;
+      const { reviewNotes } = req.body;
+
+      if (!req.user) {
+        return sendError(res, 'Authentication required', 401);
+      }
+
+      const result = await caseStageService.rejectTransition(
+        req.user,
+        requestId,
+        reviewNotes
+      );
+      return sendSuccess(res, {
+        message: 'Stage transition request rejected.',
+        ...result,
+      });
+    } catch (err: any) {
+      return sendError(res, err.message, 400);
+    }
+  },
+
+  requestStageTransitionClarification: async (req: AuthRequest, res: Response) => {
+    try {
+      const { requestId } = req.params;
+      const { reviewNotes } = req.body;
+
+      if (!req.user) {
+        return sendError(res, 'Authentication required', 401);
+      }
+
+      const result = await caseStageService.requestClarification(
+        req.user,
+        requestId,
+        reviewNotes
+      );
+      return sendSuccess(res, {
+        message: 'Clarification requested from counselor.',
+        ...result,
+      });
     } catch (err: any) {
       return sendError(res, err.message, 400);
     }

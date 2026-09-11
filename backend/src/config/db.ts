@@ -16,6 +16,7 @@ export const connectDatabase = async (): Promise<boolean> => {
     logger.info('Connected to MongoDB database successfully.');
     return true;
   } catch (err: any) {
+    mongoose.set('bufferCommands', false);
     logger.warn(`MongoDB not reachable at ${config.mongodbUri}. Operating in fallback mode for rapid development/prototype:`, err.message);
     isConnected = false;
     return false;

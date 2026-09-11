@@ -63,12 +63,13 @@ export const UserDashboardPage: React.FC = () => {
   });
 
   const [trendData, setTrendData] = useState<any[]>([]);
+  const [officialCase, setOfficialCase] = useState<any>(null);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isStageGuideOpen, setIsStageGuideOpen] = useState(false);
   const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
 
-  const currentStage: CaseStage = user?.caseStage || 'COURT_TRIAL';
+  const officialStage: CaseStage = officialCase?.caseStage || user?.caseStage || 'INVESTIGATION';
 
   useEffect(() => {
     const loadOverview = async () => {
@@ -96,9 +97,20 @@ export const UserDashboardPage: React.FC = () => {
           { date: 'Sat', mood: 6.5, stress: 5.5, energy: 6.0, sleepHours: 6.8, senseOfSafety: 7.0, caseRelatedStress: 5.5 },
         ]);
       }
+
+      // Fetch official case status & pending stage transition
+      try {
+        const caseIdStr = user?.caseId || 'MP-1042';
+        const caseRes: any = await api.get(`/cases/${caseIdStr}`);
+        if (caseRes.data?.case) {
+          setOfficialCase(caseRes.data.case);
+        }
+      } catch {
+        // Safe fallback
+      }
     };
     loadOverview();
-  }, []);
+  }, [user]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -155,7 +167,7 @@ export const UserDashboardPage: React.FC = () => {
     }
   };
 
-  const stageInfo = getStageInfo(currentStage);
+  const stageInfo = getStageInfo(officialStage);
   const firstName = user?.fullName?.split(' ')[0] || 'Alex';
 
   return (
@@ -317,10 +329,11 @@ export const UserDashboardPage: React.FC = () => {
         </div>
 
         <CaseJourneyTimeline
-          currentStage={currentStage}
+          currentStage={officialStage}
           caseId={user?.caseId || 'MP-1042'}
           victimType={user?.victimType || 'Protected Witness'}
           isReadOnly={true}
+          pendingTransition={officialCase?.pendingStageTransition || null}
         />
 
         {/* Calm Stage Guide */}
@@ -656,7 +669,7 @@ export const UserDashboardPage: React.FC = () => {
         isOpen={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
         caseId={user?.caseId || 'MP-1042'}
-        caseStage={currentStage}
+        caseStage={officialStage}
       />
 
       {/* Privacy & Rights Consent Modal */}

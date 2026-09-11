@@ -15,6 +15,7 @@ import {
   Sliders,
   Bell,
   Lock,
+  Inbox,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -40,6 +41,7 @@ export const Sidebar: React.FC = () => {
 
   const adminLinks = [
     { to: '/admin', label: 'Executive Overview', icon: LayoutDashboard },
+    { to: '/admin/inbox', label: 'Stage Transition Inbox', icon: Inbox },
     { to: '/admin/analytics', label: 'Risk & Wellbeing Analytics', icon: BarChart3 },
     { to: '/admin/cases', label: 'System Case Table', icon: Users },
     { to: '/admin/heatmap', label: 'Regional Distress Map', icon: Map },

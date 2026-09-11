@@ -141,3 +141,26 @@ The Sidebar is permanently accessible on the left of the viewport. It dynamicall
 2. Inspect the privacy-preserving ($k \ge 5$) aggregate metrics and stage distribution chart.
 3. Click **"Regional Distress Map"** in the sidebar $\rightarrow$ click **Special Courts & Witness Cell Cluster** to inspect cohort telemetry.
 4. Click **"Intervention Impact Sim"** in the sidebar $\rightarrow$ adjust policy sliders (expand DLSA capacity +25%) $\rightarrow$ click **"Run Scenario Simulation"** to forecast directional distress reduction.
+5. Click **"Stage Transition Inbox"** (`/admin/inbox`) $\rightarrow$ review counselor milestone evidence references $\rightarrow$ click **"Review"** $\rightarrow$ authorize or request clarification for official stage transitions.
+
+---
+
+## 🏛️ 5. Official Case-Stage Confirmation Workflow
+
+> **Core Governance Principle**: Case-stage changes are official administrative/legal milestones. Counselors can recommend or request a transition with documented milestone evidence, but only an authorized District Welfare Officer can confirm it. AI-generated wellbeing signals support prioritization and intervention and never automatically change the official case stage.
+
+### Counselor Request Flow:
+1. Counselor opens `/counselor/cases/:id`.
+2. Clicks **"Request Case Stage Update"**.
+3. Selects requested target stage, enters **Official Evidence Reference Identifier** (e.g. `INV-2026-1042 / Chargesheet 44/2026`), and provides the documented milestone justification.
+4. Clicks **"Submit for Official Confirmation"**.
+5. The request enters `PENDING` review status without immediately altering `Case.caseStage`.
+
+### Admin Confirmation Inbox Flow:
+1. District Welfare Officer opens `/admin/inbox`.
+2. Filter requests by `Pending Review`, `Clarification Required`, `Approved`, or `Rejected`.
+3. Reviews legal evidence reference and counselor justification.
+4. Actions available:
+   - **Approve Transition**: Officially updates `Case.caseStage`, records stage history timestamps, creates an `AuditLog`, and updates the victim dashboard.
+   - **Request Clarification**: Prompts counselor for updated records or specific court references.
+   - **Reject Transition**: Records formal administrative rationale.
