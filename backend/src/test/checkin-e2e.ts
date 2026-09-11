@@ -32,8 +32,8 @@ export async function runCheckinE2EDebug() {
   let user: any = null;
   try {
     const authRes = await authService.login({
-      email: 'demo.user@mindpulse.local',
-      password: 'MindPulseDemo2026!',
+      email: 'user@gmail.com',
+      password: 'MindPulse',
     });
     token = authRes.token;
     user = authRes.user;

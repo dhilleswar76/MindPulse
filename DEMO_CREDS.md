@@ -6,21 +6,21 @@ MindPulse provides three pre-configured demo personas to evaluate the complete e
 
 ## 📋 Quick Credentials Summary
 
-> **Default Password for All Demo Accounts**: `MindPulseDemo2026!`
+> **Default Password for All Demo Accounts**: `MindPulse`
 
 | Role / Persona | Email Address | Password | Landing Route | Access Scope |
 | :--- | :--- | :--- | :--- | :--- |
-| **Victim / Protected Witness** | `demo.user@mindpulse.local` | `MindPulseDemo2026!` | `/dashboard` | Case journey tracking, check-ins, encrypted journal, wellness baseline, distress insights, AI forecasting, statutory compensation calculator, DLSA forms, companion assistant. |
-| **Designated Counselor** | `demo.counselor@mindpulse.local` | `MindPulseDemo2026!` | `/counselor` | Clinical decision support, prioritized case triage queue, distress alerts, longitudinal baseline comparisons, multi-disciplinary intervention pathways. |
-| **District Welfare Admin** | `demo.admin@mindpulse.local` | `MindPulseDemo2026!` | `/admin` *(Hidden Route)* | District/State aggregate analytics ($k \ge 5$), regional distress heatmaps, what-if intervention simulator, tamper-evident security audit trail. |
+| **Victim / Protected Witness** | `user@gmail.com` | `MindPulse` | `/dashboard` | Case journey tracking, check-ins, encrypted journal, wellness baseline, distress insights, AI forecasting, statutory compensation calculator, DLSA forms, companion assistant. |
+| **Designated Counselor** | `counsellor@gmail.com` | `MindPulse` | `/counselor` | Clinical decision support, prioritized case triage queue, distress alerts, longitudinal baseline comparisons, multi-disciplinary intervention pathways. |
+| **District Welfare Admin** | `admin@gmail.com` | `MindPulse` | `/admin` *(Hidden Route)* | District/State aggregate analytics ($k \ge 5$), regional distress heatmaps, what-if intervention simulator, tamper-evident security audit trail. |
 
 ---
 
 ## 👤 Persona 1: Victim / Protected Witness
 
 - **Identity**: Alex Rivera (Protected Witness, Case `MP-1042`)
-- **Email**: `demo.user@mindpulse.local`
-- **Password**: `MindPulseDemo2026!`
+- **Email**: `user@gmail.com`
+- **Password**: `MindPulse`
 - **Role**: `USER`
 - **Active Case Stage**: `COURT_TRIAL` (Trial in progress)
 - **District / State**: District Central, National Capital Region
@@ -43,8 +43,8 @@ MindPulse provides three pre-configured demo personas to evaluate the complete e
 
 - **Identity**: Dr. Sarah Jenkins (Senior Clinical Psychologist)
 - **Department**: District Legal Aid & Victim Support Cell (DLSA)
-- **Email**: `demo.counselor@mindpulse.local`
-- **Password**: `MindPulseDemo2026!`
+- **Email**: `counsellor@gmail.com`
+- **Password**: `MindPulse`
 - **Role**: `COUNSELOR`
 - **Jurisdiction**: District Central
 
@@ -61,8 +61,8 @@ MindPulse provides three pre-configured demo personas to evaluate the complete e
 
 - **Identity**: Marcus Vance (District Welfare Officer)
 - **Department**: Department of Social Justice & Empowerment
-- **Email**: `demo.admin@mindpulse.local`
-- **Password**: `MindPulseDemo2026!`
+- **Email**: `admin@gmail.com`
+- **Password**: `MindPulse`
 - **Role**: `ADMIN`
 - **Jurisdiction**: District Central / National Capital Region
 - **Hidden Route**: `/admin` *(Accessible only to authenticated ADMIN accounts)*
@@ -81,15 +81,16 @@ MindPulse provides three pre-configured demo personas to evaluate the complete e
 
 ### 1. Victim & Counselor Sign-In (Standard Login)
 - **URL**: `http://localhost:5173/login`
-- Enter **Victim** (`demo.user@mindpulse.local`) or **Counselor** (`demo.counselor@mindpulse.local`) credentials.
-- Or use the one-click auto-fill buttons on the login page.
+- Manually enter credentials:
+  - **Victim**: `user@gmail.com` / `MindPulse`
+  - **Counselor**: `counsellor@gmail.com` / `MindPulse`
 - Directs to `/dashboard` for Victims or `/counselor` for Counselors.
 
 ### 2. District Welfare Admin Sign-In (Hidden Route)
 - **URL**: `http://localhost:5173/admin`
 - Navigate directly to `/admin` in your browser.
 - Displays the restricted **District Welfare Administration Portal Login**.
-- Enter `demo.admin@mindpulse.local` & `MindPulseDemo2026!` (or click Auto-Fill).
+- Manually enter `admin@gmail.com` / `MindPulse`.
 - Unlocks the executive administrative dashboard, regional heatmaps, what-if simulator, and audit trails.
 
 ### 3. Switching Personas

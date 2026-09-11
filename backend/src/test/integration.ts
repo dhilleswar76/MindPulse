@@ -48,8 +48,8 @@ export async function runIntegrationTests() {
   try {
     console.log('\n--- 2. Authentication & RBAC Verification ---');
     const victimAuth = await authService.login({
-      email: 'demo.user@mindpulse.local',
-      password: 'MindPulseDemo2026!',
+      email: 'user@gmail.com',
+      password: 'MindPulse',
     });
     victimToken = victimAuth.token;
     victimUser = victimAuth.user;
@@ -60,15 +60,15 @@ export async function runIntegrationTests() {
     assert(typeof victimToken === 'string' && victimToken.length > 20, 'Victim receives valid JWT', 'Auth');
 
     const counselorAuth = await authService.login({
-      email: 'demo.counselor@mindpulse.local',
-      password: 'MindPulseDemo2026!',
+      email: 'counsellor@gmail.com',
+      password: 'MindPulse',
     });
     counselorToken = counselorAuth.token;
     assert(counselorAuth.user.role === 'COUNSELOR', 'Counselor persona resolves to COUNSELOR role', 'Auth');
 
     const adminAuth = await authService.login({
-      email: 'demo.admin@mindpulse.local',
-      password: 'MindPulseDemo2026!',
+      email: 'admin@gmail.com',
+      password: 'MindPulse',
     });
     adminToken = adminAuth.token;
     assert(adminAuth.user.role === 'ADMIN', 'Admin persona resolves to ADMIN role', 'Auth');

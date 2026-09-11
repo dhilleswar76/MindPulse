@@ -19,7 +19,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     const role: UserRole = roleStr === 'COUNSELOR' ? 'COUNSELOR' : roleStr === 'ADMIN' ? 'ADMIN' : 'USER';
     req.user = {
       userId: `demo_${role.toLowerCase()}`,
-      email: `demo.${role.toLowerCase()}@mindpulse.local`,
+      email: role === 'COUNSELOR' ? 'counsellor@gmail.com' : role === 'ADMIN' ? 'admin@gmail.com' : 'user@gmail.com',
       role,
       fullName:
         role === 'USER'
@@ -55,7 +55,7 @@ export const optionalAuthenticateToken = (req: AuthRequest, res: Response, next:
       const role: UserRole = roleStr === 'COUNSELOR' ? 'COUNSELOR' : roleStr === 'ADMIN' ? 'ADMIN' : 'USER';
       req.user = {
         userId: `demo_${role.toLowerCase()}`,
-        email: `demo.${role.toLowerCase()}@mindpulse.local`,
+        email: role === 'COUNSELOR' ? 'counsellor@gmail.com' : role === 'ADMIN' ? 'admin@gmail.com' : 'user@gmail.com',
         role,
         fullName:
           role === 'USER'
@@ -81,7 +81,7 @@ export const optionalAuthenticateToken = (req: AuthRequest, res: Response, next:
   // Default anonymous/protected fallback user context for safe non-clinical companion queries
   req.user = {
     userId: 'demo_user',
-    email: 'demo.user@mindpulse.local',
+    email: 'user@gmail.com',
     role: 'USER',
     fullName: 'Alex Rivera (Protected Witness)',
     victimType: 'WITNESS',

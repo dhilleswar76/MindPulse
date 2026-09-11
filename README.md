@@ -122,11 +122,9 @@ cd backend && npm run seed
 
 | Role | Email | Password | Landing Route | Case ID & Context |
 | :--- | :--- | :--- | :--- | :--- |
-| **Protected Witness (Victim)** | `demo.user@mindpulse.local` | `MindPulseDemo2026!` | `/dashboard` | **Case MP-1042** (Alex Rivera) • *Court/Trial Stage* • Experiencing acute testimony anxiety & sleep disruption |
-| **Support Counselor** | `demo.counselor@mindpulse.local` | `MindPulseDemo2026!` | `/counselor` | **Dr. Sarah Jenkins** • *District Legal Aid & Victim Support Cell* • Triages case queue & logs legal aid pathways |
-| **District Welfare Official** | `demo.admin@mindpulse.local` | `MindPulseDemo2026!` | `/admin` *(Hidden Route)* | **Marcus Vance** • *District Social Justice Division* • Monitors anonymized regional distress trends ($k \ge 5$) |
-
-*(Demo accounts can be auto-filled with one click directly on the `/login` page)*
+| **Protected Witness (Victim)** | `user@gmail.com` | `MindPulse` | `/dashboard` | **Case MP-1042** (Alex Rivera) • *Court/Trial Stage* • Experiencing acute testimony anxiety & sleep disruption |
+| **Support Counselor** | `counsellor@gmail.com` | `MindPulse` | `/counselor` | **Dr. Sarah Jenkins** • *District Legal Aid & Victim Support Cell* • Triages case queue & logs legal aid pathways |
+| **District Welfare Official** | `admin@gmail.com` | `MindPulse` | `/admin` *(Hidden Route)* | **Marcus Vance** • *District Social Justice Division* • Monitors anonymized regional distress trends ($k \ge 5$) |
 
 ---
 
