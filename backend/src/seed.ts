@@ -7,13 +7,13 @@ export const seedDatabase = async () => {
   logger.info('🌱 Starting MindPulse synthetic seed data generation (SIH26094)...');
   const connected = await connectDatabase();
 
-  const password = 'MindPulseDemo2026!';
+  const password = 'MindPulse';
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash(password, salt);
 
   const demoUsers = [
     {
-      email: 'demo.user@mindpulse.local',
+      email: 'user@gmail.com',
       passwordHash,
       fullName: 'Alex Rivera (Protected Witness)',
       role: 'USER',
@@ -27,7 +27,7 @@ export const seedDatabase = async () => {
       consentStatus: true,
     },
     {
-      email: 'demo.counselor@mindpulse.local',
+      email: 'counsellor@gmail.com',
       passwordHash,
       fullName: 'Dr. Sarah Jenkins (Designated Counselor)',
       role: 'COUNSELOR',
@@ -35,7 +35,7 @@ export const seedDatabase = async () => {
       state: 'National Capital Region',
     },
     {
-      email: 'demo.admin@mindpulse.local',
+      email: 'admin@gmail.com',
       passwordHash,
       fullName: 'Marcus Vance (District Welfare Official)',
       role: 'ADMIN',
@@ -59,9 +59,9 @@ export const seedDatabase = async () => {
 
   logger.info('═══════════════════════════════════════════════════════════');
   logger.info(' MindPulse SIH26094 Demo Credentials Ready:');
-  logger.info(' • Victim/Witness: demo.user@mindpulse.local       / MindPulseDemo2026!');
-  logger.info(' • Counselor:      demo.counselor@mindpulse.local  / MindPulseDemo2026!');
-  logger.info(' • Admin/Official: demo.admin@mindpulse.local      / MindPulseDemo2026!');
+  logger.info(' • Victim/Witness: user@gmail.com       / MindPulse');
+  logger.info(' • Counselor:      counsellor@gmail.com / MindPulse');
+  logger.info(' • Admin/Official: admin@gmail.com      / MindPulse');
   logger.info('═══════════════════════════════════════════════════════════');
 };
 

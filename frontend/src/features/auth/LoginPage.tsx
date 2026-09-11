@@ -4,8 +4,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { Lock, Mail, ArrowRight, Sparkles } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('demo.user@mindpulse.local');
-  const [password, setPassword] = useState('MindPulseDemo2026!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -21,11 +21,6 @@ export const LoginPage: React.FC = () => {
     } catch (err: any) {
       setError(err.message || 'Login failed');
     }
-  };
-
-  const fillQuickDemo = (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPassword('MindPulseDemo2026!');
   };
 
   return (
@@ -79,37 +74,6 @@ export const LoginPage: React.FC = () => {
           <ArrowRight className="w-4 h-4" />
         </button>
       </form>
-
-      {/* Demo Credentials Helper */}
-      <div className="mt-6 pt-5 border-t border-slate-800">
-        <div className="flex items-center gap-1 text-xs font-semibold text-teal-400 mb-2">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Quick Demo One-Click Fill:</span>
-        </div>
-        <div className="grid grid-cols-3 gap-2 text-xs">
-          <button
-            type="button"
-            onClick={() => fillQuickDemo('demo.user@mindpulse.local')}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-300 text-center transition-colors"
-          >
-            Victim / Witness
-          </button>
-          <button
-            type="button"
-            onClick={() => fillQuickDemo('demo.counselor@mindpulse.local')}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-300 text-center transition-colors"
-          >
-            Counselor
-          </button>
-          <button
-            type="button"
-            onClick={() => fillQuickDemo('demo.admin@mindpulse.local')}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 rounded-lg text-slate-300 text-center transition-colors"
-          >
-            District Admin
-          </button>
-        </div>
-      </div>
 
       <p className="mt-6 text-center text-xs text-slate-400">
         Don't have an account?{' '}

@@ -13,16 +13,25 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     return;
   }
 
-  // Seamless support for demo tokens in prototype & test environments
+  // Support demo persona tokens for seamless prototype, test & evaluation
   if (token.startsWith('demo_token')) {
     const roleStr = token.replace('demo_token_', '').toUpperCase();
     const role: UserRole = roleStr === 'COUNSELOR' ? 'COUNSELOR' : roleStr === 'ADMIN' ? 'ADMIN' : 'USER';
-    const fullName = role === 'COUNSELOR' ? 'Dr. Sarah Jenkins' : role === 'ADMIN' ? 'Marcus Vance' : 'Alex Rivera';
     req.user = {
-      userId: `demo_${role.toLowerCase()}_1`,
-      email: `demo.${role.toLowerCase()}@mindpulse.local`,
+      userId: `demo_${role.toLowerCase()}`,
+      email: role === 'COUNSELOR' ? 'counsellor@gmail.com' : role === 'ADMIN' ? 'admin@gmail.com' : 'user@gmail.com',
       role,
-      fullName,
+      fullName:
+        role === 'USER'
+          ? 'Alex Rivera (Protected Witness)'
+          : role === 'COUNSELOR'
+          ? 'Dr. Sarah Jenkins'
+          : 'Marcus Vance (District Welfare Officer)',
+      victimType: role === 'USER' ? 'WITNESS' : undefined,
+      caseId: role === 'USER' ? 'MP-1042' : undefined,
+      caseStage: role === 'USER' ? 'COURT_TRIAL' : undefined,
+      district: 'Central District',
+      state: 'National Capital Region',
     };
     return next();
   }
@@ -44,12 +53,21 @@ export const optionalAuthenticateToken = (req: AuthRequest, res: Response, next:
     if (token.startsWith('demo_token')) {
       const roleStr = token.replace('demo_token_', '').toUpperCase();
       const role: UserRole = roleStr === 'COUNSELOR' ? 'COUNSELOR' : roleStr === 'ADMIN' ? 'ADMIN' : 'USER';
-      const fullName = role === 'COUNSELOR' ? 'Dr. Sarah Jenkins' : role === 'ADMIN' ? 'Marcus Vance' : 'Alex Rivera';
       req.user = {
-        userId: `demo_${role.toLowerCase()}_1`,
-        email: `demo.${role.toLowerCase()}@mindpulse.local`,
+        userId: `demo_${role.toLowerCase()}`,
+        email: role === 'COUNSELOR' ? 'counsellor@gmail.com' : role === 'ADMIN' ? 'admin@gmail.com' : 'user@gmail.com',
         role,
-        fullName,
+        fullName:
+          role === 'USER'
+            ? 'Alex Rivera (Protected Witness)'
+            : role === 'COUNSELOR'
+            ? 'Dr. Sarah Jenkins'
+            : 'Marcus Vance (District Welfare Officer)',
+        victimType: role === 'USER' ? 'WITNESS' : undefined,
+        caseId: role === 'USER' ? 'MP-1042' : undefined,
+        caseStage: role === 'USER' ? 'COURT_TRIAL' : undefined,
+        district: 'Central District',
+        state: 'National Capital Region',
       };
       return next();
     }
@@ -62,10 +80,15 @@ export const optionalAuthenticateToken = (req: AuthRequest, res: Response, next:
 
   // Default anonymous/protected fallback user context for safe non-clinical companion queries
   req.user = {
-    userId: 'demo_user_1',
-    email: 'demo.user@mindpulse.local',
+    userId: 'demo_user',
+    email: 'user@gmail.com',
     role: 'USER',
-    fullName: 'Alex Rivera',
+    fullName: 'Alex Rivera (Protected Witness)',
+    victimType: 'WITNESS',
+    caseId: 'MP-1042',
+    caseStage: 'COURT_TRIAL',
+    district: 'Central District',
+    state: 'National Capital Region',
   };
   next();
 };

@@ -1,19 +1,10 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { UserRole } from '../types';
 import { Activity, Shield, UserCheck, LogOut, HeartPulse } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export const Navbar: React.FC = () => {
-  const { user, logout, switchDemoRole } = useAuth();
-  const navigate = useNavigate();
-
-  const handleRoleChange = (role: UserRole) => {
-    switchDemoRole(role);
-    if (role === 'COUNSELOR') navigate('/counselor');
-    else if (role === 'ADMIN') navigate('/admin');
-    else navigate('/dashboard');
-  };
+  const { user, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3.5 flex items-center justify-between">
@@ -38,31 +29,25 @@ export const Navbar: React.FC = () => {
         <span>Ministry of Social Justice & Empowerment • Non-Diagnostic Decision Support</span>
       </div>
 
-      {/* Role Switcher & User Profile */}
+      {/* Authenticated Portal Badge */}
       <div className="flex items-center gap-3">
-        {/* Prototype Role Switcher */}
-        <div className="flex items-center bg-slate-800/90 border border-slate-700 rounded-lg p-0.5 text-xs">
-          <button
-            onClick={() => handleRoleChange('USER')}
-            className={`px-2.5 py-1 rounded-md transition-colors ${user?.role === 'USER' ? 'bg-teal-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-white'
-              }`}
-          >
-            Victim / Witness
-          </button>
-          <button
-            onClick={() => handleRoleChange('COUNSELOR')}
-            className={`px-2.5 py-1 rounded-md transition-colors ${user?.role === 'COUNSELOR' ? 'bg-indigo-500 text-white font-bold' : 'text-slate-400 hover:text-white'
-              }`}
-          >
-            Counselor
-          </button>
-          <button
-            onClick={() => handleRoleChange('ADMIN')}
-            className={`px-2.5 py-1 rounded-md transition-colors ${user?.role === 'ADMIN' ? 'bg-amber-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-white'
-              }`}
-          >
-            District Admin
-          </button>
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg border text-xs font-semibold">
+          {user?.role === 'COUNSELOR' ? (
+            <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+              <UserCheck className="w-3.5 h-3.5" />
+              Counselor Portal
+            </span>
+          ) : user?.role === 'ADMIN' ? (
+            <span className="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+              <Shield className="w-3.5 h-3.5" />
+              District Admin Portal
+            </span>
+          ) : (
+            <span className="bg-teal-500/10 text-teal-400 border border-teal-500/30 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5" />
+              Victim & Witness Portal
+            </span>
+          )}
         </div>
 
         {/* User Info */}

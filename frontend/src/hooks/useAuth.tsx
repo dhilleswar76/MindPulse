@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const DEMO_USERS: Record<UserRole, User> = {
   USER: {
     id: 'demo_user_1',
-    email: 'demo.user@mindpulse.local',
+    email: 'user@gmail.com',
     fullName: 'Alex Rivera (Case MP-1042)',
     role: 'USER',
     victimType: 'WITNESS',
@@ -31,7 +31,7 @@ const DEMO_USERS: Record<UserRole, User> = {
   },
   COUNSELOR: {
     id: 'demo_counselor_1',
-    email: 'demo.counselor@mindpulse.local',
+    email: 'counsellor@gmail.com',
     fullName: 'Dr. Sarah Jenkins',
     role: 'COUNSELOR',
     department: 'District Legal Aid & Victim Support Cell',
@@ -40,7 +40,7 @@ const DEMO_USERS: Record<UserRole, User> = {
   },
   ADMIN: {
     id: 'demo_admin_1',
-    email: 'demo.admin@mindpulse.local',
+    email: 'admin@gmail.com',
     fullName: 'Marcus Vance (District Welfare Officer)',
     role: 'ADMIN',
     department: 'Social Justice & Empowerment Department',
@@ -68,8 +68,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       // Demo fallback if backend is starting
       let matchedRole: UserRole = 'USER';
-      if (email.includes('counselor')) matchedRole = 'COUNSELOR';
-      if (email.includes('admin')) matchedRole = 'ADMIN';
+      const emailLower = email.toLowerCase();
+      if (emailLower.includes('counselor') || emailLower.includes('counsellor')) matchedRole = 'COUNSELOR';
+      if (emailLower.includes('admin')) matchedRole = 'ADMIN';
 
       const fallbackUser = DEMO_USERS[matchedRole];
       setUser(fallbackUser);
