@@ -14,6 +14,7 @@ import { BaselineOverviewPage } from '../features/wellness-baseline/BaselineOver
 import { RiskAssessmentPage } from '../features/risk/RiskAssessmentPage';
 import { ForecastingPage } from '../features/forecasting/ForecastingPage';
 import { RecommendationsPage } from '../features/recommendations/RecommendationsPage';
+import { VictimCompensationPage } from '../features/compensation/VictimCompensationPage';
 import { SupportAssistantPage } from '../features/support/SupportAssistantPage';
 import { CounselorDashboardPage } from '../features/counselor/CounselorDashboardPage';
 import { CaseDetailsPage } from '../features/counselor/CaseDetailsPage';
@@ -48,6 +49,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/risk" element={<RiskAssessmentPage />} />
           <Route path="/forecast" element={<ForecastingPage />} />
           <Route path="/recommendations" element={<RecommendationsPage />} />
+          <Route path="/compensation" element={<VictimCompensationPage />} />
           <Route path="/support" element={<SupportAssistantPage />} />
         </Route>
 

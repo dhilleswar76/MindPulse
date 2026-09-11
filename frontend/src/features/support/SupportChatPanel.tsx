@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, Shield, Sparkles, Wind, BookOpen, HeartHandshake, PhoneCall, X, Minus, Scale, Moon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Bot, Send, Shield, Sparkles, Wind, BookOpen, HeartHandshake, PhoneCall, X, Minus, Scale, Moon, Calculator, ArrowRight } from 'lucide-react';
 import api from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -215,6 +216,22 @@ export const SupportChatPanel: React.FC<SupportChatPanelProps> = ({
                   ))}
                 </div>
               )}
+
+              {/* Action Button: Compensation Form & Calculator */}
+              {m.sender === 'assistant' &&
+                (m.text.toLowerCase().includes('compensation') ||
+                  m.resources?.some((r) => r.toLowerCase().includes('compensation'))) && (
+                  <div className="mt-3 pt-2.5 border-t border-slate-800/80">
+                    <Link
+                      to="/compensation"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition-all shadow-sm"
+                    >
+                      <Calculator className="w-3.5 h-3.5" />
+                      <span>Open Compensation Calculator & Document Form</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                )}
 
               {/* Follow-up Suggestion Chips */}
               {m.followUpSuggestions && m.followUpSuggestions.length > 0 && (
@@ -439,10 +456,10 @@ function generateLocalAssistantResponse(
   // Victim Compensation
   if (/\b(compensation|357a|financial relief|relief|grant)\b/i.test(lower)) {
     return {
-      reply: "Under **Section 357A CrPC**, victims can access:\n\n• Interim financial grants within 14–30 days of FIR\n• Emergency medical and surgical reimbursement\n• Long-term rehabilitation and family subsistence grants\n\nSubmit Form I through the District Legal Services Authority (DLSA) with your counselor's assistance.",
+      reply: "Under **Section 357A CrPC** and NALSA Central Victim Compensation schemes, victims and dependents are entitled to statutory compensation from **₹2,00,000 to ₹10,00,000**:\n\n• **Interim Relief**: Sanctioned within 14–30 days for urgent surgical and living costs\n• **Mandatory Documents**: FIR copy, hospital MLC/medical discharge summary, identity proof, and bank DBT details\n• **Direct Welfare Transfer**: Zero fee, direct benefit transfer (DBT) via DLSA\n\nYou can use our interactive calculator to see your eligible compensation amount or open Form I to upload your documents directly.",
       isSafety: false,
-      resources: ['Section 357A CrPC', 'DLSA Form I Guidelines'],
-      followUpSuggestions: ['How to submit Form I', 'Free legal assistance'],
+      resources: ['Section 357A CrPC', 'Victim Compensation Calculator', 'DLSA Form I Guidelines'],
+      followUpSuggestions: ['What documents are needed?', 'How can I get free legal aid?'],
     };
   }
 

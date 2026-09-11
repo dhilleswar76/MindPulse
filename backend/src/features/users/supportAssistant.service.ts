@@ -17,6 +17,7 @@ export interface SupportChatResponse {
   resourcesSuggested: string[];
   disclaimer: string;
   followUpSuggestions?: string[];
+  provider?: string;
 }
 
 export type SupportIntent =
