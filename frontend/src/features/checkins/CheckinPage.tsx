@@ -29,8 +29,6 @@ import { PrivacyConsentModal } from '../auth/PrivacyConsentModal';
 import { useAuth } from '../../hooks/useAuth';
 import { analyzeCase, UnifiedAnalysisResponse, CheckInItem } from '../../services/mlApi';
 import { getStoredCheckIns, storeCheckIns } from '../../services/checkinHistory';
-import { RiskCard } from '../ai-insights/components/RiskCard';
-import { AnomalyCard } from '../ai-insights/components/AnomalyCard';
 
 export const CheckinPage: React.FC = () => {
   const { user } = useAuth();
@@ -700,30 +698,24 @@ export const CheckinPage: React.FC = () => {
                     Calling ML engine at http://localhost:8000/analyze
                   </span>
                 </div>
-              ) : aiAnalysis ? (
+              ) : (
                 <div className="space-y-4 pt-4 text-left max-w-xl mx-auto border-t border-slate-800 animate-in fade-in">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-teal-400" />
-                      <span>Updated AI Telemetry Signals</span>
-                    </span>
-                    <Link
-                      to="/risk"
-                      className="text-xs text-teal-400 hover:text-teal-300 font-semibold inline-flex items-center gap-1"
-                    >
-                      <span>View Full AI Insights</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <RiskCard risk={aiAnalysis.risk} />
-                    <AnomalyCard
-                      anomaly={aiAnalysis.anomaly}
-                      observationsUsed={aiAnalysis.data_quality?.observations_used}
-                    />
+                  <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-teal-400" />
+                      <span className="text-xs font-bold text-white uppercase tracking-wider">
+                        Daily Check-In Recorded Securely
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Your reflection has been safely logged and shared with your assigned counselor (<strong className="text-white">Dr. Sarah Jenkins</strong>) for review.
+                    </p>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Your wellbeing may benefit from additional support. If you are feeling tense or preparing for an upcoming hearing date, gentle grounding practices and support touchpoints are available below.
+                    </p>
                   </div>
                 </div>
-              ) : null}
+              )}
 
               {/* Quick Grounding Action */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">

@@ -20,6 +20,7 @@ import {
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { CounselorCase } from '../../types';
+import { AIInsightsDashboard } from '../ai-insights/AIInsightsDashboard';
 
 export const CounselorDashboardPage: React.FC = () => {
   const [cases, setCases] = useState<CounselorCase[]>([]);
@@ -27,6 +28,7 @@ export const CounselorDashboardPage: React.FC = () => {
   const [filter, setFilter] = useState('ALL');
   const [stageFilter, setStageFilter] = useState('ALL');
   const [search, setSearch] = useState('');
+  const [selectedAiCaseId, setSelectedAiCaseId] = useState<string>('MP-1042');
 
   useEffect(() => {
     const fetchCases = async () => {
@@ -153,6 +155,10 @@ export const CounselorDashboardPage: React.FC = () => {
       (c.caseStage && c.caseStage.toLowerCase().includes(search.toLowerCase()));
     return matchesRisk && matchesStage && matchesSearch;
   });
+
+  const selectedCase =
+    cases.find((c) => c.caseId === selectedAiCaseId || c.id === selectedAiCaseId) ||
+    cases[0];
 
   const getRiskBadge = (level: string) => {
     switch (level) {
@@ -506,6 +512,63 @@ export const CounselorDashboardPage: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Dedicated Section: AI-Powered Case Insights & Decision Support */}
+      <section className="space-y-4 pt-4 border-t border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/90 p-5 rounded-2xl border border-slate-800">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-teal-400 bg-teal-500/10 px-2.5 py-0.5 rounded-full border border-teal-500/20">
+                Professional Decision Support
+              </span>
+              <span className="text-xs text-slate-400">• Real-Time ML Telemetry</span>
+            </div>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-teal-400" />
+              <span>AI Case Insights & Clinical Review</span>
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Examine real-time ML risk predictions, personal baseline anomalies, and SHAP explainability for case evaluation.
+            </p>
+          </div>
+
+          {cases.length > 0 && (
+            <div className="flex items-center gap-2.5">
+              <label htmlFor="ai-case-select" className="text-xs text-slate-400 font-medium whitespace-nowrap">
+                Inspect Case:
+              </label>
+              <select
+                id="ai-case-select"
+                value={selectedCase?.caseId || selectedAiCaseId}
+                onChange={(e) => setSelectedAiCaseId(e.target.value)}
+                className="bg-slate-950 border border-slate-700 text-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-indigo-500"
+              >
+                {cases.map((c) => (
+                  <option key={c.id || c.caseId} value={c.caseId || c.id}>
+                    {c.caseId} — {c.victimName} ({c.riskLevel})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+
+        {selectedCase ? (
+          <AIInsightsDashboard
+            key={selectedCase.caseId || selectedCase.id}
+            userId={selectedCase.userId}
+            caseId={selectedCase.caseId}
+            caseStage={selectedCase.caseStage}
+            initialCheckIns={
+              selectedCase.recentCheckIn ? [selectedCase.recentCheckIn] : undefined
+            }
+          />
+        ) : (
+          <div className="p-8 text-center glass-card border border-slate-800 rounded-2xl text-xs text-slate-400">
+            Select a case above to inspect AI insights.
+          </div>
+        )}
+      </section>
     </div>
   );
 };
