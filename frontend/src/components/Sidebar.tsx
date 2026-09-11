@@ -26,7 +26,6 @@ export const Sidebar: React.FC = () => {
   const userLinks = [
     { to: '/dashboard', label: 'Case Journey & Home', icon: LayoutDashboard },
     { to: '/checkins', label: 'Wellbeing Check-in', icon: Smile },
-    { to: '/journal', label: 'Journal & Reflections', icon: BookOpen },
     { to: '/wellness', label: 'Personal Baseline', icon: Activity },
     { to: '/risk', label: 'Distress Signals & XAI', icon: AlertTriangle },
     { to: '/forecast', label: 'Early Risk Forecast', icon: TrendingUp },

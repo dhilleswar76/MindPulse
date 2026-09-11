@@ -29,7 +29,6 @@ MindPulse provides three pre-configured demo personas to evaluate the complete e
 ### Available Routes & Features:
 - `/dashboard` — Case Journey Timeline (6 stages) & Quick Status Overview
 - `/checkins` — Voluntary 10-Point Telemetry Check-in (Mood, Stress, Sleep, Perceived Safety, Case Tension)
-- `/journal` — Private Reflections & Sentiment Analysis
 - `/wellness` — 14-Day Rolling Statistical Baseline
 - `/risk` — Non-Diagnostic Distress Risk & SHAP Explainability (XAI)
 - `/forecast` — 3-Day Risk Projection & Milestone Sensitivity

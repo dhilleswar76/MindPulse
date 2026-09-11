@@ -16,7 +16,6 @@ import {
   ChevronRight,
   Shield,
   Moon,
-  PenTool,
   Lock,
   Wind,
   Compass,
@@ -267,23 +266,8 @@ export const UserDashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 3 Secondary Reflection Options */}
-        <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <Link
-            to="/journal"
-            className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800/80 border border-slate-700/40 text-slate-300 hover:text-white transition-all group"
-          >
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
-              <PenTool className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="font-semibold block text-white group-hover:text-teal-300">
-                Write in Journal
-              </span>
-              <span className="text-[11px] text-slate-400">Private, unshared reflection</span>
-            </div>
-          </Link>
-
+        {/* Secondary Wellbeing Options */}
+        <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <button
             type="button"
             onClick={() => setIsVoiceModalOpen(true)}

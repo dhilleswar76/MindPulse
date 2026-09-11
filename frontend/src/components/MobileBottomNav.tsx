@@ -21,7 +21,6 @@ export const MobileBottomNav: React.FC = () => {
   const userItems = [
     { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
     { to: '/checkins', label: 'Check-in', icon: Smile },
-    { to: '/journal', label: 'Journal', icon: BookOpen },
     { to: '/wellness', label: 'History', icon: Activity },
     { to: '/recommendations', label: 'Support', icon: Sparkles },
   ];
