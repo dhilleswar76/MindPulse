@@ -111,4 +111,38 @@ export interface IPendingStageTransition {
   status: 'PENDING' | 'CLARIFICATION_REQUIRED';
 }
 
+// Counsellor Allocation & Counselling Request Types
+export type CounsellorStatus = 'NOT_ALLOCATED' | 'PENDING' | 'ACTIVE';
 
+export type CounsellingRequestType =
+  | 'ADMIN_TO_COUNSELLOR'
+  | 'COUNSELLOR_TO_ADMIN'
+  | 'VICTIM_TO_ADMIN';
+
+export type CounsellingRequestStatus =
+  | 'PENDING'
+  | 'ACCEPTED'
+  | 'REJECTED'
+  | 'APPROVED'
+  | 'CANCELLED';
+
+export interface ICounsellingRequestItem {
+  _id?: string;
+  victimId: string;
+  victimName: string;
+  caseId: string;
+  counsellorId?: string;
+  counsellorName?: string;
+  requestedBy: string;
+  requestedByName: string;
+  requestedByRole: UserRole;
+  requestType: CounsellingRequestType;
+  status: CounsellingRequestStatus;
+  caseStage?: string;
+  riskLevel?: RiskLevel;
+  notes?: string;
+  rejectionReason?: string;
+  createdAt: Date | string;
+  respondedAt?: Date | string;
+  approvedAt?: Date | string;
+}

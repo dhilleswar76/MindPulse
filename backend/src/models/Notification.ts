@@ -4,6 +4,14 @@ export type NotificationType =
   | 'STAGE_COMPLETION_REQUESTED'
   | 'STAGE_APPROVED'
   | 'STAGE_REJECTED'
+  | 'COUNSELLING_REQUEST_CREATED'
+  | 'COUNSELLING_REQUEST_ACCEPTED'
+  | 'COUNSELLING_REQUEST_REJECTED'
+  | 'COUNSELLING_REQUEST_APPROVED'
+  | 'COUNSELLING_ALLOCATED'
+  | 'COUNSELLOR_SUGGESTION_REQUESTED'
+  | 'COUNSELLOR_SUGGESTION_RECEIVED'
+  | 'CHAT_MESSAGE_RECEIVED'
   | 'GENERAL';
 
 export interface INotification extends Document {
@@ -38,7 +46,20 @@ const NotificationSchema = new Schema<INotification>(
     stage: { type: String },
     type: {
       type: String,
-      enum: ['STAGE_COMPLETION_REQUESTED', 'STAGE_APPROVED', 'STAGE_REJECTED', 'GENERAL'],
+      enum: [
+        'STAGE_COMPLETION_REQUESTED',
+        'STAGE_APPROVED',
+        'STAGE_REJECTED',
+        'COUNSELLING_REQUEST_CREATED',
+        'COUNSELLING_REQUEST_ACCEPTED',
+        'COUNSELLING_REQUEST_REJECTED',
+        'COUNSELLING_REQUEST_APPROVED',
+        'COUNSELLING_ALLOCATED',
+        'COUNSELLOR_SUGGESTION_REQUESTED',
+        'COUNSELLOR_SUGGESTION_RECEIVED',
+        'CHAT_MESSAGE_RECEIVED',
+        'GENERAL',
+      ],
       default: 'GENERAL',
       index: true,
     },

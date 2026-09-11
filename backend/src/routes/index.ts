@@ -16,6 +16,15 @@ import casesRoutes from '../features/cases/cases.routes.js';
 import mlRoutes from '../features/ml/ml.routes.js';
 import compensationRoutes from '../features/compensation/compensation.routes.js';
 import notificationsRoutes from '../features/notifications/notifications.routes.js';
+import {
+  victimCounsellingRouter,
+  counsellorAllocationRouter,
+  adminCounsellingRouter,
+} from '../features/counseling/counsellingAllocation.routes.js';
+import {
+  victimChatRouter,
+  counsellorChatRouter,
+} from '../features/counseling/counsellorChat.routes.js';
 
 const router = Router();
 
@@ -39,13 +48,19 @@ router.use('/forecast', forecastingRoutes);
 router.use('/recommendations', recommendationsRoutes);
 router.use('/alerts', alertsRoutes);
 router.use('/counselor', counselorRoutes);
+router.use('/counselor', counsellorAllocationRouter);
+router.use('/counselor', counsellorChatRouter);
+router.use('/counsellors', counsellorAllocationRouter);
+router.use('/counsellors', counsellorChatRouter);
+router.use('/victims', victimCounsellingRouter);
+router.use('/victims', victimChatRouter);
 router.use('/interventions', interventionsRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/users', usersRoutes);
+router.use('/admin', adminCounsellingRouter);
 router.use('/admin', adminRoutes);
 router.use('/ml', mlRoutes);
 router.use('/compensation', compensationRoutes);
 router.use('/notifications', notificationsRoutes);
-
 
 export default router;

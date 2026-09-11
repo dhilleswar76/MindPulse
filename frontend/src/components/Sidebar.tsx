@@ -16,6 +16,7 @@ import {
   Bell,
   Lock,
   Inbox,
+  MessageSquare,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -24,6 +25,8 @@ export const Sidebar: React.FC = () => {
 
   const userLinks = [
     { to: '/dashboard', label: 'Case Journey & Home', icon: LayoutDashboard },
+    { to: '/victim/counsellor-chat', label: 'Counsellor Chat', icon: MessageSquare },
+    { to: '/my-counsellor', label: 'My Counsellor', icon: Users },
     { to: '/checkins', label: 'Wellbeing Check-in', icon: Smile },
     { to: '/wellness', label: 'Personal Baseline', icon: Activity },
     { to: '/risk', label: 'Wellbeing Signals & Support', icon: Activity },
@@ -34,6 +37,8 @@ export const Sidebar: React.FC = () => {
 
   const counselorLinks = [
     { to: '/counselor', label: 'Command Center & Triage', icon: LayoutDashboard },
+    { to: '/counselor/inbox', label: 'Counsellor Inbox', icon: Inbox },
+    { to: '/counselor/available-victims', label: 'Available Victims', icon: Users },
     { to: '/risk', label: 'AI Case Insights & Telemetry', icon: Sparkles },
     { to: '/counselor/cases', label: 'Prioritized Case Queue', icon: Users },
     { to: '/counselor/alerts', label: 'Distress Alerts', icon: Bell },
@@ -43,6 +48,7 @@ export const Sidebar: React.FC = () => {
   const adminLinks = [
     { to: '/admin', label: 'Executive Overview', icon: LayoutDashboard },
     { to: '/admin/inbox', label: 'Stage Transition Inbox', icon: Inbox },
+    { to: '/admin/counsellor-allocation', label: 'Counsellor Allocation', icon: Users },
     { to: '/admin/analytics', label: 'Risk & Wellbeing Analytics', icon: BarChart3 },
     { to: '/admin/cases', label: 'System Case Table', icon: Users },
     { to: '/admin/heatmap', label: 'Regional Distress Map', icon: Map },

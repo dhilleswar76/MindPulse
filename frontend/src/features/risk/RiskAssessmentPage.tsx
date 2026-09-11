@@ -115,7 +115,7 @@ export const RiskAssessmentPage: React.FC = () => {
           </div>
 
           <Link
-            to="/support"
+            to="/victim/counsellor-chat"
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold rounded-xl transition-all shadow-sm shrink-0 self-start sm:self-auto"
           >
             <span>Talk With Counselor</span>
@@ -124,10 +124,10 @@ export const RiskAssessmentPage: React.FC = () => {
         </div>
 
         <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-4 text-xs text-slate-400">
-          <span className="flex items-center gap-1.5 text-teal-300">
+          <Link to="/victim/counsellor-chat" className="flex items-center gap-1.5 text-teal-300 hover:text-teal-200 transition-colors">
             <UserCheck className="w-3.5 h-3.5 text-teal-400" />
             <span>Assigned Counselor: <strong>{user?.assignedCounselor || 'Dr. Sarah Jenkins'}</strong></span>
-          </span>
+          </Link>
           <span className="text-slate-600">•</span>
           <span>District Welfare & Legal Aid Support Cell Active</span>
         </div>
@@ -188,7 +188,7 @@ export const RiskAssessmentPage: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
-            to="/support"
+            to="/victim/counsellor-chat"
             className="p-5 rounded-2xl bg-slate-900/85 hover:bg-slate-800/80 border border-slate-800 hover:border-teal-500/40 transition-all flex flex-col justify-between space-y-3 group"
           >
             <div className="space-y-2">
@@ -196,14 +196,14 @@ export const RiskAssessmentPage: React.FC = () => {
                 <HeartHandshake className="w-5 h-5" />
               </div>
               <h3 className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors">
-                Support Companion
+                Counsellor Dialogue
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Connect with your assigned counselor or explore calming guidance in a private conversational space.
+                Connect with your assigned trauma counsellor in a confidential, encrypted 1-to-1 conversation space.
               </p>
             </div>
             <span className="text-xs font-semibold text-teal-400 flex items-center gap-1">
-              <span>Open Support Chat</span>
+              <span>Chat With Counsellor</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </span>
           </Link>

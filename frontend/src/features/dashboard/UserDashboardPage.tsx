@@ -208,12 +208,12 @@ export const UserDashboardPage: React.FC = () => {
 
             {/* Assigned Counselor Touchpoint */}
             <div className="pt-2 flex flex-wrap items-center gap-3 text-xs text-slate-400">
-              <div className="flex items-center gap-1.5 text-slate-300">
+              <Link to="/victim/counsellor-chat" className="flex items-center gap-1.5 text-slate-300 hover:text-teal-300 transition-colors">
                 <HeartHandshake className="w-4 h-4 text-teal-400 shrink-0" />
                 <span>
                   Designated Counselor: <strong className="text-white">Dr. Sarah Jenkins</strong>
                 </span>
-              </div>
+              </Link>
               <span className="text-slate-600 hidden sm:inline">•</span>
               <span className="text-slate-400">District Legal Aid & Witness Welfare Cell</span>
             </div>
@@ -229,11 +229,18 @@ export const UserDashboardPage: React.FC = () => {
               <span>Record Daily Check-In</span>
             </Link>
             <Link
+              to="/victim/counsellor-chat"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-sm font-semibold rounded-2xl border border-emerald-500/30 transition-colors"
+            >
+              <HeartHandshake className="w-4 h-4 text-emerald-400" />
+              <span>Counsellor Chat</span>
+            </Link>
+            <Link
               to="/support"
               className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-2xl border border-slate-700/80 transition-colors"
             >
               <Bot className="w-4 h-4 text-teal-400" />
-              <span>Support Chat</span>
+              <span>AI Companion</span>
             </Link>
           </div>
         </div>
@@ -560,10 +567,10 @@ export const UserDashboardPage: React.FC = () => {
             </div>
 
             <Link
-              to="/support"
+              to="/victim/counsellor-chat"
               className="w-full py-2.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 font-semibold rounded-xl text-xs border border-emerald-500/30 transition-colors text-center block"
             >
-              Request Follow-Up Touchpoint
+              Chat With Assigned Counsellor
             </Link>
           </div>
 

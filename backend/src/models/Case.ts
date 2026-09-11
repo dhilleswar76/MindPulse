@@ -12,6 +12,8 @@ export interface ICase extends Document {
   state: string;
   assignedCounselorId?: mongoose.Types.ObjectId;
   assignedCounselorName?: string;
+  counsellorStatus?: 'NOT_ALLOCATED' | 'PENDING' | 'ACTIVE';
+  counsellorAssignedAt?: Date;
   consentStatus: boolean;
   priorityScore: number; // 0.00 to 1.00
   recentRiskLevel: 'STABLE' | 'WATCH' | 'ELEVATED' | 'REQUIRES_REVIEW';
@@ -130,7 +132,14 @@ const CaseSchema = new Schema<ICase>(
     district: { type: String, required: true, default: 'Central District', index: true },
     state: { type: String, required: true, default: 'National Capital Region', index: true },
     assignedCounselorId: { type: Schema.Types.ObjectId, ref: 'User' },
-    assignedCounselorName: { type: String, default: 'Dr. Sarah Jenkins' },
+    assignedCounselorName: { type: String },
+    counsellorStatus: {
+      type: String,
+      enum: ['NOT_ALLOCATED', 'PENDING', 'ACTIVE'],
+      default: 'NOT_ALLOCATED',
+      index: true,
+    },
+    counsellorAssignedAt: { type: Date },
     consentStatus: { type: Boolean, default: true },
     priorityScore: { type: Number, default: 0.5, min: 0, max: 1 },
     recentRiskLevel: {

@@ -232,7 +232,16 @@ export interface AppNotification {
   recipientId?: string;
   caseId?: string;
   stage?: string;
-  type: 'STAGE_COMPLETION_REQUESTED' | 'STAGE_APPROVED' | 'STAGE_REJECTED' | 'GENERAL';
+  type:
+    | 'STAGE_COMPLETION_REQUESTED'
+    | 'STAGE_APPROVED'
+    | 'STAGE_REJECTED'
+    | 'COUNSELLING_REQUEST_CREATED'
+    | 'COUNSELLING_REQUEST_ACCEPTED'
+    | 'COUNSELLING_REQUEST_REJECTED'
+    | 'COUNSELLING_REQUEST_APPROVED'
+    | 'COUNSELLING_ALLOCATED'
+    | 'GENERAL';
   title: string;
   message: string;
   submittedBy?: string;
@@ -245,4 +254,170 @@ export interface AppNotification {
   updatedAt: string;
 }
 
+export type CounsellorStatus = 'NOT_ALLOCATED' | 'PENDING' | 'REQUESTED' | 'ACTIVE' | 'INACTIVE' | 'TRANSFERRED';
 
+export type CounsellingRequestType = 'VICTIM_TO_ADMIN' | 'ADMIN_TO_COUNSELLOR' | 'COUNSELLOR_TO_ADMIN';
+
+export type CounsellingRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'APPROVED' | 'CANCELLED';
+
+export interface CounsellingRequest {
+  _id: string;
+  victimId: string;
+  victimName: string;
+  caseId: string;
+  counsellorId?: string;
+  counsellorName?: string;
+  requestedBy: string;
+  requestedByName: string;
+  requestedByRole: UserRole;
+  requestType: CounsellingRequestType;
+  status: CounsellingRequestStatus;
+  caseStage?: string;
+  riskLevel?: string;
+  notes?: string;
+  preferredLanguage?: string;
+  preferredGender?: string;
+  rejectionReason?: string;
+  respondedAt?: string;
+  approvedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VictimCounsellorProfileResponse {
+  victimId: string;
+  victimName: string;
+  caseId: string;
+  caseStage: string;
+  counsellorStatus: CounsellorStatus;
+  counsellor: {
+    id: string;
+    fullName: string;
+    email: string;
+    specialization: string;
+    experienceYears: number;
+    availability: string;
+    assignedSince: string;
+    district?: string;
+    phone?: string;
+  } | null;
+  pendingRequest: {
+    _id: string;
+    requestType: CounsellingRequestType;
+    requestedByName: string;
+    createdAt: string;
+    status: CounsellingRequestStatus;
+  } | null;
+}
+
+export interface AvailableVictimItem {
+  id: string;
+  victimId: string;
+  victimName: string;
+  caseId: string;
+  caseStage: string;
+  victimType: string;
+  district: string;
+  riskLevel: RiskLevel;
+  counsellorStatus: CounsellorStatus;
+  myPendingRequest?: {
+    _id: string;
+    status: CounsellingRequestStatus;
+  } | null;
+  hasActiveRequest: boolean;
+  createdAt: string;
+}
+
+export interface AvailableCounsellorItem {
+  id: string;
+  _id: string;
+  fullName: string;
+  email: string;
+  specialization: string;
+  experienceYears: number;
+  district: string;
+  currentCases: number;
+  availability: 'AVAILABLE' | 'BUSY' | 'UNAVAILABLE';
+}
+
+export interface ChatMessage {
+  _id: string;
+  conversationId: string;
+  senderId: string;
+  senderName: string;
+  senderRole: 'USER' | 'COUNSELOR';
+  receiverId: string;
+  message: string;
+  messageType?: 'TEXT' | 'ATTACHMENT' | 'SYSTEM';
+  read: boolean;
+  readAt?: string | Date;
+  createdAt: string | Date;
+}
+
+export interface ChatConversation {
+  _id: string;
+  victimId: string;
+  victimName: string;
+  counsellorId: string;
+  counsellorName?: string;
+  caseId: string;
+  lastMessage?: string;
+  lastMessageAt?: string | Date;
+  lastSenderRole?: 'USER' | 'COUNSELOR';
+  victimUnreadCount?: number;
+  counsellorUnreadCount?: number;
+  unreadCount?: number;
+  status?: 'ACTIVE' | 'ARCHIVED';
+}
+
+export interface CounsellorSuggestionItem {
+  _id: string;
+  victimId: string;
+  victimName: string;
+  counsellorId: string;
+  counsellorName: string;
+  caseId: string;
+  status: 'PENDING' | 'RESPONDED' | 'CANCELLED';
+  telemetrySnapshot?: {
+    mood?: number;
+    stress?: number;
+    sleepHours?: number;
+    anxiety?: number;
+    safety?: number;
+    riskLevel?: string;
+    riskScore?: number;
+  };
+  requestNotes?: string;
+  suggestionMessage?: string;
+  requestedAt: string | Date;
+  respondedAt?: string | Date;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+}
+
+export interface VictimChatData {
+  counsellor: {
+    id: string;
+    fullName: string;
+    email: string;
+    specialization: string;
+    experienceYears: number;
+    availabilityStatus: string;
+    district?: string;
+  } | null;
+  conversation: ChatConversation | null;
+  messages: ChatMessage[];
+  hasCounsellor: boolean;
+  counsellorStatus?: CounsellorStatus;
+}
+
+export interface CounsellorInboxData {
+  conversations: ChatConversation[];
+  suggestionRequests: CounsellorSuggestionItem[];
+  stats: {
+    activeConversations: number;
+    unreadMessages: number;
+    pendingSuggestions: number;
+    totalSuggestions: number;
+  };
+}
