@@ -128,27 +128,6 @@ export const LoginPage: React.FC = () => {
               /counselor
             </span>
           </button>
-
-          <button
-            type="button"
-            onClick={() => fillQuickDemo('demo.admin@mindpulse.local')}
-            className={`w-full p-2.5 rounded-xl text-left border transition-all flex items-center justify-between ${
-              email === 'demo.admin@mindpulse.local'
-                ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
-                : 'bg-slate-900/60 hover:bg-slate-800/80 border-slate-800 text-slate-300'
-            }`}
-          >
-            <div>
-              <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                District Welfare Admin (Hidden)
-              </div>
-              <div className="text-[11px] text-slate-400 font-mono">demo.admin@mindpulse.local</div>
-            </div>
-            <span className="text-[10px] uppercase font-semibold tracking-wider bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">
-              /admin
-            </span>
-          </button>
         </div>
         <p className="mt-2 text-[11px] text-slate-400 text-center">
           Default Password: <code className="bg-slate-800 px-1.5 py-0.5 rounded text-teal-300 font-mono">MindPulseDemo2026!</code>

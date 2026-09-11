@@ -79,11 +79,19 @@ MindPulse provides three pre-configured demo personas to evaluate the complete e
 
 ## 🚀 How to Sign In
 
-1. Start the application:
-   ```bash
-   make dev
-   ```
-2. Navigate to `http://localhost:5173/login` in your browser.
-3. Use the **One-Click Quick Fill** buttons under *"Demo Accounts"* to auto-populate any persona, or enter the credentials manually.
-4. Click **Sign In**.
-5. To switch to a different role, click **Logout** from the top right and sign in with the other persona credentials.
+### 1. Victim & Counselor Sign-In (Standard Login)
+- **URL**: `http://localhost:5173/login`
+- Enter **Victim** (`demo.user@mindpulse.local`) or **Counselor** (`demo.counselor@mindpulse.local`) credentials.
+- Or use the one-click auto-fill buttons on the login page.
+- Directs to `/dashboard` for Victims or `/counselor` for Counselors.
+
+### 2. District Welfare Admin Sign-In (Hidden Route)
+- **URL**: `http://localhost:5173/admin`
+- Navigate directly to `/admin` in your browser.
+- Displays the restricted **District Welfare Administration Portal Login**.
+- Enter `demo.admin@mindpulse.local` & `MindPulseDemo2026!` (or click Auto-Fill).
+- Unlocks the executive administrative dashboard, regional heatmaps, what-if simulator, and audit trails.
+
+### 3. Switching Personas
+- MindPulse enforces strict role boundaries without cross-role navigation.
+- To switch accounts, click **Logout** at the top right and sign in with the target credentials at `/login` (for victim/counselor) or `/admin` (for admin).

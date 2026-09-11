@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { ProtectedRoute } from './ProtectedRoute';
+import { AdminProtectedRoute } from './AdminProtectedRoute';
 
 // Feature Pages
 import { LoginPage } from '../features/auth/LoginPage';
@@ -62,8 +63,8 @@ export const AppRoutes: React.FC = () => {
           <Route path="/counselor/alerts" element={<AlertsQueuePage />} />
         </Route>
 
-        {/* Admin Routes */}
-        <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+        {/* Hidden District Admin Routes */}
+        <Route element={<AdminProtectedRoute />}>
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           <Route path="/admin/cases" element={<AdminCasesPage />} />
