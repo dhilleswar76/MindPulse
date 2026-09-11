@@ -17,7 +17,11 @@ import { ForecastingPage } from '../features/forecasting/ForecastingPage';
 import { RecommendationsPage } from '../features/recommendations/RecommendationsPage';
 import { VictimCompensationPage } from '../features/compensation/VictimCompensationPage';
 import { SupportAssistantPage } from '../features/support/SupportAssistantPage';
+import { MyCounsellorPage } from '../features/counselor/MyCounsellorPage';
+import { VictimCounsellorChatPage } from '../features/counselor/VictimCounsellorChatPage';
 import { CounselorDashboardPage } from '../features/counselor/CounselorDashboardPage';
+import { AvailableVictimsPage } from '../features/counselor/AvailableVictimsPage';
+import { CounselorInboxPage } from '../features/counselor/CounselorInboxPage';
 import { CaseDetailsPage } from '../features/counselor/CaseDetailsPage';
 import { InterventionsPage } from '../features/interventions/InterventionsPage';
 import { AlertsQueuePage } from '../features/alerts/AlertsQueuePage';
@@ -27,6 +31,7 @@ import { AdminDashboardPage } from '../features/admin/AdminDashboardPage';
 import { AdminAnalyticsPage } from '../features/admin/AdminAnalyticsPage';
 import { AdminCasesPage } from '../features/admin/AdminCasesPage';
 import { AdminInboxPage } from '../features/admin/AdminInboxPage';
+import { AdminCounsellorAllocationPage } from '../features/admin/AdminCounsellorAllocationPage';
 import { CampusHeatmapPage } from '../features/heatmap/CampusHeatmapPage';
 import { WhatIfSimulatorPage } from '../features/simulator/WhatIfSimulatorPage';
 import { AdminAuditLogsPage } from '../features/admin/AdminAuditLogsPage';
@@ -45,6 +50,9 @@ export const AppRoutes: React.FC = () => {
         {/* Victim / Witness Portal Routes */}
         <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
           <Route path="/dashboard" element={<UserDashboardPage />} />
+          <Route path="/my-counsellor" element={<MyCounsellorPage />} />
+          <Route path="/victim/my-counsellor" element={<MyCounsellorPage />} />
+          <Route path="/victim/counsellor-chat" element={<VictimCounsellorChatPage />} />
           <Route path="/checkins" element={<CheckinPage />} />
           <Route path="/journal" element={<JournalPage />} />
           <Route path="/wellness" element={<BaselineOverviewPage />} />
@@ -58,7 +66,10 @@ export const AppRoutes: React.FC = () => {
         {/* Counselor Routes */}
         <Route element={<ProtectedRoute allowedRoles={['COUNSELOR']} />}>
           <Route path="/counselor" element={<CounselorDashboardPage />} />
+          <Route path="/counselor/inbox" element={<CounselorInboxPage />} />
+          <Route path="/counselor/available-victims" element={<AvailableVictimsPage />} />
           <Route path="/counselor/cases" element={<CounselorDashboardPage />} />
+          <Route path="/counselor/case/:id" element={<CaseDetailsPage />} />
           <Route path="/counselor/cases/:id" element={<CaseDetailsPage />} />
           <Route path="/counselor/interventions" element={<InterventionsPage />} />
           <Route path="/counselor/alerts" element={<AlertsQueuePage />} />
@@ -68,6 +79,7 @@ export const AppRoutes: React.FC = () => {
         <Route element={<AdminProtectedRoute />}>
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/inbox" element={<AdminInboxPage />} />
+          <Route path="/admin/counsellor-allocation" element={<AdminCounsellorAllocationPage />} />
           <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           <Route path="/admin/cases" element={<AdminCasesPage />} />
           <Route path="/admin/heatmap" element={<CampusHeatmapPage />} />

@@ -15,6 +15,12 @@ export interface IUser extends Document {
   supportStatus?: string;
   consentStatus?: boolean;
   assignedCounselor?: string;
+  counsellorId?: mongoose.Types.ObjectId;
+  counsellorStatus?: 'NOT_ALLOCATED' | 'PENDING' | 'ACTIVE';
+  counsellorAssignedAt?: Date;
+  specialization?: string;
+  experienceYears?: number;
+  availabilityStatus?: 'AVAILABLE' | 'BUSY' | 'UNAVAILABLE';
   department?: string;
   yearOfStudy?: number;
   avatarUrl?: string;
@@ -53,6 +59,21 @@ const UserSchema = new Schema<IUser>(
     supportStatus: { type: String, default: 'ACTIVE_MONITORING' },
     consentStatus: { type: Boolean, default: true },
     assignedCounselor: { type: String },
+    counsellorId: { type: Schema.Types.ObjectId, ref: 'User' },
+    counsellorStatus: {
+      type: String,
+      enum: ['NOT_ALLOCATED', 'PENDING', 'ACTIVE'],
+      default: 'NOT_ALLOCATED',
+      index: true,
+    },
+    counsellorAssignedAt: { type: Date },
+    specialization: { type: String, default: 'Trauma & Legal Aid Counselling' },
+    experienceYears: { type: Number, default: 8 },
+    availabilityStatus: {
+      type: String,
+      enum: ['AVAILABLE', 'BUSY', 'UNAVAILABLE'],
+      default: 'AVAILABLE',
+    },
     department: { type: String },
     yearOfStudy: { type: Number },
     avatarUrl: { type: String },

@@ -12,4 +12,8 @@ export * from './Case.js';
 export * from './AuditLog.js';
 export * from './StageTransitionRequest.js';
 export * from './Notification.js';
+export * from './CounsellingRequest.js';
+export * from './Conversation.js';
+export * from './Message.js';
+export * from './CounsellorSuggestion.js';
 
